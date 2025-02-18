@@ -1,0 +1,9 @@
+.box-shadow {
+  box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.2);
+}
+
+img {
+  opacity: 1 !important;
+  filter: none !important;
+  background-color: transparent !important;
+}
