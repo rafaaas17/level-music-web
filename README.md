@@ -40,44 +40,44 @@
   </a>
 </p>
 
-## Descripción
+## Description
 
-**Level Music App** es una plataforma web desarrollada con **React y Vite**, diseñada para la gestión eficiente de eventos. Permite a **Level Music Corp** administrar eventos, trabajadores y contrataciones de manera organizada y accesible.
+**Level Music App** is a web platform developed with **React and Vite**, designed for efficient event management. It allows **Level Music Corp** to manage events, workers, and contracts in an organized and accessible way.
 
-## Características principales
+## Main Features
 
-- 📅 **Gestión de eventos:** Creación, edición y administración de eventos musicales.
-- 👥 **Gestión de trabajadores:** Administración del equipo de producción y soporte de eventos.
-- 💼 **Control de contrataciones:** Seguimiento de pagos y disponibilidad del personal.
-- 🔐 **Autenticación segura:** Inicio de sesión con Google y Facebook.
+- 📅 **Event Management:** Create, edit, and manage music events.
+- 👥 **Worker Management:** Administration of production and event support teams.
+- 💼 **Contract Management:** Track payments and staff availability.
+- 🔐 **Secure Authentication:** Login with Google and Facebook.
 
-## Tecnologías utilizadas
+## Technologies Used
 
 - **Frontend:** React + Vite 🚀
-- **Estado global:** Redux
+- **State Management:** Redux
 - **UI:** Material UI
-- **Autenticación:** Firebase Auth (Google Sign-In, Facebook SDK)
+- **Authentication:** Firebase Auth (Google Sign-In, Facebook SDK)
 - **API Requests:** Axios
 
-## Instalación
+## Installation
 
-Clona el repositorio e instala las dependencias:
+Clone the repository and install dependencies:
 
 ```bash
-$ git clone https://github.com/gastonrodrig/level-music-frontend
-$ cd level-music-frontend
+$ git clone https://github.com/LevelMusic/LevelMusicFrontend.git
+$ cd LevelMusicFrontend
 $ npm install
 ```
 
-## Ejecución del proyecto
+## Running the Project
 
-Iniciar el servidor de desarrollo:
+Start the development server:
 
 ```bash
 $ npm run dev
 ```
 
-## Contacto
+## Contact
 
 📧 **Email:** gaston.rodriguez0410@gmail.com
-📍 **Ubicación:** Lima, Perú
+📍 **Location:** Lima, Perú
