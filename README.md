@@ -50,6 +50,7 @@
 - **UI:** Material UI
 - **Authentication:** Firebase Auth (Google Sign-In, Facebook SDK)
 - **API Requests:** Axios
+- **Testing:** Jest
 
 ## Installation
 
