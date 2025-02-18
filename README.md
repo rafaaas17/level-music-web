@@ -22,14 +22,6 @@
   </a>
 </p>
 
-<p align="center">
-  <a aria-label="Try Vite" href="https://vitejs.dev/">Try Vite</a>
-  &ensp;•&ensp;
-  <a aria-label="Read the Documentation" href="https://react.dev/">Read the Documentation</a>
-  &ensp;•&ensp;
-  <a aria-label="Learn more on our blog" href="https://mui.com/blog/">Learn more on our blog</a>
-</p>
-
 <h6 align="center">Follow me on</h6>
 <p align="center">
   <a aria-label="GitHub" href="[gastonrodrig](https://github.com/gastonrodrig)" target="_blank">
