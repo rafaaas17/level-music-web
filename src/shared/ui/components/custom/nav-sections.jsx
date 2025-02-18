@@ -1,6 +1,6 @@
 import { Box, Button, useTheme } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { sections } from '../../../shared/constants/custom';
+import { sections } from '../../../constants/custom/nav-sections';
 
 export const NavSections = () => {
   const theme = useTheme();

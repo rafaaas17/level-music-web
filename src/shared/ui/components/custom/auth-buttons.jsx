@@ -2,8 +2,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Box, Button, IconButton, Container } from '@mui/material';
 import { Login as LoginIcon, PersonAdd as PersonAddIcon, Logout as LogoutIcon } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
-import { useScreenSizes } from '../../../shared/constants/screen-width';
-import { startLogout } from '../../../store/auth';
+import { useScreenSizes } from '../../../constants/screen-width';
+import { startLogout } from '../../../../store/auth';
 
 export const AuthButtons = () => {
   const { isMd } = useScreenSizes();

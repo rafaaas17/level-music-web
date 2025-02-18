@@ -1,6 +1,6 @@
 import React from 'react';
 import { Drawer, Box, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
-import { sections } from '../../../shared/constants/custom';
+import { sections } from '../../../constants/custom/nav-sections';
 import { Link } from 'react-router-dom';
 
 export const CDrawer = ({ drawerOpen, handleDrawerToggle }) => {

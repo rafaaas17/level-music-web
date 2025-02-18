@@ -3,7 +3,7 @@ import { AdminRouter } from '../admin/routes/admin-router';
 import { AuthRouter } from '../auth/routes/auth-router';
 import { LandingRoutes } from '../landing/routes/landing-routes';
 import { useCheckAuth } from '../hooks';
-import { CircProgress } from '../ui/components/common';
+import { CircProgress } from '../shared/ui/components/common';
 
 export const AppRouter = () => {
   const status = useCheckAuth();

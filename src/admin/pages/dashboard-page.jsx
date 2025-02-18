@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Box, Typography, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import { NavBar, Footer } from '../../ui/components/common';
+import { NavBar, Footer } from '../../shared/ui/components/common';
 import * as XLSX from 'xlsx';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 

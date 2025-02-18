@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { Logo, CDrawer } from './';
 import { NavSections, AuthButtons, ToogleTheme, MenuDrawer } from '../custom';
-import { useScreenSizes } from '../../../shared/constants/screen-width';
+import { useScreenSizes } from '../../../constants/screen-width';
 
 export const NavBar = () => {
   const theme = useTheme();
