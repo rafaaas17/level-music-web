@@ -1,10 +1,8 @@
-import { Box, Button, useTheme } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { sections } from '../../../constants/custom/nav-sections';
 
 export const NavSections = () => {
-  const theme = useTheme();
-
   return (
     <Box sx={{ flexGrow: 1, display: { md: 'flex', xs: 'none' }, ml: 2 }}>
       {sections.map((section) => (
@@ -12,7 +10,9 @@ export const NavSections = () => {
           key={section.id}
           component={Link}
           to={section.url}
-          sx={{ color: 'white' }}
+          sx={{
+            color: 'white',
+          }}
         >
           {section.title}
         </Button>

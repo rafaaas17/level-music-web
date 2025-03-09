@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const ClientsPage = () => {
+export const EventsPage = () => {
   return (
     <div>
       <p>ClientsPage</p>

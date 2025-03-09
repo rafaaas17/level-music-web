@@ -5,12 +5,12 @@ export const sections = [
     url: '/'
   },
   {
-    id: 3,
-    title: 'CLIENTES',
-    url: '/clientes'
+    id: 2,
+    title: 'EVENTOS',
+    url: '/eventos'
   },
   {
-    id: 4,
+    id: 3,
     title: 'CONTACTO',
     url: '/contacto'
   }

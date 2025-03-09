@@ -1,3 +1,3 @@
 export * from './home-page';
-export * from './clients-page';
+export * from './events-page';
 export * from './contact-page';
