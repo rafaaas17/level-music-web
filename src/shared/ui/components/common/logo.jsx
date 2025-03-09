@@ -1,4 +1,5 @@
 import { Typography, useTheme, Box } from '@mui/material';
+import logo from "../../../../assets/images/logo.png";
 
 export const Logo = () => {
   const theme = useTheme();
@@ -18,7 +19,7 @@ export const Logo = () => {
       {/* Imagen del logo */}
       <Box
         component="img"
-        src="./logo.png"
+        src={logo}
         alt="Logo Level Music"
         sx={{
           width: { md: 45, xs: 40 }, 
@@ -35,7 +36,7 @@ export const Logo = () => {
           fontWeight: 700,
           letterSpacing: '.2rem',
           textDecoration: 'none',
-          color: theme.palette.text.primary,
+          color: 'white',
         }}
       >
         LEVEL MUSIC

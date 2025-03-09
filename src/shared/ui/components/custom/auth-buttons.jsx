@@ -20,7 +20,7 @@ export const AuthButtons = () => {
           <Button 
             variant="outlined" 
             startIcon={<LogoutIcon />} 
-            color="text" 
+            color="white" 
             sx={{ border: 'none', mx: 2 }} 
             onClick={handleLogout}
           >
@@ -28,7 +28,7 @@ export const AuthButtons = () => {
           </Button>
         ) : (
           <IconButton onClick={handleLogout}>
-            <LogoutIcon sx={{ color: 'text.primary' }} />
+            <LogoutIcon sx={{ color: 'white' }} />
           </IconButton>
         )}
       </Box>
@@ -47,8 +47,7 @@ export const AuthButtons = () => {
               key={to} 
               variant="outlined" 
               startIcon={icon} 
-              color="text" 
-              sx={{ border: 'none', p: 1 }} 
+              sx={{ border: 'none', p: 1, color: 'white' }} 
               component={Link} 
               to={to}
             >
@@ -58,7 +57,7 @@ export const AuthButtons = () => {
         </Container>
       ) : (
         <IconButton component={Link} to="/auth/login">
-          <LoginIcon sx={{ color: 'text.primary' }} />
+          <LoginIcon sx={{ color: 'white' }}/>
         </IconButton>
       )}
     </Box>

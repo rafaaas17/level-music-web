@@ -11,7 +11,7 @@ export const MenuDrawer = ({ handleDrawerToggle }) => {
         aria-controls="menu-appbar"
         aria-haspopup="true"
         onClick={handleDrawerToggle}
-        color="inherit"
+        sx={{ color: 'white' }}
       >
         <MenuIcon />
       </IconButton>

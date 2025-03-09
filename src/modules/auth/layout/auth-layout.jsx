@@ -1,4 +1,5 @@
-import { Grid, Typography } from "@mui/material";
+import { Grid, Typography, Box } from "@mui/material";
+import { AccountCircle } from "@mui/icons-material";
 
 export const AuthLayout = ({ children, title = '' }) => {
   return (
@@ -23,9 +24,22 @@ export const AuthLayout = ({ children, title = '' }) => {
           alignItems: "center"
         }}
       >
-        <Typography variant="h4" sx={{ mb: 2, fontWeight: "medium" }}>
-          {title}
-        </Typography>
+        <Box
+          component="div"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 1,
+            mb: 2
+          }}
+        >
+          <AccountCircle sx={{ fontSize: 35 }} />
+          <Typography variant="h4" sx={{ fontWeight: "medium" }}>
+            {title}
+          </Typography>
+        </Box>
+
 
         {children}
       </Grid>

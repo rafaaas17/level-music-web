@@ -12,9 +12,7 @@ export const NavSections = () => {
           key={section.id}
           component={Link}
           to={section.url}
-          sx={{
-            color: theme.palette.text.primary,
-          }}
+          sx={{ color: 'white' }}
         >
           {section.title}
         </Button>

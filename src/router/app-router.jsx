@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { AdminRouter } from '../admin/routes/admin-router';
-import { AuthRouter } from '../auth/routes/auth-router';
-import { LandingRoutes } from '../landing/routes/landing-routes';
+import { AdminRouter } from '../modules/admin/routes/admin-router';
+import { AuthRouter } from '../modules/auth/routes/auth-router';
+import { LandingRoutes } from '../modules/landing/routes/landing-routes';
 import { useCheckAuth } from '../hooks';
 import { CircProgress } from '../shared/ui/components/common';
 

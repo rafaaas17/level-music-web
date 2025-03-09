@@ -10,7 +10,7 @@ export const ToogleTheme = () => {
   return (
     <IconButton 
       onClick={() => dispatch(toggleTheme())}
-      color="inherit"
+      sx={{ color: 'white' }}
     >
       { mode === 'dark' ? <Brightness7 /> : <Brightness4 /> }
     </IconButton>

@@ -1,98 +1,83 @@
+import { signInWithGoogle, signInWithFacebook, registerUserWithEmailPassword, loginWithEmailPassword, logoutFirebase } from '../../modules/auth/firebase/providers';
+import { checkingCredentials, logout, login } from './';
 import { apiConfig } from "../../api/api-config";
-import { checkingCredentials, login, logout } from "./auth-slice";
 
 // Verificar estado de autenticación
 export const checkingAuthentication = () => {
   return async (dispatch) => {
     dispatch(checkingCredentials());
-  };
-};
+  }
+}
+
+// Iniciar sesión con Google
+export const startGoogleSignIn = () => {
+  return async (dispatch) => {
+    dispatch(checkingCredentials());
+    const result = await signInWithGoogle();
+
+    if(!result.ok) return dispatch( logout(result.errorMessage) );
+
+    try {
+      const { data } = await apiConfig.post("/auth/google", {
+        email: result.email,
+        uid: result.uid,
+      });
+
+      if (data.necesitaUsername) {
+        return dispatch(login({ ...result, necesitaUsername: true }));
+      }
+
+      dispatch(login(data.usuario));
+    } catch (error) {
+      console.error("Error en Google Sign-In:", error);
+      dispatch(logout("Error al iniciar sesión con Google"));
+    }
+  }
+}
+
+// Iniciar sesión con Facebook
+export const startFacebookSignIn = () => {
+  return async (dispatch) => {
+    dispatch(checkingCredentials());
+    const result = await signInWithFacebook();
+
+    if(!result.ok) return dispatch( logout(result.errorMessage) );
+
+    dispatch(login(result));
+  }
+}
+
+// Crear usuario con email y contraseña
+export const startCreatingUserWithEmailPassword = ({ email, password, displayName, navigate }) => {
+  return async (dispatch) => {
+    dispatch(checkingCredentials());
+
+    const { ok, uid, photoURL, errorMessage } = await registerUserWithEmailPassword({ email, password, displayName });
+
+    if(!ok) return dispatch( logout({ errorMessage }) );
+
+    dispatch(login({ uid, displayName, email, photoURL }));
+  }
+}
 
 // Iniciar sesión con email y contraseña
-export const startLogin = ({ email, password, navigate }) => {
+export const startLoginWithEmailPassword = ({ email, password }) => {
   return async (dispatch) => {
     dispatch(checkingCredentials());
 
-    try {
-      const { data } = await apiConfig.post("/auth/login", { email, password });
+    const resp = await loginWithEmailPassword({ email, password });
 
-      if (data.success) {
-        dispatch(login({ user: data.user, token: data.token }));
-        sessionStorage.setItem("token", data.token);
+    if(!resp.ok) return dispatch( logout(resp) );
 
-        navigate("/admin");
-      } else {
-        dispatch(logout({ errorMessage: data.message }));
-      }
-    } catch (error) {
-      console.error("Error en login:", error);
-      dispatch(logout({ errorMessage: error.response.data.message }));
-    }
-  };
-};
-
-// Registrar un nuevo usuario
-export const startRegister = ({ username, email, mobile, password }) => {
-  return async (dispatch) => {
-    dispatch(checkingCredentials());
-
-    try {
-      const { data } = await apiConfig.post("/auth/register", {
-        username,
-        email,
-        mobile,
-        password,
-      });
-
-      if (data.success) {
-        dispatch(login({ user: data.user, token: data.token }));
-        sessionStorage.setItem("token", data.token);
-      } else {
-        dispatch(logout({ errorMessage: data.message }));
-      }
-    } catch (error) {
-      console.error("Error en registro:", error);
-      dispatch(logout({ errorMessage: "Error al registrar usuario" }));
-    }
-  };
-};
+    dispatch(login(resp));
+  }
+}
 
 // Cerrar sesión
-export const startLogout = (navigate) => {
-  return (dispatch) => {
-    sessionStorage.removeItem("token"); 
-    dispatch(logout());
-    navigate("/auth/login", { replace: true }); 
-  };
-};
-
-// Verificar si el usuario sigue autenticado
-export const fetchUserDetails = () => {
+export const startLogout = () => {
   return async (dispatch) => {
-    try {
-      const token = sessionStorage.getItem("token");
+    await logoutFirebase();
 
-      if (!token) {
-        dispatch(logout());
-        return;
-      }
-
-      const { data } = await apiConfig.get("/auth/get-userDetails", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (data.success) {
-        dispatch(login({ user: data.user, token }));
-      } else {
-        dispatch(logout());
-      }
-    } catch (error) {
-      console.error("Error obteniendo datos del usuario:", error);
-
-      if (error.response?.status === 401) {
-        sessionStorage.removeItem("token");
-        dispatch(logout());
-      }
-    }
-  };
-};
+    dispatch(logout());
+  }
+}
