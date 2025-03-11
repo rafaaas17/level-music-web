@@ -11,7 +11,7 @@ export const sections = [
   },
   {
     id: 3,
-    title: 'CONTACTO',
-    url: '/contacto'
+    title: 'SOLICITAR',
+    url: '/solicitar-evento'
   }
 ]

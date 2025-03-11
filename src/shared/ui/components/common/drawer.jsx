@@ -2,7 +2,7 @@ import React from 'react';
 import { Drawer, Box, List, ListItem, ListItemButton, ListItemText, useTheme, Divider } from '@mui/material';
 import { sections } from '../../../constants/custom/nav-sections';
 import { Link } from 'react-router-dom';
-import { WhatsApp, Instagram, Facebook } from '@mui/icons-material';
+import { SocialMedia } from '../custom';
 
 export const CDrawer = ({ drawerOpen, handleDrawerToggle }) => {
   const theme = useTheme();
@@ -48,21 +48,7 @@ export const CDrawer = ({ drawerOpen, handleDrawerToggle }) => {
         </List>
         <Box>
           <Divider color="white" sx={{ mx: -2, mb: 1 }}/>
-          <Box
-            component={"div"}
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: 1,
-              paddingY: 2
-            }}
-          >
-            <Instagram />
-            <Facebook />
-            <WhatsApp />
-            +51 989160593
-          </Box>
+          <SocialMedia />
         </Box>
       </Box>
     </Drawer>

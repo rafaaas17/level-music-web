@@ -23,7 +23,13 @@ export const getTheme = (mode) =>
       social_media: {
         text: mode === "dark" ? "#C0B9B3" : "#666666",
         divider: mode === "dark" ? "#5D493B" : "#C4C4C4",
-      }
+      },
+      paper: {
+        main: mode === "dark" ? "#1D1D1D" : "#000"
+      },
+      footer: {
+        main: mode === 'dark' ? "#1D1D1D" : "#333333"
+      }      
     },
     typography: {
       fontFamily: "'Mulish', sans-serif",

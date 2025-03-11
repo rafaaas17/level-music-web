@@ -1,12 +1,13 @@
 import React from "react";
-import { AppBar, Toolbar, Typography, Button, Container, Box, Grid, Card, CardContent } from "@mui/material";
+import { Typography, Button, Container, Box, Grid, Card, CardContent } from "@mui/material";
 import { Link } from "react-router-dom";
+import { LandingLayout } from "../layout/landing-layout";
 
 export const HomePage = () => {
   return (
     <>
       <Box sx={{ bgcolor: "#FFF", py: 10, textAlign: "center", mt: 10 }}>
-        <Container>
+        <>
           <Typography variant="h3" gutterBottom sx={{ color: "#1D478A" }}>
             Organiza Eventos Inolvidables
           </Typography>
@@ -16,7 +17,7 @@ export const HomePage = () => {
           <Button component={Link} variant="contained" to="/auth/login" sx={{ bgcolor: "#1D478A", color: "#FFF" }} size="large">
             Contáctanos
           </Button>
-        </Container>
+        </>
       </Box>
       <Container sx={{ py: 10 }}>
         <Grid container spacing={4}>

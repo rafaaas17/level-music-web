@@ -1,4 +1,4 @@
-import { ThemeProvider } from "@emotion/react";
+import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
@@ -12,10 +12,10 @@ export const AppTheme = ({ children }) => {
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-    dispatch(setTheme(mediaQuery.matches ? "dark" : "light"));
     const handleChange = (e) => dispatch(setTheme(e.matches ? "dark" : "light"));
-    
+    handleChange(mediaQuery);
     mediaQuery.addEventListener("change", handleChange);
+
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, [dispatch]);
 
