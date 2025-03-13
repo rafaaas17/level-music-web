@@ -1,21 +1,15 @@
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { TextField, Button, Alert, Box, Divider, Typography, useTheme } from "@mui/material";
-import { Google } from "@mui/icons-material";
+import { TextField, Button, Alert, Box, Typography, useTheme } from "@mui/material";
 import { AuthLayout } from "../layout/auth-layout";
-import { startGoogleSignIn, startLoginWithEmailPassword } from "../../../store/auth";
+import { useAuthStore } from "../../../hooks/use-auth-store";
+import googleLogo from "../../../assets/images/logo/google.png";
 
 export const LoginPage = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const theme = useTheme();
-  // Estado de autenticación
-  const { 
-    status, 
-    errorMessage 
-  } = useSelector((state) => state.auth);
+  const { status, errorMessage, startLogin, onGoogleSignIn } = useAuthStore();
   
   // Hook de formulario
   const {
@@ -26,12 +20,11 @@ export const LoginPage = () => {
 
   const isAuthenticated = useMemo(() => status === "checking", [status]);
 
-  const onSubmit = (data) => {
-    dispatch(startLoginWithEmailPassword({ ...data }));
-  };
-
-  const onGoogleSignIn = () => {
-    dispatch(startGoogleSignIn());
+  const onSubmit = async (data) => {
+    const success = await startLogin(data);
+    if (success) {
+      navigate('/');
+    }
   };
 
   return (
@@ -130,7 +123,7 @@ export const LoginPage = () => {
         >
           <Box
             component="img"
-            src="/src/assets/images/logo/google.png"
+            src={googleLogo}
             alt="Google Logo"
             sx={{
               width: 24,
