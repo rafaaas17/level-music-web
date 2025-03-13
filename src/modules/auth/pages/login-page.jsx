@@ -1,16 +1,16 @@
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { TextField, Button, Alert, Box, Divider, Typography } from "@mui/material";
-import { Facebook, Google } from "@mui/icons-material";
+import { Link, useNavigate } from "react-router-dom";
+import { TextField, Button, Alert, Box, Divider, Typography, useTheme } from "@mui/material";
+import { Google } from "@mui/icons-material";
 import { AuthLayout } from "../layout/auth-layout";
-import { startGoogleSignIn, startFacebookSignIn, startLoginWithEmailPassword } from "../../../store/auth";
+import { startGoogleSignIn, startLoginWithEmailPassword } from "../../../store/auth";
 
 export const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const theme = useTheme();
   // Estado de autenticación
   const { 
     status, 
@@ -34,12 +34,11 @@ export const LoginPage = () => {
     dispatch(startGoogleSignIn());
   };
 
-  const onFacebookSignIn = () => {
-    dispatch(startFacebookSignIn());
-  };
-
   return (
-    <AuthLayout title="Iniciar Sesión">
+    <AuthLayout 
+      title="Bienvenido al mundo de los eventos inolvidables." 
+      subtitle="Inicia sesión y descubre experiencias únicas."
+    >
       <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
         {/* Email */}
         <TextField
@@ -73,17 +72,33 @@ export const LoginPage = () => {
           </Box>
         )}
 
+        <Box sx={{ display: "flex", justifyContent: "flex-end", my: 2 }}>
+          <Link 
+            to="/forgot-password" 
+            style={{ 
+              color: theme.palette.text.primary, 
+              textDecoration: "underline" 
+            }}
+          >
+            ¿Olvidaste tu contraseña?
+          </Link> 
+        </Box>
+
         {/* Botón de inicio de sesión */}
         <Button
           type="submit"
           fullWidth
-          variant="contained"
+          variant="text"
           color="primary"
           sx={{
             mt: 2,
             padding: "10px",
             textTransform: "none",
             fontSize: "1rem",
+            "&:hover": {
+              backgroundColor: theme.palette.primary.hover,
+            },
+            backgroundColor: theme.palette.primary.main,
             color: "white",
           }}
           disabled={isSubmitting || isAuthenticated}
@@ -91,69 +106,39 @@ export const LoginPage = () => {
           Ingresar
         </Button>
 
-        {/* Botón de registro */}
-        <Button
-          fullWidth
-          variant="contained"
-          onClick={register}
-          color="primary"
-          sx={{
-            mt: 2,
-            padding: "10px",
-            textTransform: "none",
-            fontSize: "1rem",
-            color: "white",
-          }}
-          disabled={isSubmitting || isAuthenticated}
-        >
-          Registrarse
-        </Button>
-
-        {/* Divider */}
-        <Divider sx={{ width: "100%", mt: 2, mb: 1 }} />
-        <Typography sx={{ mb: 2 }}>O conéctese por Social Media</Typography>
+        <Typography sx={{ my: 5 }}>
+          ¿Aún no tienes una cuenta?  <Link to="/register" style={{ color: theme.palette.text.primary, textDecoration: "underline", fontWeight: 600 }}>Crear Cuenta</Link>
+        </Typography>
 
         {/* Google Login */}
         <Button
           fullWidth
-          variant="contained"
+          variant="text"
           onClick={onGoogleSignIn}
           sx={{
             padding: "10px",
             textTransform: "none",
             fontSize: "1rem",
-            color: "white",
+            color: "#000",
             "&:hover": {
-              backgroundColor: "#3a66c2",
+              backgroundColor: "#D3B7AD",
             },
-            backgroundColor: "#5383EC",
+            backgroundColor: "#F0D1C5",
             mb: 2,
           }}
           disabled={isSubmitting || isAuthenticated}
         >
-          <Google />
-          <Typography sx={{ ml: 1 }}>Continuar con Google</Typography>
-        </Button>
-
-        {/* Facebook Login */}
-        <Button
-          fullWidth
-          variant="contained"
-          onClick={onFacebookSignIn}
-          sx={{
-            padding: "10px",
-            textTransform: "none",
-            fontSize: "1rem",
-            color: "white",
-            backgroundColor: "#4A66AC", 
-            "&:hover": {
-              backgroundColor: "#3b5998", 
-            },
-          }}
-          disabled={isSubmitting || isAuthenticated}
-        >
-          <Facebook />
-          <Typography sx={{ ml: 1 }}>Continuar con Facebook</Typography>
+          <Box
+            component="img"
+            src="/src/assets/images/logo/google.png"
+            alt="Google Logo"
+            sx={{
+              width: 24,
+              height: 24,
+              mr: 1
+            }}
+          />
+          <Typography sx={{ ml: 1 }}>Continuar con Gmail</Typography>
         </Button>
       </form>
     </AuthLayout>

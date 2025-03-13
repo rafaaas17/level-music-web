@@ -11,7 +11,7 @@ export const sections = [
   },
   {
     id: 3,
-    title: 'SOLICITAR',
-    url: '/solicitar-evento'
+    title: 'COTIZAR',
+    url: '/solicitar-cotizacion'
   }
 ]

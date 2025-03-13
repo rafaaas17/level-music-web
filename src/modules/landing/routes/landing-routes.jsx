@@ -6,7 +6,7 @@ export const LandingRoutes = () => {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/eventos" element={<EventsPage />} />
-      <Route path="/solicitar-evento" element={<RequestPage />} />
+      <Route path="/solicitar-cotizacion" element={<RequestPage />} />
       <Route path="/*" element={<Navigate to="/" />} />
     </Routes>
   );

@@ -1,7 +1,37 @@
-import { Grid, Typography, Box } from "@mui/material";
-import { AccountCircle } from "@mui/icons-material";
+import { Grid, Typography, Box, Paper } from "@mui/material";
+import backgroundImage from '../../../assets/images/carrousel/imagen_1.png';
+import { useTheme } from "@mui/material/styles";
+import { Logo } from "../../../shared/ui/components/common/logo";
 
-export const AuthLayout = ({ children, title = '' }) => {
+export const AuthLayout = ({ children, title = '', subtitle = '' }) => {
+  const theme = useTheme();
+
+  const content = (
+    <>
+      <Box
+        component="div"
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          gap: 2,
+          mb: 2,
+          color: theme.palette.text.secondary
+        }}
+      >
+        <Logo />
+        <Typography sx={{ fontSize: 20, fontWeight: 600, pt: 2 }}>
+          {title}
+        </Typography>
+        <Typography sx={{ fontSize: 16, fontWeight: 200 }}>
+          {subtitle}
+        </Typography>
+      </Box>
+      {children}
+    </>
+  );
+
   return (
     <Grid
       container
@@ -9,40 +39,39 @@ export const AuthLayout = ({ children, title = '' }) => {
       alignItems="center"
       sx={{
         minHeight: "calc(100vh - 64px)",
-        backgroundColor: 'background.default',
-        padding: 2
+        backgroundImage: { md: `url(${backgroundImage})`, xs: 'none'},
+        padding: 2,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
       }}
     >
-      <Grid
-        item
-        xs={12} sm={8} md={6} lg={5}
+      {/* Versión móvil */}
+      <Box
         sx={{
-          p: 4,
-          textAlign: "center",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center"
+          display: { xs: 'block', md: 'none' },
+          width: '100%',
+          padding: 2,
         }}
       >
-        <Box
-          component="div"
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 1,
-            mb: 2
-          }}
-        >
-          <AccountCircle sx={{ fontSize: 35 }} />
-          <Typography variant="h4" sx={{ fontWeight: "medium" }}>
-            {title}
-          </Typography>
-        </Box>
+        {content}
+      </Box>
 
-
-        {children}
-      </Grid>
+      {/* Versión desktop */}
+      <Paper
+        sx={{
+          display: { xs: 'none', md: 'flex' },
+          padding: 5,
+          textAlign: "center",
+          flexDirection: "column",
+          alignItems: "center",
+          marginTop: "64px",
+          borderRadius: 8,
+          backgroundColor: theme.palette.background.default,
+          width: { md: '50%', lg: '35%' }
+        }}
+      >
+        {content}
+      </Paper>
     </Grid> 
   );
 };

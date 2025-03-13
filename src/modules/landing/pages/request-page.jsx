@@ -17,7 +17,7 @@ export const RequestPage = () => {
   };
 
   const renderStepContent = (step) => {
-    if (step !== 3) return StepSections[step].component;
+    if (step !== 4) return StepSections[step].component;
     
     return (
       <Typography sx={{ fontSize: 16 }}>

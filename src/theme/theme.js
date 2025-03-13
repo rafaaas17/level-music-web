@@ -7,6 +7,7 @@ export const getTheme = (mode) =>
       mode,
       primary: {
         main: mode === "dark" ? "#964901" : "#EF7E1B",
+        hover: mode === "dark" ? "#703501" : "#CF6D17",
       },
       secondary: {
         main: "#E6BB93",
@@ -19,6 +20,7 @@ export const getTheme = (mode) =>
       },
       text: {
         primary: mode === "dark" ? "#FFFBFF" : "#252020",
+        secondary: mode === "dark" ? "#ffffff" : "#666666",
       },
       social_media: {
         text: mode === "dark" ? "#C0B9B3" : "#666666",

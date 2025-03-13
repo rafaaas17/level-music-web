@@ -28,7 +28,7 @@ export const NavBar = () => {
           {!isMd && <MenuDrawer handleDrawerToggle={handleDrawerToggle} />}
           
           {/* Logo */}
-          <Logo />
+          <Logo isNav />
 
           {/* Sections */}
           <NavSections />
