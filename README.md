@@ -1,7 +1,7 @@
 <!-- Banner Image -->
 
 <p align="center">
-  <h1 align="center">Level Music Frontend</h1>
+  <h1 align="center">Level Music Web</h1>
 </p>
 
 <p align="center">
@@ -34,7 +34,7 @@
 
 ## Description
 
-**Level Music App** is a web platform developed with **React and Vite**, designed for efficient event management. It allows **Level Music Corp** to manage events, workers, and contracts in an organized and accessible way.
+**Level Music Web** is a platform developed with **React and Vite**, designed for efficient event management. It allows **Level Music Corp** to manage events, workers, and contracts in an organized and accessible way.
 
 ## Main Features
 
@@ -48,7 +48,7 @@
 - **Frontend:** React + Vite 🚀
 - **State Management:** Redux
 - **UI:** Material UI
-- **Authentication:** Firebase Auth (Google Sign-In, Facebook SDK)
+- **Authentication:** Firebase Auth (Google Sign-In, Email/Password)
 - **API Requests:** Axios
 - **Testing:** Jest
 
