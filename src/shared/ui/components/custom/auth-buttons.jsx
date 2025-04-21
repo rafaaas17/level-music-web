@@ -1,17 +1,16 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Box, Button, IconButton, Container } from '@mui/material';
 import { Login as LoginIcon, PersonAdd as PersonAddIcon, Logout as LogoutIcon } from '@mui/icons-material';
-import { useDispatch, useSelector } from 'react-redux';
 import { useScreenSizes } from '../../../constants/screen-width';
-import { startLogout } from '../../../../store/auth';
+import { useAuthStore } from '../../../../hooks/use-auth-store';
 
 export const AuthButtons = () => {
   const { isMd } = useScreenSizes();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { status } = useSelector((state) => state.auth);
 
-  const handleLogout = () => dispatch(startLogout(navigate));
+  const { onLogout, status } = useAuthStore();
+
+  const handleLogout = () => onLogout() && navigate('/auth/login');
 
   if (status === 'authenticated') {
     return (

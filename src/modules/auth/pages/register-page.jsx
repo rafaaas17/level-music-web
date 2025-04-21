@@ -1,9 +1,122 @@
-import React from 'react';
+import { useEffect, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
+import { Button, Alert, Box, Typography, useTheme } from "@mui/material";
+import { AuthLayout } from "../layout/auth-layout";
+import { useAuthStore } from "../../../hooks/use-auth-store";
+import { FormInputText } from "../../../shared/ui/components/form/form-input-text";
+import googleLogo from "../../../assets/images/logo/google.png";
+import { CircProgress } from '../../../shared/ui/components/common';
+import { useDispatch } from "react-redux";
+import { clearErrorMessage } from "../../../store/auth";
 
 export const RegisterPage = () => {
+  const navigate = useNavigate();
+  const theme = useTheme();
+  const dispatch = useDispatch();
+  const { status, errorMessage, startCreateUser, onGoogleSignIn } = useAuthStore();
+
+  const { 
+    control, 
+    handleSubmit, 
+    formState: { isSubmitting } 
+  } = useForm({
+    mode: "onBlur"
+  });
+  
+  const isAuthenticated = useMemo(() => status === "checking", [status]);
+
+  useEffect(() => {
+    dispatch(clearErrorMessage());
+  }, []);
+
+  const onSubmit = async (data) => {
+    const success = await startCreateUser(data);
+    if (success) navigate('/');
+  };
+
+  const signInWithGoogle = async () => {
+    const success = await onGoogleSignIn();
+    if (success) navigate('/');
+  };
+
   return (
-    <div>
-      RegisterPage
-    </div>
+    <AuthLayout 
+      title="Regístrate para explorar eventos únicos" 
+      subtitle="Usa estas credenciales para reservar eventos y gestionar tu cuenta fácilmente."
+    >
+      {status === 'checking' && <CircProgress />}
+      <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
+        <FormInputText
+          name="email"
+          control={control}
+          label="Correo electrónico"
+          rules={{ 
+            required: "El email es obligatorio",
+            pattern: {
+              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+              message: "Email inválido"
+            }
+          }}
+        />
+        <FormInputText
+          name="password"
+          control={control}
+          label="Contraseña"
+          type="password"
+          rules={{ 
+            required: "La contraseña es obligatoria",
+            minLength: { value: 6, message: "Mínimo 6 caracteres" },
+            maxLength: { value: 12, message: "Máximo 12 caracteres" }
+          }}
+        />
+        {errorMessage && <Alert severity="error" sx={{ mt: 2 }}>{errorMessage}</Alert>}
+        <Button
+          type="submit"
+          fullWidth
+          variant="text"
+          sx={{
+            mt: 3,
+            padding: "10px",
+            textTransform: "none",
+            fontSize: "1rem",
+            backgroundColor: theme.palette.primary.main,
+            color: "white",
+            "&:hover": { backgroundColor: theme.palette.primary.hover }
+          }}
+          disabled={isSubmitting || isAuthenticated}
+        >
+          Registrarse
+        </Button>
+        <Typography sx={{ my: 3, textAlign: 'center' }}>O crea una cuenta con</Typography>
+        <Button
+          fullWidth
+          variant="text"
+          onClick={signInWithGoogle}
+          sx={{
+            padding: "10px",
+            textTransform: "none",
+            fontSize: "1rem",
+            color: "#000",
+            "&:hover": { backgroundColor: "#D3B7AD" },
+            backgroundColor: "#F0D1C5",
+            mb: 2,
+          }}
+          disabled={isSubmitting || isAuthenticated}
+        >
+          <Box component="img" src={googleLogo} alt="Google Logo" sx={{ width: 24, height: 24, mr: 1 }} />
+          <Typography sx={{ ml: 1 }}>Continuar con Gmail</Typography>
+        </Button>
+        <Typography sx={{ mt: 1, textAlign: 'center' }}>
+          ¿Ya tienes cuenta?{' '}
+          <Link 
+            to="/auth/login" 
+            style={{ color: theme.palette.text.primary, textDecoration: "underline", fontWeight: 600 }}
+          >
+            Inicia sesión
+          </Link>
+        </Typography>
+      </form>
+    </AuthLayout>
   );
 };

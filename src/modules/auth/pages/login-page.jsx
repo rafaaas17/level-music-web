@@ -1,37 +1,46 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { TextField, Button, Alert, Box, Typography, useTheme } from "@mui/material";
 import { AuthLayout } from "../layout/auth-layout";
 import { useAuthStore } from "../../../hooks/use-auth-store";
 import googleLogo from "../../../assets/images/logo/google.png";
+import { clearErrorMessage } from "../../../store/auth";
+import { CircProgress } from "../../../shared/ui/components/common";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
   const theme = useTheme();
+  const dispatch = useDispatch();
   const { status, errorMessage, startLogin, onGoogleSignIn } = useAuthStore();
   
-  // Hook de formulario
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm();
+  } = useForm({
+    mode: "onBlur"
+  });
 
   const isAuthenticated = useMemo(() => status === "checking", [status]);
 
+  useEffect(() => {
+    dispatch(clearErrorMessage());
+  }, []);
+
   const onSubmit = async (data) => {
     const success = await startLogin(data);
-    if (success) {
-      navigate('/');
-    }
+    if (success) navigate('/');
   };
 
   return (
     <AuthLayout 
       title="Bienvenido al mundo de los eventos inolvidables." 
       subtitle="Inicia sesión y descubre experiencias únicas."
+      isLogin
     >
+      {status === 'checking' && <CircProgress />}
       <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
         {/* Email */}
         <TextField
@@ -100,7 +109,17 @@ export const LoginPage = () => {
         </Button>
 
         <Typography sx={{ my: 5 }}>
-          ¿Aún no tienes una cuenta?  <Link to="/register" style={{ color: theme.palette.text.primary, textDecoration: "underline", fontWeight: 600 }}>Crear Cuenta</Link>
+          ¿Aún no tienes una cuenta?{' '}
+          <Link 
+            to="/auth/register" 
+            style={{ 
+              color: theme.palette.text.primary, 
+              textDecoration: "underline", 
+              fontWeight: 600 
+            }}
+          >
+            Crear Cuenta
+          </Link>
         </Typography>
 
         {/* Google Login */}

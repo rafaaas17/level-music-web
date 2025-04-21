@@ -3,14 +3,14 @@ import backgroundImage from '../../../assets/images/carrousel/imagen_1.png';
 import { useTheme } from "@mui/material/styles";
 import { Logo } from "../../../shared/ui/components/common/logo";
 
-export const AuthLayout = ({ children, title = '', subtitle = '' }) => {
+export const AuthLayout = ({ children, title = '', subtitle = '', isLogin = false }) => {
   const theme = useTheme();
 
   const content = (
     <>
       <Box
         component="div"
-        sx={{
+        sx={{ 
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -20,11 +20,11 @@ export const AuthLayout = ({ children, title = '', subtitle = '' }) => {
           color: theme.palette.text.secondary
         }}
       >
-        <Logo />
-        <Typography sx={{ fontSize: 20, fontWeight: 600, pt: 2 }}>
+        { isLogin && <Logo />}
+        <Typography sx={{ fontSize: isLogin ? 20 : 25, fontWeight: 600, pt: 2 }}>
           {title}
         </Typography>
-        <Typography sx={{ fontSize: 16, fontWeight: 200 }}>
+        <Typography sx={{ fontSize: 16, fontWeight: 200, paddingTop: isLogin ? 0 : 2 }}>
           {subtitle}
         </Typography>
       </Box>

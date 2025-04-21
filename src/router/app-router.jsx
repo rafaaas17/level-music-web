@@ -3,15 +3,10 @@ import { AdminRouter } from '../modules/admin/routes/admin-router';
 import { AuthRouter } from '../modules/auth/routes/auth-router';
 import { LandingRoutes } from '../modules/landing/routes/landing-routes';
 import { useCheckAuth } from '../hooks';
-import { CircProgress } from '../shared/ui/components/common';
 
 export const AppRouter = () => {
   const status = useCheckAuth();
   const location = useLocation();
-
-  if (status === 'checking') {
-    return <CircProgress />;
-  }
 
   if (status === 'authenticated' && location.pathname === '/') {
     return <Navigate to="/admin" />;
