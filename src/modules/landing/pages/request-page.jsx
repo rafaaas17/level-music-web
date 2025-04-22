@@ -2,23 +2,56 @@ import React from 'react';
 import { Box, Stepper, Step, StepLabel, Button, Typography, useMediaQuery, useTheme, Paper, Divider } from '@mui/material';
 import { LandingLayout } from '../layout/landing-layout';
 import { CustomStepIcon, StepSections } from '../components';
+import { useDispatch } from 'react-redux';
+import { useEventStore } from '../../../hooks/use-event-store';
+
+
 
 export const RequestPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm')); 
-  const [activeStep, setActiveStep] = React.useState(0);
+ 
+  const dispatch = useDispatch();
+  const { 
+    resetEventForm,
+    updateEventSection,
+    goToNextPage,
+    goToPreviousPage,
+    validateEventForm,
+    currentPage
 
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+   } = useEventStore();
+   const handleNext = () => {
+    // Validar los datos de la página actual antes de avanzar
+    const validation = validateEventForm();
+    if (!validation.valid) {
+      alert(validation.message); // Mostrar mensaje de error si la validación falla
+      return;
+    }
+
+    // Avanzar a la siguiente página
+    goToNextPage();
   };
 
   const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    // Retroceder a la página anterior
+    goToPreviousPage();
+  };
+  const handleFinalize = () => {
+    // Aquí podrías enviar los datos a un backend o realizar alguna acción final
+    alert('Formulario completado. Datos enviados correctamente.');
+
+    // Reiniciar el formulario
+    resetEventForm();
   };
 
   const renderStepContent = (step) => {
-    if (step !== 4) return StepSections[step].component;
-    
+    // Renderizar el componente correspondiente a cada paso
+    if (step !== StepSections.length ) {
+      return StepSections[step].component;
+    }
+
+    // Mensaje final en el último paso
     return (
       <Typography sx={{ fontSize: 16 }}>
         Hemos recibido tus datos, en breve te enviaremos la proforma de tu evento.
@@ -42,7 +75,7 @@ export const RequestPage = () => {
           marginBottom: { xs: 4, md: 0 }
         }}
       >
-        <Stepper activeStep={activeStep} orientation={isMobile ? 'vertical' : 'horizontal'}>
+        <Stepper activeStep={currentPage }  orientation={isMobile ? 'vertical' : 'horizontal'}>
           {StepSections.map((step) => (
             <Step key={step.label}>
               <StepLabel slots={{ stepIcon: (props) => <CustomStepIcon {...props} icon={step.icon} /> }}>
@@ -56,18 +89,18 @@ export const RequestPage = () => {
         <Divider sx={{ mt: 3, marginX: -3 }} />
 
         <Box sx={{ mt: 2 }}>
-          {renderStepContent(activeStep)}
+          {renderStepContent(currentPage )}
           <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
             <Button 
               color="inherit" 
               onClick={handleBack} 
-              sx={{ mr: 1, display: { xs: activeStep === 0 ? 'none' : 'block' } }}
+              sx={{ mr: 1, display: { xs: currentPage  === 0 ? 'none' : 'block' } }}
             >
               Atrás
             </Button>
             <Box sx={{ flex: '1 1 auto' }} />
-            <Button onClick={handleNext}>
-              {activeStep === StepSections.length - 1 ? 'Finalizar' : 'Siguiente'}
+            <Button onClick={currentPage === StepSections.length ? handleFinalize : handleNext}>
+              {currentPage === StepSections.length  ? 'Finalizar' : 'Siguiente'}
             </Button>
           </Box>
         </Box>
