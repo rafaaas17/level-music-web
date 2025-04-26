@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import {updateSection,nextPage,previousPage,resetForm,} from "../store/events";
+import {updateSection,nextPage,previousPage,resetForm,} from "../../store";
 
 export const useEventStore = () => {
     const dispatch = useDispatch();

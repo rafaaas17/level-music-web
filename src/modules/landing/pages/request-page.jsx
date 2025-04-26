@@ -3,7 +3,7 @@ import { Box, Stepper, Step, StepLabel, Button, Typography, useMediaQuery, useTh
 import { LandingLayout } from '../layout/landing-layout';
 import { CustomStepIcon, StepSections } from '../components';
 import { useDispatch } from 'react-redux';
-import { useEventStore } from '../../../hooks/use-event-store';
+import { useEventStore } from '../../../hooks';
 
 
 

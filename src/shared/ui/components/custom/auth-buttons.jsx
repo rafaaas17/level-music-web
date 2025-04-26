@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Box, Button, IconButton, Container } from '@mui/material';
 import { Login as LoginIcon, PersonAdd as PersonAddIcon, Logout as LogoutIcon } from '@mui/icons-material';
 import { useScreenSizes } from '../../../constants/screen-width';
-import { useAuthStore } from '../../../../hooks/use-auth-store';
+import { useAuthStore } from '../../../../hooks';
 
 export const AuthButtons = () => {
   const { isMd } = useScreenSizes();
