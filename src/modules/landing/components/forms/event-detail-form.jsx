@@ -1,5 +1,5 @@
 import { Box, TextField, MenuItem } from '@mui/material';
-import { useEventStore } from '../../../../hooks/use-event-store';
+import { useEventStore } from '../../../../hooks';
 
 
 export const EventDetailsForm = () => {
@@ -7,14 +7,14 @@ export const EventDetailsForm = () => {
 
   const { eventCategory, eventType, attendeesCount, eventSchedule, eventDescription} = sections.find((section) => section.id === currentPage).data;
   
-  const handleNext = () => {
-    // Validar los datos de la página actual antes de avanzar
-    const validation = validateCurrentPage();
-    if (!validation.valid) {
-      alert(validation.message); // Mostrar mensaje de error si la validación falla
-      return;
-    }
-  }
+  // const handleNext = () => {
+  //   // Validar los datos de la página actual antes de avanzar
+  //   const validation = validateCurrentPage();
+  //   if (!validation.valid) {
+  //     alert(validation.message); // Mostrar mensaje de error si la validación falla
+  //     return;
+  //   }
+  // }
   
   return (
     <Box>

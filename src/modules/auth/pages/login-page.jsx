@@ -4,10 +4,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { TextField, Button, Alert, Box, Typography, useTheme } from "@mui/material";
 import { AuthLayout } from "../layout/auth-layout";
-import { useAuthStore } from "../../../hooks/use-auth-store";
-import googleLogo from "../../../assets/images/logo/google.png";
-import { clearErrorMessage } from "../../../store/auth";
+import { useAuthStore } from "../../../hooks";
+import { clearErrorMessage } from "../../../store";
 import { CircProgress } from "../../../shared/ui/components/common";
+import googleLogo from "../../../assets/images/logo/google.png";
 
 export const LoginPage = () => {
   const navigate = useNavigate();

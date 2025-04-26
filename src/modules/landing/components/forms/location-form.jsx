@@ -1,5 +1,5 @@
 import { Box, TextField, MenuItem } from '@mui/material';
-import { useEventStore } from '../../../../hooks/use-event-store';
+import { useEventStore } from '../../../../hooks';
 
 export const LocationForm = () => {
   const { sections, updateEventSection, currentPage } = useEventStore();

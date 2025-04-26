@@ -3,18 +3,18 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Alert, Box, Typography, useTheme } from "@mui/material";
 import { AuthLayout } from "../layout/auth-layout";
-import { useAuthStore } from "../../../hooks/use-auth-store";
+import { useAuthStore } from "../../../hooks";
 import { FormInputText } from "../../../shared/ui/components/form/form-input-text";
 import googleLogo from "../../../assets/images/logo/google.png";
 import { CircProgress } from '../../../shared/ui/components/common';
 import { useDispatch } from "react-redux";
-import { clearErrorMessage } from "../../../store/auth";
+import { clearErrorMessage } from "../../../store";
 
 export const RegisterPage = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const dispatch = useDispatch();
-  const { status, errorMessage, startCreateUser, onGoogleSignIn } = useAuthStore();
+  const { status, errorMessage, startRegisterUser, onGoogleSignIn } = useAuthStore();
 
   const { 
     control, 
@@ -31,7 +31,7 @@ export const RegisterPage = () => {
   }, []);
 
   const onSubmit = async (data) => {
-    const success = await startCreateUser(data);
+    const success = await startRegisterUser(data);
     if (success) navigate('/');
   };
 

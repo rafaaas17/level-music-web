@@ -1,5 +1,5 @@
 import { Box, FormControlLabel, Checkbox, TextField } from '@mui/material';
-import { useEventStore } from '../../../../hooks/use-event-store';
+import { useEventStore } from '../../../../hooks';
 
 export const ServicesForm = () => {
   const { sections, updateEventSection, currentPage } = useEventStore();
