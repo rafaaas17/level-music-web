@@ -4,7 +4,7 @@ import { sections } from '../../../constants/custom/nav-sections';
 import { Link } from 'react-router-dom';
 import { SocialMedia } from '../custom';
 
-export const CDrawer = ({ drawerOpen, handleDrawerToggle }) => {
+export const LandingDrawer = ({ drawerOpen, handleDrawerToggle }) => {
   const theme = useTheme();
 
   return (

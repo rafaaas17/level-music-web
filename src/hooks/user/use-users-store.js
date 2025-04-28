@@ -6,20 +6,26 @@ import {
   updateUser,
   refreshUsers,
 } from "../../store";
-import { createUserGoogleModel } from "../../shared/models";
+import { 
+  createUserGoogleModel,
+  createUserEmailPasswordModel,
+} from "../../shared/models";
 
 export const useUsersStore = () => {
   const { users, selected } = useSelector((state) => state.users);
   const dispatch = useDispatch();
 
-  const startCreateUser = async (user, role) => {
+  const startCreateUser = async (user, role, model) => {
     try {
-      const newUser = createUserGoogleModel(user, role);
-      console.log(newUser)
+      const modelMap = {
+        "google": createUserGoogleModel,
+        "email/password": createUserEmailPasswordModel,
+      };
+      const newUser = modelMap[model](user, role);
       const { data } = await userApi.post("/", newUser);
       return { ok: true, data };
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return false;
     }
   };
