@@ -27,8 +27,9 @@ export const useAuthStore = () => {
       const { user } = await signInWithPopup(FirebaseAuth, googleProvider);
       const { data, ok } = await findUserByEmail(user.providerData[0].email); 
 
+      console.log(user)
       if (!ok) {
-        const { data: newUser } = await startCreateUser(user, "Cliente");
+        const { data: newUser } = await startCreateUser(user, "Cliente", "google");
         dispatch(login({ 
           uid: newUser.auth_id, 
           email: newUser.email, 
@@ -97,6 +98,7 @@ export const useAuthStore = () => {
         return true;
       }
     } catch (error) {
+      console.log(error)
       dispatch(logout(error.message));
       if (error.code === "auth/invalid-credential") {
         dispatch(logout({ errorMessage: "Credenciales incorrectas" }));
@@ -116,7 +118,20 @@ export const useAuthStore = () => {
         dispatch(logout({ errorMessage: "Este correo ya está registrado." }));
         return false;
       } else {
-        await createUserWithEmailAndPassword(FirebaseAuth, email, password);
+        const { user } = await createUserWithEmailAndPassword(FirebaseAuth, email, password);
+        const { data: newUser } = await startCreateUser(user, "Cliente", "email/password");
+        dispatch(login({ 
+          uid: newUser.auth_id, 
+          email: newUser.email, 
+          displayName: null, 
+          phone: null,
+          documentType: null,
+          documentNumber: null,
+          role: newUser.role,
+          userStatus: newUser.status, // Activo, Inactivo
+          photoURL: null,
+          token: user.accessToken
+        }));
         return true;
       }
     } catch (error) {

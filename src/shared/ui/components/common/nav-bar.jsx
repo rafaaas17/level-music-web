@@ -5,7 +5,7 @@ import {
   Container, 
   useTheme
 } from '@mui/material';
-import { Logo, CDrawer } from './';
+import { Logo, LandingDrawer } from './';
 import { NavSections, AuthButtons, ToogleTheme, MenuDrawer } from '../custom';
 import { useScreenSizes } from '../../../constants/screen-width';
 
@@ -43,7 +43,7 @@ export const NavBar = () => {
       </Container>
 
       {/* Drawer del landing */}
-      <CDrawer drawerOpen={drawerOpen} handleDrawerToggle={handleDrawerToggle} />
+      <LandingDrawer drawerOpen={drawerOpen} handleDrawerToggle={handleDrawerToggle} />
     </AppBar>
   );
 };

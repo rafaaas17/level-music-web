@@ -19,8 +19,7 @@ export const AuthButtons = () => {
           <Button 
             variant="outlined" 
             startIcon={<LogoutIcon />} 
-            color="white" 
-            sx={{ border: 'none', mx: 2 }} 
+            sx={{ border: 'none', mx: 2, color: 'white' }} 
             onClick={handleLogout}
           >
             Cerrar Sesión

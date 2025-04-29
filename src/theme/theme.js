@@ -16,7 +16,7 @@ export const getTheme = (mode) =>
         main: red.A400,
       },
       background: {
-        default: mode === "dark" ? "#2B1200" : "#FFFFFF",
+        default: mode === "dark" ? "#44444E" : "#FFFFFF",
       },
       text: {
         primary: mode === "dark" ? "#FFFBFF" : "#252020",
