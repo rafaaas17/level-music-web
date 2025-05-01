@@ -1,11 +1,9 @@
 import React from 'react';
 import { Box, Stepper, Step, StepLabel, Button, Typography, useMediaQuery, useTheme, Paper, Divider } from '@mui/material';
-import { LandingLayout } from '../layout/landing-layout';
 import { CustomStepIcon, StepSections } from '../components';
 import { useDispatch } from 'react-redux';
 import { useEventStore } from '../../../hooks';
-
-
+import { LandingLayout } from '../layout/landing-layout';
 
 export const RequestPage = () => {
   const theme = useTheme();

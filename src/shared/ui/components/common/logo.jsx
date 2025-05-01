@@ -1,13 +1,14 @@
 import { Typography, useTheme, Box } from '@mui/material';
-import logo from "../../../../assets/images/logo.png";
+import { Link } from 'react-router-dom'; // Importa Link para navegación interna
+import { logo } from "../../../../assets/images/logo";
 
 export const Logo = ({ isNav = false }) => {
   const theme = useTheme();
 
   return (
     <Box 
-      component={isNav ? "a" : "div"}
-      href={isNav ? "/" : undefined}
+      component={isNav ? Link : "div"} 
+      to={isNav ? "/" : undefined} 
       sx={{
         alignItems: 'center',
         textDecoration: 'none',
