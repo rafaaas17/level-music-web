@@ -31,7 +31,10 @@ export const getTheme = (mode) =>
       },
       footer: {
         main: mode === 'dark' ? "#1D1D1D" : "#333333"
-      }      
+      },
+      pagination: {
+        main: mode === 'dark' ? "#1D1D1D" : "#333333"
+      },
     },
     typography: {
       fontFamily: "'Mulish', sans-serif",

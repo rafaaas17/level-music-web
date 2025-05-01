@@ -22,25 +22,18 @@ export const AppRouter = () => {
     return <CircProgress />;
   }
 
-  if (status === 'authenticated' && location.pathname.startsWith('/auth')) {
-    const isAdminRoute = lastRoute.startsWith('/admin');
-    const isClientRoute = lastRoute.startsWith('/cliente');
-  
-    if (role === 'Administrador' && isAdminRoute) {
-      return <Navigate to={lastRoute} replace />;
-    }
-  
-    if (role === 'Cliente' && isClientRoute) {
-      return <Navigate to={lastRoute} replace />;
-    }
-  
+  if (status === 'authenticated') {
     const dashboardPath = role === 'Administrador' ? '/admin' : '/cliente';
-    return <Navigate to={dashboardPath} replace />;
-  }
 
-  if (status === 'authenticated' && location.pathname === '/') {
-    const dashboardPath = role === 'Administrador' ? '/admin' : '/cliente';
-    return <Navigate to={dashboardPath} replace />;
+    // Redirigir desde rutas de autenticación
+    if (location.pathname.startsWith('/auth')) {
+      return <Navigate to={lastRoute.startsWith(dashboardPath) ? lastRoute : dashboardPath} replace />;
+    }
+
+    // Redirigir desde la raíz
+    if (location.pathname === '/') {
+      return <Navigate to={dashboardPath} replace />;
+    }
   }
 
   return (
