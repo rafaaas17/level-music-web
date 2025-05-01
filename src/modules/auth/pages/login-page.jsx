@@ -2,12 +2,12 @@ import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { TextField, Button, Alert, Box, Typography, useTheme } from "@mui/material";
+import { Button, Alert, Box, Typography, useTheme } from "@mui/material";
 import { AuthLayout } from "../layout/auth-layout";
-import { useAuthStore } from "../../../hooks/use-auth-store";
+import { useAuthStore } from "../../../hooks";
+import { clearErrorMessage } from "../../../store";
+import { CircProgress, FormInputText } from "../../../shared/ui/components";
 import googleLogo from "../../../assets/images/logo/google.png";
-import { clearErrorMessage } from "../../../store/auth";
-import { CircProgress } from "../../../shared/ui/components/common";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -16,9 +16,9 @@ export const LoginPage = () => {
   const { status, errorMessage, startLogin, onGoogleSignIn } = useAuthStore();
   
   const {
-    register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    register
   } = useForm({
     mode: "onBlur"
   });
@@ -43,26 +43,31 @@ export const LoginPage = () => {
       {status === 'checking' && <CircProgress />}
       <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
         {/* Email */}
-        <TextField
-          fullWidth
-          margin="normal"
+        <FormInputText
+          name="email"
+          register={register}
           label="Email"
-          variant="outlined"
-          {...register("email", { required: "El email es obligatorio" })}
-          error={!!errors.email}
-          helperText={errors.email?.message}
+          type="email"
+          error={errors.email}
+          rules={{ 
+            required: "El email es obligatorio",
+            pattern: {
+              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+              message: "Email inválido"
+            }
+          }}
         />
 
         {/* Contraseña */}
-        <TextField
-          fullWidth
-          margin="normal"
+        <FormInputText
+          name="password"
+          register={register}
           label="Contraseña"
           type="password"
-          variant="outlined"
-          {...register("password", { required: "La contraseña es obligatoria" })}
-          error={!!errors.password}
-          helperText={errors.password?.message}
+          error={errors.password}
+          rules={{ 
+            required: "La contraseña es obligatoria",
+          }}
         />
 
         {/* Mensaje de error */}
@@ -79,7 +84,8 @@ export const LoginPage = () => {
             to="/forgot-password" 
             style={{ 
               color: theme.palette.text.primary, 
-              textDecoration: "underline" 
+              textDecoration: "underline",
+              fontSize: 16,
             }}
           >
             ¿Olvidaste tu contraseña?
@@ -93,10 +99,10 @@ export const LoginPage = () => {
           variant="text"
           color="primary"
           sx={{
-            mt: 2,
+            mt: 1,
             padding: "10px",
             textTransform: "none",
-            fontSize: "1rem",
+            fontSize: 16,
             "&:hover": {
               backgroundColor: theme.palette.primary.hover,
             },
@@ -108,7 +114,7 @@ export const LoginPage = () => {
           Ingresar
         </Button>
 
-        <Typography sx={{ my: 5 }}>
+        <Typography sx={{ my: 3, fontSize: 16 }}>
           ¿Aún no tienes una cuenta?{' '}
           <Link 
             to="/auth/register" 
@@ -130,7 +136,7 @@ export const LoginPage = () => {
           sx={{
             padding: "10px",
             textTransform: "none",
-            fontSize: "1rem",
+            fontSize: 16,
             color: "#000",
             "&:hover": {
               backgroundColor: "#D3B7AD",

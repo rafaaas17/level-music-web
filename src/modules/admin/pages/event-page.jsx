@@ -3,7 +3,19 @@ import React from 'react';
 export const EventPage = () => {
   return (
     <div>
-      EventPage
+      <p>Event Page</p>
+      <p>Event Page</p>
+      <p>Event Page</p>
+      <p>Event Page</p>
+      <p>Event Page</p>
+      <p>Event Page</p>
+      <p>Event Page</p>
+      <p>Event Page</p>
+      <p>Event Page</p>
+      <p>Event Page</p>
+      <p>Event Page</p>
+      <p>Event Page</p>
+      <p>Event Page</p>
     </div>
   );
 };

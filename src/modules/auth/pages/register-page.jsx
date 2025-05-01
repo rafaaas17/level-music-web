@@ -3,23 +3,22 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Alert, Box, Typography, useTheme } from "@mui/material";
 import { AuthLayout } from "../layout/auth-layout";
-import { useAuthStore } from "../../../hooks/use-auth-store";
-import { FormInputText } from "../../../shared/ui/components/form/form-input-text";
-import googleLogo from "../../../assets/images/logo/google.png";
-import { CircProgress } from '../../../shared/ui/components/common';
+import { useAuthStore } from "../../../hooks";
+import { CircProgress, FormInputText } from '../../../shared/ui/components';
 import { useDispatch } from "react-redux";
-import { clearErrorMessage } from "../../../store/auth";
+import { clearErrorMessage } from "../../../store";
+import googleLogo from "../../../assets/images/logo/google.png";
 
 export const RegisterPage = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const dispatch = useDispatch();
-  const { status, errorMessage, startCreateUser, onGoogleSignIn } = useAuthStore();
+  const { status, errorMessage, startRegisterUser, onGoogleSignIn } = useAuthStore();
 
   const { 
-    control, 
     handleSubmit, 
-    formState: { isSubmitting } 
+    formState: { errors, isSubmitting },
+    register,
   } = useForm({
     mode: "onBlur"
   });
@@ -31,7 +30,7 @@ export const RegisterPage = () => {
   }, []);
 
   const onSubmit = async (data) => {
-    const success = await startCreateUser(data);
+    const success = await startRegisterUser(data);
     if (success) navigate('/');
   };
 
@@ -47,10 +46,13 @@ export const RegisterPage = () => {
     >
       {status === 'checking' && <CircProgress />}
       <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
+        {/* Email */}
         <FormInputText
           name="email"
-          control={control}
+          register={register}
           label="Correo electrónico"
+          type="email"
+          error={errors.email}
           rules={{ 
             required: "El email es obligatorio",
             pattern: {
@@ -59,11 +61,14 @@ export const RegisterPage = () => {
             }
           }}
         />
+
+        {/* Contraseña */}
         <FormInputText
           name="password"
-          control={control}
+          register={register}
           label="Contraseña"
           type="password"
+          error={errors.password}
           rules={{ 
             required: "La contraseña es obligatoria",
             minLength: { value: 6, message: "Mínimo 6 caracteres" },
