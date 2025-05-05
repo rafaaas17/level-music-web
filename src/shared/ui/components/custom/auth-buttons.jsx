@@ -14,7 +14,7 @@ export const AuthButtons = () => {
 
   if (status === 'authenticated') {
     return (
-      <Box sx={{ flexGrow: 0, mx: { md: -3, xs: 0 } }}>
+      <Box sx={{ flexGrow: 0, mx: { lg: -3, xs: 0 } }}>
         {isMd ? (
           <Button 
             variant="outlined" 
@@ -34,7 +34,7 @@ export const AuthButtons = () => {
   }
 
   return (
-    <Box sx={{ flexGrow: 0, mx: { md: -3, xs: 0 } }}>
+    <Box sx={{ flexGrow: 0, mx: { lg: -3, xs: 0 } }}>
       {isMd ? (
         <Container>
           {[

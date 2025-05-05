@@ -1,4 +1,5 @@
-export { default as imagen_1 } from './imagen_1.png';
+export { default as imagen_1_lm } from './imagen_1_lm.png';
+export { default as imagen_1_dm } from './imagen_1_dm.png';
 export { default as imagen_2 } from './imagen_2.jpg';
 export { default as imagen_3 } from './imagen_3.jpg';
 export { default as imagen_4 } from './imagen_4.jpg';

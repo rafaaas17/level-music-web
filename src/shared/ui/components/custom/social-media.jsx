@@ -17,7 +17,6 @@ export const SocialMedia = () => {
         justifyContent: 'center',
         alignItems: 'center',
         gap: 0.5, // Reduce el espacio entre los íconos
-        paddingTop: { md: 0, xs: 1 },
       }}
     >
       {socialLinks.map((link, index) => (
