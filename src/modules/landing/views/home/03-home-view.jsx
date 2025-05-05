@@ -20,7 +20,6 @@ import {
   imagen_6,
 } from '../../../../assets/images/home';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
-import { useScreenSizes } from '../../../../shared/constants/screen-width';
 
 const slides = [
   { src: imagen_2, alt: 'evento 1' },
@@ -39,7 +38,6 @@ const StyledSwiper = styled(Swiper)({
 
 export const HomeView03 = () => {
   const theme = useTheme();
-  const { isXs, isSm } = useScreenSizes();
   const prevRef = useRef(null);
   const nextRef = useRef(null);
 

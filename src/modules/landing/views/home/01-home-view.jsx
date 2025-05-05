@@ -42,7 +42,7 @@ const SlideContent = ({ image, title, subtitle, buttonText, isSecondSlide = fals
               left: 0,
               width: '100%',
               height: '100%',
-              backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+              backgroundColor: theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0.5)' : undefined, 
               zIndex: 1,
             }
           : undefined, 

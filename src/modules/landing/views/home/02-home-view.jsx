@@ -1,5 +1,5 @@
 import { Container, Typography, Box, useTheme } from '@mui/material';
-import { imagen_1 } from '../../../../assets/images/home';
+import { imagen_1_lm, imagen_1_dm } from '../../../../assets/images/home';
 
 export const HomeView02 = () => {
   const theme = useTheme();
@@ -48,7 +48,7 @@ export const HomeView02 = () => {
           >
             <Box
               component="img"
-              src={imagen_1}
+              src={ theme.palette.mode === 'light' ? imagen_1_lm : imagen_1_dm}
               alt="equipo"
               sx={{
                 width: { xs: '75%', md: '90%' },

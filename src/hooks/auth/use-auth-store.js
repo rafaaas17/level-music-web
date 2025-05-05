@@ -18,7 +18,7 @@ export const useAuthStore = () => {
   const dispatch = useDispatch();
   const checkingAuthentication = () => dispatch(checkingCredentials());
 
-  const { status, uid, email, displayName, photoURL, errorMessage } = useSelector((state) => state.auth);
+  const { status, uid, email, displayName, photoURL, role, errorMessage } = useSelector((state) => state.auth);
   const { startCreateUser, findUserByEmail } = useUsersStore();
 
   const onGoogleSignIn = async () => {
@@ -155,6 +155,7 @@ export const useAuthStore = () => {
     email, 
     displayName, 
     photoURL, 
+    role,
     errorMessage,
     checkingAuthentication, 
     onGoogleSignIn, 

@@ -1,49 +1,151 @@
-import * as React from 'react';
+import { useState } from 'react';
 import { 
   AppBar, 
   Toolbar, 
   Container, 
-  useTheme
+  useTheme,
+  Box
 } from '@mui/material';
-import { Logo, LandingDrawer } from './';
+import { Logo, LandingDrawer, ProtectedDrawer } from './';
 import { NavSections, AuthButtons, ToogleTheme, MenuDrawer } from '../custom';
 import { useScreenSizes } from '../../../constants/screen-width';
+import { useAuthStore } from '../../../../hooks';
+import { menuItems } from '../../../../modules/admin/constants/menu-items';
 
 export const NavBar = () => {
   const theme = useTheme();
-  const { isMd } = useScreenSizes();
+  const { status, role } = useAuthStore();
+  const { isLg } = useScreenSizes();
 
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const [landingDrawerOpen, setLandingDrawerOpen] = useState(false);
+  const [protectedDrawerOpen, setProtectedDrawerOpen] = useState(false);
 
-  const handleDrawerToggle = () => {
-    setDrawerOpen((prev) => !prev);
+  const handleLandingDrawerToggle = () => {
+    setLandingDrawerOpen((prev) => !prev);
+  };
+
+  const handleProtectedDrawerToggle = () => {
+    setProtectedDrawerOpen((prev) => !prev);
   };
 
   return (
-    <AppBar position="fixed" sx={{ backgroundColor: theme.palette.primary.main }}>
+    <AppBar
+      position="fixed"
+      sx={{ backgroundColor: theme.palette.primary.main }}
+    >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-
-          {/* Menu Drawer (para el tamaño de ipad) */}
-          {!isMd && <MenuDrawer handleDrawerToggle={handleDrawerToggle} />}
-          
-          {/* Logo */}
-          <Logo isNav />
-
-          {/* Sections */}
-          <NavSections />
-
-          {/* Toogle theme */}
-          <ToogleTheme />
-
-          {/* Login & Register Buttons */}
-          <AuthButtons />
-
+          {status === "authenticated" ? (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+              }}
+            >
+              { isLg ? (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                  }}
+                >
+                  <>
+                    <Logo isNav />
+                    <NavSections />
+                  </>
+                  <>
+                    <ToogleTheme />
+                    <AuthButtons />
+                  </>
+                </Box>
+              ) : (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                    gap: 1,
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <MenuDrawer handleDrawerToggle={handleProtectedDrawerToggle} type="menu" />
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Logo isNav />
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <MenuDrawer handleDrawerToggle={handleLandingDrawerToggle} />
+                  </Box>
+                </Box>
+              )}
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+              }}
+            >
+              { isLg ? (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                  }}
+                >
+                  <>
+                    <Logo isNav />
+                    <NavSections />
+                  </>
+                  <>
+                    <ToogleTheme />
+                    <AuthButtons />
+                  </>
+                </Box>
+              ) : (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                    gap: 1,
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Logo isNav />
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <MenuDrawer handleDrawerToggle={handleLandingDrawerToggle} type="menu" />
+                  </Box>
+                </Box>
+              )}
+            </Box>
+          )}
         </Toolbar>
       </Container>
 
       {/* Drawer del landing */}
-      <LandingDrawer drawerOpen={drawerOpen} handleDrawerToggle={handleDrawerToggle} />
+      <LandingDrawer
+        drawerOpen={landingDrawerOpen}
+        handleDrawerToggle={handleLandingDrawerToggle}
+      />
+
+      {/* Drawer del protected */}
+      <ProtectedDrawer
+        drawerOpen={protectedDrawerOpen}
+        handleDrawerToggle={handleProtectedDrawerToggle}
+        menuItems={ role === 'Administrador' ? menuItems : undefined }
+      />
     </AppBar>
   );
 };
