@@ -3,9 +3,9 @@ import { workerTypeApi } from '../../api';
 import {
   refreshWorkerTypes,
   selectedWorkerType,
-  setLoading,
-  setPage,
-  setRowsPerPage,
+  setLoadingWorkerType,
+  setPageWorkerType,
+  setRowsPerPageWorkerType,
   showSnackbar,
 } from '../../store';
 import { 
@@ -30,7 +30,7 @@ export const useWorkerTypesStore = () => {
   const [order, setOrder] = useState('asc');
 
   const startCreateWorkerType = async (workerType) => {
-    dispatch(setLoading(true));
+    dispatch(setLoadingWorkerType(true));
     try {
       const payload = createWorkerTypeModel(workerType);
       await workerTypeApi.post('/', payload);
@@ -48,12 +48,12 @@ export const useWorkerTypesStore = () => {
       }));
       return false;
     } finally {
-      dispatch(setLoading(false));
+      dispatch(setLoadingWorkerType(false));
     }
   };
 
   const startLoadingWorkerTypesPaginated = async () => {
-    dispatch(setLoading(true));
+    dispatch(setLoadingWorkerType(true));
     try {
       const limit  = rowsPerPage;
       const offset = currentPage * rowsPerPage;
@@ -76,12 +76,12 @@ export const useWorkerTypesStore = () => {
       console.log(error);
       return false;
     } finally {
-      dispatch(setLoading(false));
+      dispatch(setLoadingWorkerType(false));
     }
   };
 
   const startUpdateWorkerType = async (id, workerType) => {
-    dispatch(setLoading(true));
+    dispatch(setLoadingWorkerType(true));
     try {
       const payload = updateWorkerTypeModel(workerType);
       await workerTypeApi.put(`/${id}`, payload);
@@ -99,12 +99,12 @@ export const useWorkerTypesStore = () => {
       }));
       return false;
     } finally {
-      dispatch(setLoading(false));
+      dispatch(setLoadingWorkerType(false));
     }
   };
 
   const startDeleteWorkerType = async (id) => {
-    dispatch(setLoading(true));
+    dispatch(setLoadingWorkerType(true));
     try {
       await workerTypeApi.delete(`/${id}`);
       startLoadingWorkerTypesPaginated();
@@ -121,7 +121,7 @@ export const useWorkerTypesStore = () => {
       }));
       return false;
     } finally {
-      dispatch(setLoading(false));
+      dispatch(setLoadingWorkerType(false));
     }
   };
 
@@ -130,11 +130,11 @@ export const useWorkerTypesStore = () => {
   };
 
   const setPageGlobal = (page) => {
-    dispatch(setPage(page));
+    dispatch(setPageWorkerType(page));
   };
 
   const setRowsPerPageGlobal = (rows) => {
-    dispatch(setRowsPerPage(rows));
+    dispatch(setRowsPerPageWorkerType(rows));
   };
 
   return {

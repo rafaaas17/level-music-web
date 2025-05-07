@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const ServicesPage = () => {
+export const ServicePage = () => {
   return (
       <p>Services Page</p>
   )

@@ -23,13 +23,13 @@ export const workerTypesSlice = createSlice({
     selectedWorkerType: (state, action) => {
       state.selected = action.payload;
     },
-    setLoading: (state, action) => {
+    setLoadingWorkerType: (state, action) => {
       state.loading = action.payload;
     },
-    setPage: (state, action) => {
+    setPageWorkerType: (state, action) => {
       state.currentPage = action.payload;
     },
-    setRowsPerPage: (state, action) => {
+    setRowsPerPageWorkerType: (state, action) => {
       state.rowsPerPage = action.payload;
     },
   },
@@ -38,7 +38,7 @@ export const workerTypesSlice = createSlice({
 export const {
   refreshWorkerTypes,
   selectedWorkerType,
-  setLoading,
-  setPage,
-  setRowsPerPage,
+  setLoadingWorkerType,
+  setPageWorkerType,
+  setRowsPerPageWorkerType,
 } = workerTypesSlice.actions;
