@@ -4,12 +4,12 @@ import { Close } from "@mui/icons-material";
 
 export const ServiceTypeModal = ({ open, onClose, serviceType  = {},
 setServiceType }) => {
-  const isEditing = !!serviceType?.id;
-  const { startCreatteServiceType, startUpdateServiceType } = useServiceTypeStore();
+  const isEditing = !!serviceType?._id;
+  const { startCreateServiceType, startUpdateServiceType } = useServiceTypeStore();
 
   const handleSave = async () => {
     if (!isEditing) {
-      const success = await startCreatteServiceType(serviceType); 
+      const success = await startCreateServiceType(serviceType); 
       if (success) onClose(); 
     } else {
       const success = await startUpdateServiceType(serviceType._id, serviceType); 

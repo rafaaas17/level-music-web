@@ -9,11 +9,12 @@ import {
   showSnackbar 
 } from "../../store";
 import { useState } from "react";
+import { serviceTypeApi } from "../../api";
 
 export const useServiceTypeStore = () => {
   const dispatch = useDispatch();
   const{
-    serviceType,
+    serviceTypes,
     selected,
     total,
     loading,
@@ -53,17 +54,18 @@ export const useServiceTypeStore = () => {
       const limit  = rowsPerPage;
       const offset = currentPage * rowsPerPage;
       const { data } = await serviceTypeApi.get('/paginated', {
-        params: { 
+        params: {
           limit,
           offset,
-          search: searchTerm.trim(), 
-          sortField: orderBy, 
-          sortOrder: order  },
+          search: searchTerm.trim(),
+          sortField: orderBy,
+          sortOrder: order,
+        },
       });
       dispatch(refreshServiceType({
         items: data.items,
         total: data.total,
-        page: currentPage,
+        page:  currentPage,
       }));
       return true;
     } catch (error) {
@@ -74,7 +76,7 @@ export const useServiceTypeStore = () => {
     }
   };
 
-  const startUpdateServiceType = async (serviceType) => {
+  const startUpdateServiceType = async (id, serviceType) => {
     dispatch(setLoadingServiceType(true));
     try {
       const payload = updateServiceTypeModel(serviceType);
@@ -123,34 +125,34 @@ export const useServiceTypeStore = () => {
     dispatch(selectedServiceType({ ...serviceType }));
   };
 
-const setPageGlobal = (page) => {
-  dispatch(setPageServiceType(page));
-};
+  const setPageGlobal = (page) => {
+    dispatch(setPageServiceType(page));
+  };
 
-const setRowsPerPageGlobal = (rows) => {
-  dispatch(setRowsPerPageServiceType(rows));
-};
+  const setRowsPerPageGlobal = (rows) => {
+    dispatch(setRowsPerPageServiceType(rows));
+  };
 
-return {
-  serviceType,
-  selected,
-  total,
-  loading,
-  searchTerm,
-  rowsPerPage,
-  orderBy,
-  order,
+  return {
+    serviceTypes,
+    selected,
+    total,
+    loading,
+    searchTerm,
+    rowsPerPage,
+    orderBy,
+    order,
 
-  setSearchTerm,
-  setOrderBy,
-  setOrder, 
-  setPageGlobal,
-  setRowsPerPageGlobal,
+    setSearchTerm,
+    setOrderBy,
+    setOrder, 
+    setPageGlobal,
+    setRowsPerPageGlobal,
 
-  startCreateServiceType,
-  startLoadingServiceTypePaginated,
-  startUpdateServiceType,
-  startDeleteServiceType,
-  setSelectedServiceType,
-};
+    startCreateServiceType,
+    startLoadingServiceTypePaginated,
+    startUpdateServiceType,
+    startDeleteServiceType,
+    setSelectedServiceType,
+  };
 };

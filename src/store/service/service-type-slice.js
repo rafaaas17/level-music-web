@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  serviceType: [],
+  serviceTypes: [],
   selected: null,
   total: 0,
   currentPage: 0,
@@ -15,7 +15,7 @@ export const serviceTypeSlice = createSlice({
   reducers: {
     refreshServiceType: (state, action) => {
       const { items, total, page } = action.payload;
-      state.serviceType = items;
+      state.serviceTypes = items;
       state.total = total;
       state.currentPage = page;
       state.loading = false;

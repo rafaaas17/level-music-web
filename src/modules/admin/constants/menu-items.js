@@ -35,31 +35,19 @@ export const menuItems = [
       }
     ]
   },
-  
   { 
-    text: 'Gestionar Servicios', 
-    icon: RoomService,
+    text: 'Gestionar Trabajadores', 
+    icon: People,
     subItems: [
       { 
-        text: 'Servicios', 
-        breadcrumb: 'Servicios',
-        href: '/admin/service' 
+        text: 'Trabajadores', 
+        breadcrumb: 'Trabajadores',
+        href: '/admin/workers' 
       },
       { 
-        text: 'Tipo de Servicios', 
-        breadcrumb: 'Tipo de Servicios',
-        href: '/admin/service-type' 
-      }
-    ]
-  },
-  { 
-    text: 'Gestionar Proveedores', 
-    icon: Store,
-    subItems: [
-      { 
-        text: 'Proveedores', 
-        breadcrumb: 'Proveedores',
-        href: '/admin/provider' 
+        text: 'Tipo de Trabajadores', 
+        breadcrumb: 'Tipo de Trabajadores',
+        href: '/admin/worker-types' 
       }
     ]
   },
@@ -81,9 +69,25 @@ export const menuItems = [
   },
   { 
     text: 'Gestionar Servicios', 
-    breadcrumb: 'Servicios',
-    icon: RoomService, 
-    href: '/admin/services' 
+    icon: RoomService,
+    subItems: [
+      { 
+        text: 'Servicios', 
+        breadcrumb: 'Servicios',
+        href: '/admin/service' 
+      },
+      { 
+        text: 'Tipo de Servicios', 
+        breadcrumb: 'Tipo de Servicios',
+        href: '/admin/service-type' 
+      }
+    ]
+  },
+  { 
+    text: 'Gestionar Proveedores', 
+    breadcrumb: 'Proveedores',
+    icon: Store,
+    href: '/admin/provider' 
   },
   { 
     text: 'Almacén', 
