@@ -9,7 +9,7 @@ import { ServiceTypeModal } from "../../components";
 
 export const ServiceTypePage = () => {
   const {
-    serviceType,
+    serviceTypes, 
     total,
     loading,
     searchTerm,
@@ -26,9 +26,9 @@ export const ServiceTypePage = () => {
     startLoadingServiceTypePaginated,
     setSelectedServiceType,
     startDeleteServiceType,
-
   } = useServiceTypeStore();
   const { isLg } = useScreenSizes();
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [rowToDelete, setRowToDelete] = useState(null);
@@ -102,7 +102,7 @@ export const ServiceTypePage = () => {
           <Box display="flex" justifyContent="center" alignItems="center" sx={{ py: 5 }}>
             <CircularProgress />
           </Box>
-        ) : serviceType.length === 0 ? (
+        ) : serviceTypes.length === 0 ? (
           <Box display="flex" justifyContent="center" alignItems="center" sx={{ py: 5 }}>
             <Typography sx={{ color: 'text.secondary', fontSize: 16 }}>
               No se encontraron resultados.
@@ -110,7 +110,7 @@ export const ServiceTypePage = () => {
           </Box>
         ) : (
           <TableComponent
-            rows={serviceType}
+            rows={serviceTypes}
             columns={columns}
             order={order}
             orderBy={orderBy}
