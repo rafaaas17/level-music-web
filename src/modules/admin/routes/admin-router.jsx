@@ -9,7 +9,9 @@ import {
   EquipmentPage,
   EquipmentMaintenancePage,
   StorehousePage,
-  ServicesPage,
+  ServicePage,
+  ServiceTypePage,
+  ProviderPage,
 } from '../pages';
 import { AdminLayout } from '../layout/admin-layout';
 
@@ -37,7 +39,10 @@ export const AdminRoutes = () => {
         <Route path="storehouse" element={<StorehousePage />} />
 
         {/* Servicios */}
-        <Route path="services" element={<ServicesPage />} />
+        <Route path="service" element={<ServicePage />} />
+        <Route path="service-type" element={<ServiceTypePage />} />
+
+        <Route path="provider" element={<ProviderPage />} />
 
         {/* Rutas no encontradas */}
         <Route path="*" element={<Navigate to="/not-found" replace />} />

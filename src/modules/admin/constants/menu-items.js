@@ -35,19 +35,31 @@ export const menuItems = [
       }
     ]
   },
+  
   { 
-    text: 'Gestionar Trabajadores', 
-    icon: People,
+    text: 'Gestionar Servicios', 
+    icon: RoomService,
     subItems: [
       { 
-        text: 'Trabajadores', 
-        breadcrumb: 'Trabajadores',
-        href: '/admin/workers' 
+        text: 'Servicios', 
+        breadcrumb: 'Servicios',
+        href: '/admin/service' 
       },
       { 
-        text: 'Tipo de Trabajadores', 
-        breadcrumb: 'Tipo de Trabajadores',
-        href: '/admin/worker-types' 
+        text: 'Tipo de Servicios', 
+        breadcrumb: 'Tipo de Servicios',
+        href: '/admin/service-type' 
+      }
+    ]
+  },
+  { 
+    text: 'Gestionar Proveedores', 
+    icon: Store,
+    subItems: [
+      { 
+        text: 'Proveedores', 
+        breadcrumb: 'Proveedores',
+        href: '/admin/provider' 
       }
     ]
   },
