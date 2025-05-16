@@ -1,4 +1,4 @@
-// export * from './event';
+export * from './event';
 // export * from './service';
 // export * from './storehouse';
 export * from './user';

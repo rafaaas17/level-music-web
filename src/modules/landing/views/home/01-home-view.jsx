@@ -130,35 +130,107 @@ export const HomeView01 = () => {
   return (
     <Box sx={{ width: '100%' }}>
       <Swiper
-        modules={[Navigation, Pagination]}
+        modules={[Navigation, Pagination, Autoplay]}
         loop
-        navigation={!isMobile}
-        pagination={isMobile ? { clickable: true } : { clickable: true }}
-        style={{ height: '100%', background: 'white' }}
+        navigation={{
+          prevEl: prevRef.current,
+          nextEl: nextRef.current,
+        }}
+        onBeforeInit={(swiper) => {
+          swiper.params.navigation.prevEl = prevRef.current;
+          swiper.params.navigation.nextEl = nextRef.current;
+        }}
+        pagination={{
+          clickable: true,
+          bulletClass: 'swiper-pagination-bullet', // Clase específica para HomeView01
+          bulletActiveClass: 'swiper-pagination-bullet-active', // Clase activa específica
+        }}
+        autoplay={{
+          delay: 5000,
+          disableOnInteraction: false,
+        }}
+        style={{
+          height: '100%',
+          background: 'white',
+        }}
         className="custom-swiper"
       >
-        <SwiperSlide>
-          <SlideContent
-            image={imagen1}
-            title="Producción de Audio y Sonido Profesional"
-            subtitle="Sonido en vivo · Iluminación LED · Pantallas LED"
-            buttonText="Ver Servicios"
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <SlideContent
-            image={imagen2}
-            title="Tu Playlist, Nuestra Mezcla"
-            subtitle="“Envíanos tu lista de canciones y creamos la atmósfera perfecta para tu evento.”"
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <SlideContent
-            image={imagen3}
-            title="Tu Playlist, Nuestra Mezcla"
-            subtitle="“Envíanos tu lista de canciones y creamos la atmósfera perfecta para tu evento.”"
-          />
-        </SwiperSlide>
+        {slides.map((slide, index) => (
+          <SwiperSlide key={index}>
+            <SlideContent
+              image={slide.image}
+              title={slide.title}
+              subtitle={slide.subtitle}
+              buttonText={slide.buttonText}
+              isFirstSlide={index === 0} 
+              isSecondSlide={index === 1} 
+              isThirdSlide={index === 2}
+            />
+          </SwiperSlide>
+        ))}
+        {/* Flechas personalizadas */}
+        { !isXs && (
+          <>
+            <Box
+              ref={prevRef}
+              className="swiper-button-prev"
+              sx={{
+                width: '40px',
+                height: '40px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                color: theme.palette.primary.main, 
+                fontSize: '18px',
+                backgroundColor: 'white',
+                borderRadius: '50%',
+                cursor: 'pointer',
+                position: 'absolute',
+                left: '30px', // Más separadas de la esquina izquierda
+                top: '50%',
+                transition: 'transform 0.3s ease, background-color 0.3s ease',
+                '&::after': {
+                  content: '"\\276E"',
+                  fontSize: '24px',
+                  fontWeight: 'bold',
+                },
+                '&:hover': {
+                  transform: 'scale(1.2)', // Agranda la flecha al pasar el mouse
+                  color: theme.palette.primary.dark,
+                },
+              }}
+            />
+            <Box
+              ref={nextRef}
+              className="swiper-button-next"
+              sx={{
+                width: '40px',
+                height: '40px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                color: theme.palette.primary.main, 
+                fontSize: '18px',
+                backgroundColor: 'white',
+                borderRadius: '50%',
+                cursor: 'pointer',
+                position: 'absolute',
+                right: '30px', // Más separadas de la esquina derecha
+                top: '50%',
+                transition: 'transform 0.3s ease, background-color 0.3s ease',
+                '&::after': {
+                  content: '"\\276F"', // Unicode para la flecha derecha
+                  fontSize: '24px',
+                  fontWeight: 'bold',
+                },
+                '&:hover': {
+                  transform: 'scale(1.2)', // Agranda la flecha al pasar el mouse
+                  color: theme.palette.primary.dark,
+                },
+              }}
+            />
+          </>
+        )}
       </Swiper>
     </Box>
   );

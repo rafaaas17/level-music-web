@@ -5,26 +5,37 @@ import {
   TextField,
   Button,
   IconButton,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
+import { useEventTypeStore } from "../../../../hooks";
 import { Close } from "@mui/icons-material";
-import { useWorkerTypesStore } from "../../../../hooks";
 
-export const WorkerTypeModal = ({
+export const EventTypeModal = ({
   open,
   onClose,
-  workerType = {},
-  setWorkerType,
+  eventType = {},
+  setEventType,
 }) => {
-  const isEditing = !!workerType?._id;
-  const { startCreateWorkerType, startUpdateWorkerType } =
-    useWorkerTypesStore();
+  const isEditing = !!eventType && !!eventType._id;
+  const { startCreateEventType, startUpdateEventType } = useEventTypeStore();
 
   const handleSave = async () => {
+    const eventTypeToSave = {
+      ...eventType,
+      category: eventType.category || "Social",
+    };
+
     if (!isEditing) {
-      const success = await startCreateWorkerType(workerType);
+      const success = await startCreateEventType(eventTypeToSave);
       if (success) onClose();
     } else {
-      const success = await startUpdateWorkerType(workerType._id, workerType);
+      const success = await startUpdateEventType(
+        eventType._id,
+        eventTypeToSave
+      );
       if (success) onClose();
     }
   };
@@ -51,9 +62,7 @@ export const WorkerTypeModal = ({
           mb={3}
         >
           <Typography variant="h6" fontWeight={600}>
-            {isEditing
-              ? "Editar tipo de trabajador"
-              : "Agregar tipo de trabajador"}
+            {isEditing ? "Editar evento" : "Agregar evento"}
           </Typography>
           <IconButton onClick={onClose}>
             <Close />
@@ -61,22 +70,38 @@ export const WorkerTypeModal = ({
         </Box>
 
         <Box display="flex" gap={2} mb={2} sx={{ flexDirection: "column" }}>
-          <TextField
-            label="Nombre"
+          
+        <TextField
+            label="descripción"
             fullWidth
-            value={workerType?.name || ""}
+            value={eventType?.description || ""}
             onChange={(e) =>
-              setWorkerType({ ...workerType, name: e.target.value })
+              setEventType({ ...eventType, description: e.target.value })   
             }
           />
           <TextField
-            label="Descripción"
+            label="Tipo de evento"	
             fullWidth
-            value={workerType?.description || ""}
+            value={eventType?.type || ""}
             onChange={(e) =>
-              setWorkerType({ ...workerType, description: e.target.value })
+              setEventType({ ...eventType, type: e.target.value })
             }
           />
+          
+          <FormControl fullWidth>
+            <InputLabel id="category-label">Categoria</InputLabel>
+            <Select
+              labelId="category-label"
+              id="category"
+              value={eventType?.category || "Social"}
+              onChange={(e) =>
+                setEventType({ ...eventType, category: e.target.value })
+              }
+            >
+              <MenuItem value="Social">Social</MenuItem>
+              <MenuItem value="Corporativo">Corporativo</MenuItem>
+            </Select>
+          </FormControl>
         </Box>
 
         <Button

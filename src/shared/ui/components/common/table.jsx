@@ -14,6 +14,7 @@ import {
   Card,
   CardContent,
   Typography,
+  Chip,
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useScreenSizes } from '../../../constants/screen-width';
@@ -91,7 +92,17 @@ export const TableComponent = ({
                     <Typography variant="subtitle2" color="textSecondary">
                       {column.label}
                     </Typography>
-                    <Typography variant="body1">{row[column.id]}</Typography>
+                    <Typography variant="body1">
+                      {column.id === 'status' ? (
+                        <Chip
+                          label={row[column.id]}
+                          color={row[column.id] === 'Activo' ? 'success' : 'error'}
+                          size="small"
+                        />
+                      ) : (
+                        row[column.id]
+                      )}
+                    </Typography>
                   </Box>
                 ))}
               </CardContent>
@@ -198,7 +209,15 @@ export const TableComponent = ({
                 >
                   {columns.map((column) => (
                     <TableCell key={`${row._id}-${column.id}`} sx={{ p: 2, fontSize: 16 }}>
-                      {row[column.id]}
+                      {column.id === 'status' ? (
+                        <Chip
+                          label={row[column.id]}
+                          color={row[column.id] === 'Activo' ? 'success' : 'error'}
+                          size="small"
+                        />
+                      ) : (
+                        row[column.id]
+                      )}
                     </TableCell>
                   ))}
                   {actions && (
