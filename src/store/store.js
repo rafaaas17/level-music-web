@@ -3,7 +3,11 @@ import {
   authSlice,
   themeSlice,
   eventQuotationSlice,
-  usersSlice
+  usersSlice,
+  workerTypesSlice,
+  providerSlice,
+  serviceTypeSlice,
+  uiSlice
 } from './';
 
 export const store = configureStore({
@@ -12,5 +16,9 @@ export const store = configureStore({
     theme: themeSlice.reducer,
     events: eventQuotationSlice.reducer,
     users: usersSlice.reducer,
+    workerTypes: workerTypesSlice.reducer,
+    ui: uiSlice.reducer,
+    provider: providerSlice.reducer,
+    serviceType: serviceTypeSlice.reducer
   },
 });

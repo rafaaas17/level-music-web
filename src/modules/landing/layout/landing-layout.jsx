@@ -1,7 +1,7 @@
-import { Container } from '@mui/material'
-import React from 'react'
+import { Box, Container } from '@mui/material'
+import { Outlet } from 'react-router-dom'
 
-export const LandingLayout = ({ children }) => {
+export const LandingLayout = () => {
   return (
     <Container 
       sx={{ 
@@ -10,7 +10,7 @@ export const LandingLayout = ({ children }) => {
         backgroundColor: 'background.default',
       }}
     > 
-      { children }
+      <Outlet />
     </Container>
   )
 }

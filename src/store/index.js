@@ -1,8 +1,10 @@
 export * from './auth';
 export * from './event';
-// export * from './service';
+export * from './extra';
+export * from './service';
+export * from './provider';
 // export * from './storehouse';
 export * from './theme';
 export * from './user';
-// export * from './worker';
+export * from './worker';
 export * from './store';

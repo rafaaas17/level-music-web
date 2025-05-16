@@ -1,10 +1,9 @@
-import React from 'react';
 import { Box, IconButton } from '@mui/material';
-import { Menu as MenuIcon } from '@mui/icons-material';
+import { Menu, AccountCircle } from '@mui/icons-material';
 
-export const MenuDrawer = ({ handleDrawerToggle }) => {
+export const MenuDrawer = ({ handleDrawerToggle, type }) => {
   return (
-    <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+    <Box sx={{ flexGrow: 1, display: { xs: 'flex', lg: 'none' } }}>
       <IconButton
         size="large"
         aria-label="menu"
@@ -13,7 +12,7 @@ export const MenuDrawer = ({ handleDrawerToggle }) => {
         onClick={handleDrawerToggle}
         sx={{ color: 'white' }}
       >
-        <MenuIcon />
+        { (type === 'menu') ? <Menu /> : <AccountCircle /> }
       </IconButton>
     </Box>
   );

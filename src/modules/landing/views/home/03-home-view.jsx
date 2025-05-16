@@ -1,59 +1,144 @@
-import { Box, Container, Typography, useMediaQuery, useTheme } from '@mui/material';
+import React, { useRef } from 'react';
+import {
+  Box,
+  Container,
+  Typography,
+  IconButton,
+  useMediaQuery,
+  useTheme,
+  styled
+} from '@mui/material';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination } from 'swiper/modules';
+import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import imagen4 from '../../../../assets/images/carrousel/imagen4.jpg';
-import imagen7 from '../../../../assets/images/carrousel/imagen7.jpg';  
-import imagen11 from '../../../../assets/images/carrousel/imagen11.jpg';
+import {
+  imagen_2,
+  imagen_3,
+  imagen_4,
+  imagen_5,
+  imagen_6,
+} from '../../../../assets/images/home';
+import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 
 const slides = [
-  { src: imagen4, alt: 'evento 1' },
-  { src: imagen7, alt: 'evento 2' },
-  { src: imagen11, alt: 'evento 3' },
+  { src: imagen_2, alt: 'evento 1' },
+  { src: imagen_3, alt: 'evento 2' },
+  { src: imagen_4, alt: 'evento 3' },
+  { src: imagen_5, alt: 'evento 4' },
+  { src: imagen_6, alt: 'evento 5' },
 ];
+
+const StyledSwiper = styled(Swiper)({
+  position: 'relative',
+  '& .swiper-wrapper': {
+    padding: '0',
+  },
+});
 
 export const HomeView03 = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const prevRef = useRef(null);
+  const nextRef = useRef(null);
 
   return (
-    <Box sx={{ backgroundColor: '#e67e22', py: 12 }}>
+    <Box 
+      sx={{
+        width: "100%",
+        backgroundColor: theme.palette.primary.main,
+        py: { xs: 5, md: 6 },
+      }}
+    >
       <Container>
-        <Typography
-          variant="h4"
-          align="center"
-          sx={{ fontSize: { xs: '2.5rem', sm: '3rem', md: '3.5rem' }, color: '#fff', mb: 8 }}
+        {/* HEADER: Título a la izquierda, flechas a la derecha */}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            mb: 4,
+            gap: { xs: 3, sm: 0 },
+          }}
         >
-          NUESTROS EVENTOS
-        </Typography>
+          <Typography
+            variant="h4"
+            sx={{
+              color: '#fff',
+              fontSize: { xs: 24, sm: 32, md: 40 }
+            }}
+          >
+            NUESTROS EVENTOS
+          </Typography>
+          <Box>
+            <IconButton
+              ref={prevRef}
+              sx={{
+                color: '#fff',
+                border: '2px solid #fff',
+                mr: 1,
+                width: 40,
+                height: 40
+              }}
+            >
+              <ChevronLeft />
+            </IconButton>
+            <IconButton
+              ref={nextRef}
+              sx={{
+                color: '#fff',
+                border: '2px solid #fff',
+                width: 40,
+                height: 40
+              }}
+            >
+              <ChevronRight />
+            </IconButton>
+          </Box>
+        </Box>
 
-        <Swiper
-          modules={[Navigation, Pagination]}
-          spaceBetween={32}
-          slidesPerView={isMobile ? 1 : 3}
+        {/* CARRUSEL */}
+        <StyledSwiper
+          modules={[Navigation]}
+          navigation={{
+            prevEl: prevRef.current,
+            nextEl: nextRef.current
+          }}
+          onBeforeInit={(swiper) => {
+            swiper.params.navigation.prevEl = prevRef.current;
+            swiper.params.navigation.nextEl = nextRef.current;
+          }}
           loop
-          navigation={!isMobile}
-          pagination={isMobile ? { clickable: true } : { clickable: true }}
-          className="custom-swiper"
+          spaceBetween={24}
+          breakpoints={{
+            0:   { slidesPerView: 1, slidesPerGroup: 1 },
+            600: { slidesPerView: 2, slidesPerGroup: 1 },
+            1200: { slidesPerView: 3, slidesPerGroup: 1 },
+          }}
         >
-          {slides.map((slide, index) => (
-            <SwiperSlide key={index}>
+          {slides.map((slide, idx) => (
+            <SwiperSlide key={idx}>
               <Box
-                component="img"
-                src={slide.src}
-                alt={slide.alt}
                 sx={{
-                  width: '100%',
-                  height: 'auto',
-                  borderRadius: 4,
-                  objectFit: 'cover',
+                  height: { xs: 250, sm: 230, md: 300, lg: 280 },
+                  overflow: 'hidden',
+                  borderRadius: 2
                 }}
-              />
+              >
+                <Box
+                  component="img"
+                  src={slide.src}
+                  alt={slide.alt}
+                  sx={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                  }}
+                />
+              </Box>
             </SwiperSlide>
           ))}
-        </Swiper>
+        </StyledSwiper>
       </Container>
     </Box>
   );
