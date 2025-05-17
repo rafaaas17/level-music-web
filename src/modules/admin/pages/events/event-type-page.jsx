@@ -125,6 +125,7 @@ export const EventTypePage = () => {
         onClose={() => setIsModalOpen(false)}
         eventType={selected}
         setEventType={setSelectedEventType}
+        loading={loading}
       />
 
     </Box>

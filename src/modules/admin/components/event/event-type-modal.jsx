@@ -12,16 +12,18 @@ import {
 } from "@mui/material";
 import { useEventTypeStore } from "../../../../hooks";
 import { Close } from "@mui/icons-material";
+import { useMemo } from "react";
 
 export const EventTypeModal = ({
   open,
   onClose,
   eventType = {},
   setEventType,
+  loading,
 }) => {
   const isEditing = !!eventType && !!eventType._id;
   const { startCreateEventType, startUpdateEventType } = useEventTypeStore();
-
+   
   const handleSave = async () => {
     const eventTypeToSave = {
       ...eventType,
@@ -39,6 +41,9 @@ export const EventTypeModal = ({
       if (success) onClose();
     }
   };
+
+  // El botón solo debe estar deshabilitado cuando loading es true (está cargando)
+  const isButtonDisabled = useMemo(() => loading, [loading]);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -71,20 +76,20 @@ export const EventTypeModal = ({
 
         <Box display="flex" gap={2} mb={2} sx={{ flexDirection: "column" }}>
           
-        <TextField
+          <TextField
+            label="Nombre"	
+            fullWidth
+            value={eventType?.type || ""}
+            onChange={(e) =>
+              setEventType({ ...eventType, type: e.target.value })
+            }
+          />
+           <TextField
             label="descripción"
             fullWidth
             value={eventType?.description || ""}
             onChange={(e) =>
               setEventType({ ...eventType, description: e.target.value })   
-            }
-          />
-          <TextField
-            label="Tipo de evento"	
-            fullWidth
-            value={eventType?.type || ""}
-            onChange={(e) =>
-              setEventType({ ...eventType, type: e.target.value })
             }
           />
           
@@ -102,12 +107,29 @@ export const EventTypeModal = ({
               <MenuItem value="Corporativo">Corporativo</MenuItem>
             </Select>
           </FormControl>
+
+           <FormControl fullWidth>
+            <InputLabel id="status-label">Estado</InputLabel>
+            <Select
+              labelId="status-label"
+              id="status"
+              value={eventType?.status || "Activo"}
+              onChange={(e) =>
+                setEventType({ ...eventType, status: e.target.value })
+              }
+            >
+              <MenuItem value="Activo">Activo</MenuItem>
+              <MenuItem value="Inactivo">Inactivo</MenuItem>
+            </Select>
+          </FormControl>
+  
         </Box>
 
         <Button
           variant="contained"
           fullWidth
           onClick={handleSave}
+          disabled={isButtonDisabled}
           sx={{
             mt: 1,
             backgroundColor: "#212121",
