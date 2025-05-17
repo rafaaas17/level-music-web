@@ -10,32 +10,40 @@ import {
   FormControl,
   InputLabel,
 } from "@mui/material";
-import { useProviderStore } from "../../../../hooks";
+import { useEventTypeStore } from "../../../../hooks";
 import { Close } from "@mui/icons-material";
+import { useMemo } from "react";
 
-export const ProviderModal = ({
+export const EventTypeModal = ({
   open,
   onClose,
-  provider = {},
-  setProvider,
+  eventType = {},
+  setEventType,
+  loading,
 }) => {
-  const isEditing = !!provider?._id;
-  const { startCreateProvider, startUpdateProvider } = useProviderStore();
-
+  const isEditing = !!eventType && !!eventType._id;
+  const { startCreateEventType, startUpdateEventType } = useEventTypeStore();
+   
   const handleSave = async () => {
-    const providerToSave = {
-      ...provider,
-      status: provider.status || "Activo",
+    const eventTypeToSave = {
+      ...eventType,
+      category: eventType.category || "Social",
     };
 
     if (!isEditing) {
-      const success = await startCreateProvider(providerToSave);
+      const success = await startCreateEventType(eventTypeToSave);
       if (success) onClose();
     } else {
-      const success = await startUpdateProvider(provider._id, providerToSave);
+      const success = await startUpdateEventType(
+        eventType._id,
+        eventTypeToSave
+      );
       if (success) onClose();
     }
   };
+
+  // El botón solo debe estar deshabilitado cuando loading es true (está cargando)
+  const isButtonDisabled = useMemo(() => loading, [loading]);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -59,7 +67,7 @@ export const ProviderModal = ({
           mb={3}
         >
           <Typography variant="h6" fontWeight={600}>
-            {isEditing ? "Editar proveedor" : "Agregar proveedor"}
+            {isEditing ? "Editar evento" : "Agregar evento"}
           </Typography>
           <IconButton onClick={onClose}>
             <Close />
@@ -67,57 +75,61 @@ export const ProviderModal = ({
         </Box>
 
         <Box display="flex" gap={2} mb={2} sx={{ flexDirection: "column" }}>
+          
           <TextField
-            label="Nombre"
+            label="Nombre"	
             fullWidth
-            value={provider?.name || ""}
-            onChange={(e) => setProvider({ ...provider, name: e.target.value })}
-          />
-          <TextField
-            label="Nombre de contacto"
-            fullWidth
-            value={provider?.contact_name || ""}
+            value={eventType?.type || ""}
             onChange={(e) =>
-              setProvider({ ...provider, contact_name: e.target.value })
+              setEventType({ ...eventType, type: e.target.value })
             }
           />
-          <TextField
-            label="Numero"
+           <TextField
+            label="descripción"
             fullWidth
-            value={provider?.phone || ""}
+            value={eventType?.description || ""}
             onChange={(e) =>
-              setProvider({ ...provider, phone: e.target.value })
+              setEventType({ ...eventType, description: e.target.value })   
             }
           />
-          <TextField
-            label="Email"
-            fullWidth
-            value={provider?.email || ""}
-            onChange={(e) =>
-              setProvider({ ...provider, email: e.target.value })
-            }
-          />
-
+          
           <FormControl fullWidth>
+            <InputLabel id="category-label">Categoria</InputLabel>
+            <Select
+              labelId="category-label"
+              id="category"
+              value={eventType?.category || "Social"}
+              onChange={(e) =>
+                setEventType({ ...eventType, category: e.target.value })
+              }
+            >
+              <MenuItem value="Social">Social</MenuItem>
+              <MenuItem value="Corporativo">Corporativo</MenuItem>
+            </Select>
+          </FormControl>
+
+           <FormControl fullWidth>
             <InputLabel id="status-label">Estado</InputLabel>
             <Select
               labelId="status-label"
               id="status"
-              value={provider?.status || "Activo"}
+              value={eventType?.status || "Activo"}
               onChange={(e) =>
-                setProvider({ ...provider, status: e.target.value })
+                setEventType({ ...eventType, status: e.target.value })
               }
             >
               <MenuItem value="Activo">Activo</MenuItem>
               <MenuItem value="Inactivo">Inactivo</MenuItem>
             </Select>
           </FormControl>
+  
         </Box>
 
         <Button
           variant="contained"
           fullWidth
           onClick={handleSave}
+          disabled={isButtonDisabled}
           sx={{
             mt: 1,
             backgroundColor: "#212121",

@@ -7,3 +7,21 @@ img {
   filter: none !important;
   background-color: transparent !important;
 }
+
+.custom-swiper .swiper-button-prev,
+.custom-swiper .swiper-button-next {
+  background-color: #FFCE00; 
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  color: #D90429;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10; 
+  color: white !important; /* Make arrows white */
+}
+
+.custom-swiper .swiper-pagination-bullet {
+  background-color: white !important; /* Make pagination dots white */
+}

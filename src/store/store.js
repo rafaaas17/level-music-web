@@ -7,7 +7,8 @@ import {
   workerTypesSlice,
   providerSlice,
   serviceTypeSlice,
-  uiSlice
+  uiSlice,
+  eventTypeSlice
 } from './';
 
 export const store = configureStore({
@@ -15,6 +16,7 @@ export const store = configureStore({
     auth: authSlice.reducer,
     theme: themeSlice.reducer,
     events: eventQuotationSlice.reducer,
+    eventType: eventTypeSlice.reducer,
     users: usersSlice.reducer,
     workerTypes: workerTypesSlice.reducer,
     ui: uiSlice.reducer,
