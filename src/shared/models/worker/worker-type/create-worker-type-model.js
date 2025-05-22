@@ -1,4 +1,5 @@
 export const createWorkerTypeModel = (workerType) => ({
   name: workerType.name,
-  description: workerType.description
+  description: workerType.description,
+  status: workerType.status || 'Activo',
 });

@@ -25,13 +25,10 @@ export const ServiceTypePage = () => {
     setOrder,
     startLoadingServiceTypePaginated,
     setSelectedServiceType,
-    startDeleteServiceType,
   } = useServiceTypeStore();
   const { isLg } = useScreenSizes();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [rowToDelete, setRowToDelete] = useState(null);
 
   useEffect(() => {
     startLoadingServiceTypePaginated();
@@ -42,14 +39,10 @@ export const ServiceTypePage = () => {
     setIsModalOpen(true);
   };
 
-  const deleteServiceType = (serviceType) => {
-    setRowToDelete(serviceType);
-    setIsDialogOpen(true);
-  };
-
   const columns = [
     { id: "name", label: "Nombre", sortable: true },
     { id: "description", label: "Descripción", sortable: true },
+    { id: "status", label: "Estado", sortable: true },
   ];
 
   const actions = [
@@ -58,16 +51,16 @@ export const ServiceTypePage = () => {
       icon: <Edit />,
       onClick: (row) => openModal(row),
     },
-    {
-      label: "Eliminar",
-      icon: <Delete />,
-      onClick: (row) => deleteServiceType(row),
-    },
   ];
 
   return (
     <Box>
-      <Box sx={{ borderRadius: 2, border: '1px solid rgba(0,0,0,0.12)' }}>
+      <Box
+        sx={{
+          borderRadius: 2,
+          border: (theme) => `1px solid ${theme.palette.mode === 'dark' ? 'rgb(140, 140, 140)' : 'rgba(0,0,0,0.12)'}`
+        }}
+      >
         <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ px: 3, py: 2 }}>
           <Box>
             <Typography sx={{ fontWeight: 600, fontSize: 24 }}>Listado de Tipos de Servicios</Typography>
@@ -137,26 +130,6 @@ export const ServiceTypePage = () => {
         onClose={() => setIsModalOpen(false)}
         serviceType={selected}
         setServiceType={setSelectedServiceType}
-      />
-
-      <MessageDialog
-        open={isDialogOpen}
-        onClose={() => {
-          setIsDialogOpen(false);
-          setRowToDelete(null);
-        }}
-        onConfirm={async () => {
-          if (rowToDelete) {
-            await startDeleteServiceType(rowToDelete._id);
-            setIsDialogOpen(false);
-            setRowToDelete(null);
-          }
-        }}
-        title="Confirmar eliminación"
-        message={`¿Estás seguro de que deseas eliminar "${rowToDelete?.name}"? Esta acción no se puede deshacer.`}
-        confirmText="Eliminar"
-        cancelText="Cancelar"
-        confirmColor="error"
       />
     </Box>
   );

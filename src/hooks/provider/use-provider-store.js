@@ -1,5 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
-import { refreshProvider, selectedProvider, setLoadingProvider, setPageProvider, setRowsPerPageProvider, showSnackbar } from "../../store";
+import {
+  refreshProvider,
+  selectedProvider,
+  setLoadingProvider,
+  setPageProvider,
+  setRowsPerPageProvider,
+  showSnackbar,
+} from "../../store";
 import { createProviderModel, updateProviderModel } from "../../shared/models/provider";
 import { useState } from "react";
 import { providerApi } from "../../api";
@@ -102,32 +109,6 @@ export const useProviderStore = () => {
     }
   };
 
-  const startDeleteProvider = async (id) => {
-    dispatch(setLoadingProvider(true));
-    try {
-      await providerApi.delete(`/${id}`);
-      startLoadingProviderPaginated();
-      dispatch(
-        showSnackbar({
-          message: `El proveedor fue eliminado exitosamente.`,
-          severity: "success",
-        })
-      );
-      return true;
-    } catch (error) {
-      console.log(error);
-      dispatch(
-        showSnackbar({
-          message: `Ocurrió un error al eliminar el proveedor.`,
-          severity: "error",
-        })
-      );
-      return false;
-    } finally {
-      dispatch(setLoadingProvider(false));
-    }
-  };
-
   const setSelectedProvider = (provider) => {
     dispatch(selectedProvider({ ...provider }));
   };
@@ -161,7 +142,6 @@ return {
     startCreateProvider,
     startLoadingProviderPaginated,
     startUpdateProvider,
-    startDeleteProvider,
     setSelectedProvider,
     
   };

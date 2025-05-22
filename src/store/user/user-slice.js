@@ -1,41 +1,45 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, current } from '@reduxjs/toolkit';
 
 const initialState = {
-  selected: null,
   users: [],
+  selected: null,
+  total: 0,
+  currentPage: 0,
+  rowsPerPage: 5,
+  loading: false,
 };
 
 export const usersSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {
-    createUser: (state, action) => {
-      state.users.push(action.payload);
-    },
     refreshUsers: (state, action) => {
-      state.users = action.payload;
-    },
-    updateUser: (state, action) => {
-      state.users = state.users.map((user) =>
-        user._id === action.payload._id ? { ...action.payload } : user
-      );
-      state.active = null;
-    },
-    deleteUser: (state, action) => {
-      state.users = state.users.filter((user) => user._id !== action.payload);
-      state.selected = null;
+      const { items, total, page } = action.payload;
+      state.users = items;
+      state.total = total;
+      state.currentPage = page;
+      state.loading = false;
     },
     selectedUser: (state, action) => {
       state.selected = action.payload;
+    },
+    setLoadingUser: (state, action) => {
+      state.loading = action.payload;
+    },
+    setPageUser: (state, action) => {
+      state.currentPage = action.payload;
+    },
+    setRowsPerPageUser: (state, action) => {
+      state.rowsPerPage = action.payload;
     },
   },
 });
 
 export const {
-  selectedUser,
-  createUser,
-  deleteUser,
-  updateUser,
   refreshUsers,
+  selectedUser,
+  setLoadingUser,
+  setPageUser,
+  setRowsPerPageUser,
 } = usersSlice.actions;
 

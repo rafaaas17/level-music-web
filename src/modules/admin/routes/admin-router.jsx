@@ -6,6 +6,7 @@ import {
   EventQuotationsPage,
   WorkerPage,
   WorkerTypePage,
+  ClientPage,
   EquipmentPage,
   EquipmentMaintenancePage,
   StorehousePage,
@@ -41,8 +42,10 @@ export const AdminRoutes = () => {
         {/* Servicios */}
         <Route path="service" element={<ServicePage />} />
         <Route path="service-type" element={<ServiceTypePage />} />
-
         <Route path="provider" element={<ProviderPage />} />
+
+        {/* Clientes */}
+        <Route path="client" element={<ClientPage />} />
 
         {/* Rutas no encontradas */}
         <Route path="*" element={<Navigate to="/not-found" replace />} />

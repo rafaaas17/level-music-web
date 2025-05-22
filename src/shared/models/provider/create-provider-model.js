@@ -3,5 +3,5 @@ export const createProviderModel = (provider) => ({
   contact_name: provider.contact_name,
   phone: provider.phone,
   email: provider.email,
-  status: provider.status
+  status: provider.status || 'Activo',
 });
