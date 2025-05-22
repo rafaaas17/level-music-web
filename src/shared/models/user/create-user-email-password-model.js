@@ -1,4 +1,4 @@
-export const createUserEmailPasswordModel = (user, role) => ({
+export const createUserEmailPasswordModel = (user, role, extraFields = {}) => ({
   auth_id: user.uid,
   email: user.providerData[0].email,
   full_name: null,
@@ -8,4 +8,5 @@ export const createUserEmailPasswordModel = (user, role) => ({
   role,
   status: "Activo",
   profile_picture: null,
+  ...extraFields,
 });

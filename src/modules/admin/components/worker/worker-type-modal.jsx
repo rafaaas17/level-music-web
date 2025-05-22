@@ -5,19 +5,24 @@ import {
   TextField,
   Button,
   IconButton,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { useWorkerTypesStore } from "../../../../hooks";
+import { useMemo } from "react";
 
 export const WorkerTypeModal = ({
   open,
   onClose,
   workerType = {},
   setWorkerType,
+  loading,
 }) => {
   const isEditing = !!workerType?._id;
-  const { startCreateWorkerType, startUpdateWorkerType } =
-    useWorkerTypesStore();
+  const { startCreateWorkerType, startUpdateWorkerType } = useWorkerTypesStore();
 
   const handleSave = async () => {
     if (!isEditing) {
@@ -29,6 +34,8 @@ export const WorkerTypeModal = ({
     }
   };
 
+  const isButtonDisabled = useMemo(() => loading, [loading]);
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -37,7 +44,7 @@ export const WorkerTypeModal = ({
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 500,
+          width: { xs: "90%", sm: 500 },
           bgcolor: "background.paper",
           borderRadius: 4,
           boxShadow: 24,
@@ -51,9 +58,7 @@ export const WorkerTypeModal = ({
           mb={3}
         >
           <Typography variant="h6" fontWeight={600}>
-            {isEditing
-              ? "Editar tipo de trabajador"
-              : "Agregar tipo de trabajador"}
+            {isEditing ? "Editar tipo de trabajador" : "Agregar tipo de trabajador"}
           </Typography>
           <IconButton onClick={onClose}>
             <Close />
@@ -61,6 +66,7 @@ export const WorkerTypeModal = ({
         </Box>
 
         <Box display="flex" gap={2} mb={2} sx={{ flexDirection: "column" }}>
+          {/* Nombre */}
           <TextField
             label="Nombre"
             fullWidth
@@ -69,6 +75,8 @@ export const WorkerTypeModal = ({
               setWorkerType({ ...workerType, name: e.target.value })
             }
           />
+
+          {/* Descripcion */}
           <TextField
             label="Descripción"
             fullWidth
@@ -77,12 +85,29 @@ export const WorkerTypeModal = ({
               setWorkerType({ ...workerType, description: e.target.value })
             }
           />
+
+          {/* Estado */}
+          <FormControl fullWidth>
+            <InputLabel id="status-label">Estado</InputLabel>
+            <Select
+              labelId="status-label"
+              id="status"
+              value={workerType?.status || "Activo"}
+              onChange={(e) =>
+                setWorkerType({ ...workerType, status: e.target.value })
+              }
+            >
+              <MenuItem value="Activo">Activo</MenuItem>
+              <MenuItem value="Inactivo">Inactivo</MenuItem>
+            </Select>
+          </FormControl>
         </Box>
 
         <Button
           variant="contained"
           fullWidth
           onClick={handleSave}
+          disabled={isButtonDisabled}
           sx={{
             mt: 1,
             backgroundColor: "#212121",

@@ -4,7 +4,8 @@ import {
   People,
   VolumeUp,
   Store,
-  RoomService
+  RoomService,
+  Person
 } from '@mui/icons-material';
 
 export const menuItems = [
@@ -68,6 +69,12 @@ export const menuItems = [
     ]
   },
   { 
+    text: 'Gestionar Clientes', 
+    breadcrumb: 'Clientes',
+    icon: Person,
+    href: '/admin/client' 
+  },
+  { 
     text: 'Gestionar Servicios', 
     icon: RoomService,
     subItems: [
@@ -80,14 +87,13 @@ export const menuItems = [
         text: 'Tipo de Servicios', 
         breadcrumb: 'Tipo de Servicios',
         href: '/admin/service-type' 
+      },
+      { 
+        text: 'Proveedores', 
+        breadcrumb: 'Proveedores',
+        href: '/admin/provider' 
       }
     ]
-  },
-  { 
-    text: 'Gestionar Proveedores', 
-    breadcrumb: 'Proveedores',
-    icon: Store,
-    href: '/admin/provider' 
   },
   { 
     text: 'Almacén', 

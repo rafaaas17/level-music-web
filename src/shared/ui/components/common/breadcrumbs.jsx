@@ -1,9 +1,9 @@
-import { Breadcrumbs as MuiBreadcrumbs, Link, Typography } from '@mui/material';
-import React from 'react';
+import { Breadcrumbs as MuiBreadcrumbs, Link, useTheme } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 
 export const Breadcrumbs = ({ menuItems, homeLabel = 'Inicio', homeHref = '/admin' }) => {
   const location = useLocation();
+  const theme = useTheme();
 
   if (location.pathname === '/admin') {
     return null;
@@ -41,7 +41,7 @@ export const Breadcrumbs = ({ menuItems, homeLabel = 'Inicio', homeHref = '/admi
             sx={{
               fontWeight: 500,
               fontSize: '18px',
-              color: '#000',
+              color: theme.palette.text.primary,
               textDecoration: 'underline',
             }}
           >

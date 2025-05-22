@@ -34,7 +34,7 @@ export const EventTypePage = () => {
   }, [currentPage, rowsPerPage, searchTerm, orderBy, order]);
 
   const openModal = (payload) => {
-    setSelectedEventType(payload || {}); // Si no hay payload, pasar objeto vacío
+    setSelectedEventType(payload);
     setIsModalOpen(true); 
   };
 
@@ -55,7 +55,12 @@ export const EventTypePage = () => {
 
   return (
     <Box>
-      <Box sx={{ borderRadius: 2, border: '1px solid rgba(0,0,0,0.12)' }}>
+      <Box
+        sx={{
+          borderRadius: 2,
+          border: (theme) => `1px solid ${theme.palette.mode === 'dark' ? 'rgb(140, 140, 140)' : 'rgba(0,0,0,0.12)'}`
+        }}
+      >
         <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ px: 3, py: 2 }}>
           <Box>
             <Typography sx={{ fontWeight: 600, fontSize: 24 }}>Listado de tipos de eventos</Typography>

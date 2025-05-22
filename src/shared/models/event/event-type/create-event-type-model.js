@@ -1,6 +1,6 @@
 export const createEventTypeModel = (eventType) => ({
   description: eventType.description,
   type: eventType.type,
-  category: eventType.category,
-  status: eventType.status,
+  category: eventType.category || 'Social',
+  status: eventType.status || 'Activo',
 });

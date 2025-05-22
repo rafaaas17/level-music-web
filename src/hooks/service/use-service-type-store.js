@@ -99,28 +99,6 @@ export const useServiceTypeStore = () => {
     }
   };
 
-  const startDeleteServiceType = async (id) => {
-    dispatch(setLoadingServiceType(true));
-    try {
-      await serviceTypeApi.delete(`/${id}`);
-      startLoadingServiceTypePaginated();
-      dispatch(showSnackbar({
-        message: `El tipo de servicio fue eliminado exitosamente.`,
-        severity: 'success',
-      }));
-      return true;
-    } catch (error) {
-      console.log(error);
-      dispatch(showSnackbar({
-        message: `Ocurrió un error al eliminar el tipo de servicio.`,
-        severity: 'error', 
-      }));
-      return false;
-    } finally {
-      dispatch(setLoadingServiceType(false));
-    }
-  };
-
   const setSelectedServiceType = (serviceType) => {
     dispatch(selectedServiceType({ ...serviceType }));
   };
@@ -140,6 +118,7 @@ export const useServiceTypeStore = () => {
     loading,
     searchTerm,
     rowsPerPage,
+    currentPage,
     orderBy,
     order,
 
@@ -152,7 +131,6 @@ export const useServiceTypeStore = () => {
     startCreateServiceType,
     startLoadingServiceTypePaginated,
     startUpdateServiceType,
-    startDeleteServiceType,
     setSelectedServiceType,
   };
 };

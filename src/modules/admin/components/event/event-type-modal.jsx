@@ -25,24 +25,15 @@ export const EventTypeModal = ({
   const { startCreateEventType, startUpdateEventType } = useEventTypeStore();
    
   const handleSave = async () => {
-    const eventTypeToSave = {
-      ...eventType,
-      category: eventType.category || "Social",
-    };
-
     if (!isEditing) {
-      const success = await startCreateEventType(eventTypeToSave);
+      const success = await startCreateEventType(eventType);
       if (success) onClose();
     } else {
-      const success = await startUpdateEventType(
-        eventType._id,
-        eventTypeToSave
-      );
+      const success = await startUpdateEventType(eventType._id, eventType);
       if (success) onClose();
     }
   };
 
-  // El botón solo debe estar deshabilitado cuando loading es true (está cargando)
   const isButtonDisabled = useMemo(() => loading, [loading]);
 
   return (
@@ -53,7 +44,7 @@ export const EventTypeModal = ({
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 500,
+          width: { xs: "90%", sm: 500 },
           bgcolor: "background.paper",
           borderRadius: 4,
           boxShadow: 24,
@@ -75,7 +66,7 @@ export const EventTypeModal = ({
         </Box>
 
         <Box display="flex" gap={2} mb={2} sx={{ flexDirection: "column" }}>
-          
+          {/* Nombre */}
           <TextField
             label="Nombre"	
             fullWidth
@@ -84,15 +75,18 @@ export const EventTypeModal = ({
               setEventType({ ...eventType, type: e.target.value })
             }
           />
+
+          {/* Descripcion */}
            <TextField
-            label="descripción"
+            label="Descripción"
             fullWidth
             value={eventType?.description || ""}
             onChange={(e) =>
               setEventType({ ...eventType, description: e.target.value })   
             }
           />
-          
+
+          {/* Categoria */}
           <FormControl fullWidth>
             <InputLabel id="category-label">Categoria</InputLabel>
             <Select
@@ -108,7 +102,8 @@ export const EventTypeModal = ({
             </Select>
           </FormControl>
 
-           <FormControl fullWidth>
+          {/* Estado */}
+          <FormControl fullWidth>
             <InputLabel id="status-label">Estado</InputLabel>
             <Select
               labelId="status-label"
@@ -122,7 +117,6 @@ export const EventTypeModal = ({
               <MenuItem value="Inactivo">Inactivo</MenuItem>
             </Select>
           </FormControl>
-  
         </Box>
 
         <Button

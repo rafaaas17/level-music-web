@@ -169,7 +169,7 @@ export const EventPage = () => {
                     open={Boolean(anchorEl)}
                     onClose={handleMenuClose}
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                    transformOrigin={{ vertical: 'top',    horizontal: 'right' }}
+                    transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                     PaperProps={{
                       sx: {
                         borderRadius: 2,

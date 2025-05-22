@@ -24,7 +24,7 @@ setServiceType }) => {
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          width: 500,
+          width: { xs: "90%", sm: 500 },
           bgcolor: 'background.paper',
           borderRadius: 4,
           boxShadow: 24,

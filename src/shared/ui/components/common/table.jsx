@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Table,
   TableHead,
@@ -64,7 +64,7 @@ export const TableComponent = ({
         <Box
           sx={{
             maxHeight: '625px',
-            overflowY: isLg ? (sortedRows.length > 6 ? 'auto' : 'hidden') : (sortedRows.length > 3 ? 'auto' : 'hidden'),
+            overflowY: isLg ? (sortedRows.length > 6 ? 'auto' : 'hidden') : (sortedRows.length > 2 ? 'auto' : 'hidden'),
             display: 'grid',
             gridTemplateColumns: isMd ? 'repeat(2, 1fr)' : '1fr',
             gap: 2,
@@ -72,7 +72,16 @@ export const TableComponent = ({
           }}
         >
           {sortedRows.map((row) => (
-            <Card key={row._id} sx={{ borderRadius: 3, border: '1px solid rgba(224, 224, 224, 1)', boxShadow: 'none', position: 'relative' }}>
+            <Card 
+              key={row._id} 
+              sx={{ 
+                borderRadius: 3, 
+                border: (theme) => `1px solid ${theme.palette.mode === 'dark' ? 'rgb(140, 140, 140)' : 'rgba(224, 224, 224, 1)'}`, 
+                boxShadow: 'none', 
+                backgroundColor: 'inherit',
+                position: 'relative' 
+              }}
+            >
               {actions && (
                 <IconButton
                   size="small"
@@ -92,12 +101,13 @@ export const TableComponent = ({
                     <Typography variant="subtitle2" color="textSecondary">
                       {column.label}
                     </Typography>
-                    <Typography variant="body1">
+                    <Typography component="div">
                       {column.id === 'status' ? (
                         <Chip
                           label={row[column.id]}
                           color={row[column.id] === 'Activo' ? 'success' : 'error'}
                           size="small"
+                          sx={{ color: '#fff !important' }}
                         />
                       ) : (
                         row[column.id]
@@ -113,7 +123,7 @@ export const TableComponent = ({
                 PaperProps={{
                   sx: {
                     borderRadius: 4,
-                    backgroundColor: '#fff',
+                    backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgb(0, 0, 0)' : '#FFFFFF',
                     boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.08)',
                     py: 1,
                   },
@@ -133,9 +143,9 @@ export const TableComponent = ({
                       py: 1,
                       px: 2,
                       fontSize: 14,
-                      color: action.label === 'Eliminar' ? '#d32f2f' : '#212121',
+                      color: (theme) => theme.palette.mode === 'dark' ? '#fff' : '#212121',
                       '&:hover': {
-                        backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                        backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(36, 36, 36, 0.54)' : 'rgba(0, 0, 0, 0.04)',
                       },
                     }}
                   >
@@ -166,8 +176,15 @@ export const TableComponent = ({
                     key={column.id}
                     sortDirection={orderBy === column.id ? order : false}
                     sx={{ 
-                      borderTop: '1px solid rgba(224, 224, 224, 1)', 
-                      p: 2, backgroundColor: '#f5f5f5', fontWeight: 600 
+                      borderTop: (theme) => `1px solid ${theme.palette.mode === 'dark' ? 'rgb(140, 140, 140)' : 'rgba(224, 224, 224, 1)'}`, 
+                      borderBottom: (theme) => `1px solid ${theme.palette.mode === 'dark' ? 'rgb(140, 140, 140)' : 'rgba(224, 224, 224, 1)'}`,
+                      p: 2, 
+                      backgroundColor: theme => theme.palette.mode === 'dark' ? '#1F1F1F' : '#f5f5f5', 
+                      fontWeight: 600,
+                      maxWidth: column.width || 'auto',
+                      whiteSpace: column.truncate ? 'nowrap' : 'normal',
+                      overflow: column.truncate ? 'hidden' : 'visible',
+                      textOverflow: column.truncate ? 'ellipsis' : 'clip'
                     }}
                   >
                     {column.sortable ? (
@@ -188,8 +205,10 @@ export const TableComponent = ({
                   <TableCell 
                     align="right"
                     sx={{ 
-                      borderTop: '1px solid rgba(224, 224, 224, 1)', 
-                      backgroundColor: '#f5f5f5', fontWeight: 600 
+                      borderTop: (theme) => `1px solid ${theme.palette.mode === 'dark' ? 'rgb(140, 140, 140)' : 'rgba(224, 224, 224, 1)'}`,
+                      borderBottom: (theme) => `1px solid ${theme.palette.mode === 'dark' ? 'rgb(140, 140, 140)' : 'rgba(224, 224, 224, 1)'}`,
+                      backgroundColor: theme => theme.palette.mode === 'dark' ? '#1F1F1F' : '#f5f5f5', 
+                      fontWeight: 600 
                     }}
                   >
                     Acción
@@ -208,7 +227,18 @@ export const TableComponent = ({
                   }}
                 >
                   {columns.map((column) => (
-                    <TableCell key={`${row._id}-${column.id}`} sx={{ p: 2, fontSize: 16 }}>
+                    <TableCell 
+                      key={`${row._id}-${column.id}`}
+                      sx={{
+                        p: column.id === 'status' ? 0 : 2,
+                        pl: column.id === 'status' ? 2 : 2,
+                        fontSize: 16,
+                        maxWidth: column.width || 'auto',
+                        whiteSpace: column.truncate ? 'nowrap' : 'normal',
+                        overflow: column.truncate ? 'hidden' : 'visible',
+                        textOverflow: column.truncate ? 'ellipsis' : 'clip'
+                      }}
+                    >
                       {column.id === 'status' ? (
                         <Chip
                           label={row[column.id]}
@@ -232,8 +262,8 @@ export const TableComponent = ({
                         PaperProps={{
                           sx: {
                             borderRadius: 4,
+                            backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgb(0, 0, 0)' : '#FFFFFF',
                             boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.08)',
-                            backgroundColor: '#fff',
                             py: 1,
                           },
                         }}
@@ -252,9 +282,9 @@ export const TableComponent = ({
                               py: 1,
                               px: 2,
                               fontSize: 14,
-                              color: action.label === 'Eliminar' ? '#d32f2f' : '#212121',
+                              color: (theme) => theme.palette.mode === 'dark' ? '#fff' : '#212121',
                               '&:hover': {
-                                backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                                backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(36, 36, 36, 0.54)' : 'rgba(0, 0, 0, 0.04)',
                               },
                             }}
                           >
@@ -287,7 +317,10 @@ export const TableComponent = ({
         }}
         onRowsPerPageChange={onRowsPerPageChange}
         rowsPerPageOptions={[5, 10, 25, 50]}
-        sx={{ '& .MuiTablePagination-toolbar': { py: 1, px: 2 }, borderTop: '1px solid rgba(224, 224, 224, 1)' }}
+        sx={{ 
+          '& .MuiTablePagination-toolbar': { py: 1, px: 2 }, 
+          borderTop: (theme) => `1px solid ${theme.palette.mode === 'dark' ? 'rgb(140, 140, 140)' : 'rgba(0,0,0,0.12)'}`, 
+        }}
       />
     </>
   );

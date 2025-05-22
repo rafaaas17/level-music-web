@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Box, Typography, Button, TextField, CircularProgress } from '@mui/material';
-import { AddCircleOutline, Edit, Delete } from '@mui/icons-material';
-import { TableComponent, MessageDialog } from '../../../shared/ui/components';
+import { AddCircleOutline, Edit } from '@mui/icons-material';
+import { useUsersStore } from '../../../hooks';
+import { TableComponent } from '../../../shared/ui/components';
+import { EventTypeModal } from '../components';
 import { useScreenSizes } from '../../../shared/constants/screen-width';
-import { useProviderStore } from '../../../hooks';
-import { ProviderModal } from '../components';
 
-export const ProviderPage = () => {
+export const ClientPage = () => {
   const {
-    provider,
+    users,
     total,
     loading,
     searchTerm,
@@ -22,36 +22,30 @@ export const ProviderPage = () => {
     setPageGlobal,
     setOrderBy,
     setOrder,
-    startLoadingProviderPaginated,
-    setSelectedProvider,
-    startDeleteProvider,
-  } = useProviderStore();
+    startLoadingUsersPaginated,
+    setSelectedUser,
+  } = useUsersStore();
   const { isLg } = useScreenSizes();
 
   const [isModalOpen, setIsModalOpen] = useState(false); 
-  const [isDialogOpen, setIsDialogOpen] = useState(false); 
-  const [rowToDelete, setRowToDelete] = useState(null); 
 
   useEffect(() => {
-    startLoadingProviderPaginated();
+    startLoadingUsersPaginated();
   }, [currentPage, rowsPerPage, searchTerm, orderBy, order]);
 
   const openModal = (payload) => {
-    setSelectedProvider(payload);
+    setSelectedUser(payload);
     setIsModalOpen(true); 
   };
 
-  const deleteProvider = (provider) => {
-    setRowToDelete(provider);
-    setIsDialogOpen(true);
-  };
-
   const columns = [
-    { id: 'name', label: 'Nombre', sortable: true },
-    { id: 'contact_name', label: 'Nombre de contacto', sortable: true },
-    { id: 'phone', label: 'Numero', sortable: false },
-    { id: 'email', label: 'Email', sortable: false },
-    { id: 'status', label: 'Status' , sortable: false },
+    { id: 'first_name', label: 'Nombre', sortable: true, width: '140px', truncate: true },
+    { id: 'last_name', label: 'Apellido', sortable: true, width: '140px', truncate: true },
+    { id: 'email', label: 'Correo', sortable: true, width: '140px', truncate: true },
+    { id: 'phone', label: '# Telefono', sortable: true, width: '140px', truncate: true },
+    { id: 'document_type', label: 'Tipo Doc', sortable: true, width: '120px', truncate: true },
+    { id: 'document_number', label: '# Documento', sortable: true, width: '140px', truncate: true },
+    { id: 'status', label: 'Estado', sortable: true, width: '140px', truncate: true },
   ];
 
   const actions = [
@@ -60,20 +54,20 @@ export const ProviderPage = () => {
       icon: <Edit />, 
       onClick: (row) => openModal(row),
     },
-    { 
-      label: 'Eliminar', 
-      icon: <Delete />, 
-      onClick: (row) => deleteProvider(row),
-    },
   ];
 
   return (
     <Box>
-      <Box sx={{ borderRadius: 2, border: '1px solid rgba(0,0,0,0.12)' }}>
+      <Box
+        sx={{
+          borderRadius: 2,
+          border: (theme) => `1px solid ${theme.palette.mode === 'dark' ? 'rgb(140, 140, 140)' : 'rgba(0,0,0,0.12)'}`
+        }}
+      >
         <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ px: 3, py: 2 }}>
           <Box>
-            <Typography sx={{ fontWeight: 600, fontSize: 24 }}>Listado de Proveedores</Typography>
-            <Typography sx={{ color: 'text.secondary', fontSize: 16 }}>Administra los proveedores</Typography>
+            <Typography sx={{ fontWeight: 600, fontSize: 24 }}>Listado de Clientes</Typography>
+            <Typography sx={{ color: 'text.secondary', fontSize: 16 }}>Administra los clientes</Typography>
           </Box>
           <Button
             variant="contained"
@@ -81,7 +75,7 @@ export const ProviderPage = () => {
             sx={{ backgroundColor: '#212121', color: '#fff', borderRadius: 2, textTransform: 'none', px: 3, py: 1.5 }}
             onClick={() => openModal()} 
           >
-            {isLg ? 'Agregar Proveedor' : 'Agregar'}
+            {isLg ? 'Agregar Cliente' : 'Agregar'}
           </Button>
         </Box>
 
@@ -104,7 +98,7 @@ export const ProviderPage = () => {
           <Box display="flex" justifyContent="center" alignItems="center" sx={{ py: 5 }}>
             <CircularProgress />
           </Box>
-        ) : provider.length === 0 ? (
+        ) : users.length === 0 ? (
           <Box display="flex" justifyContent="center" alignItems="center" sx={{ py: 5 }}>
             <Typography sx={{ color: 'text.secondary', fontSize: 16 }}>
               No se encontraron resultados.
@@ -112,7 +106,7 @@ export const ProviderPage = () => {
           </Box>
         ) : (
           <TableComponent
-            rows={provider}
+            rows={users}
             columns={columns}
             order={order}
             orderBy={orderBy}
@@ -134,32 +128,14 @@ export const ProviderPage = () => {
         )}
       </Box>
 
-      <ProviderModal
+      <EventTypeModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        provider={selected}
-        setProvider={setSelectedProvider}
+        eventType={selected}
+        setEventType={setSelectedUser}
+        loading={loading}
       />
 
-      <MessageDialog
-        open={isDialogOpen}
-        onClose={() => {
-          setIsDialogOpen(false);
-          setRowToDelete(null);
-        }}
-        onConfirm={async () => {
-          if (rowToDelete) {
-            await startDeleteProvider(rowToDelete._id);
-            setIsDialogOpen(false);
-            setRowToDelete(null);
-          }
-        }}
-        title="Confirmar eliminación"
-        message={`¿Estás seguro de que deseas eliminar "${rowToDelete?.name}"? Esta acción no se puede deshacer.`}
-        confirmText="Eliminar"
-        cancelText="Cancelar"
-        confirmColor="error"
-      />
     </Box>
   );
 };

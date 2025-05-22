@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Box, Typography, Button, TextField, CircularProgress } from '@mui/material';
 import { AddCircleOutline, Edit, Delete } from '@mui/icons-material';
-import { useWorkerTypesStore } from '../../../../hooks';
 import { TableComponent, MessageDialog } from '../../../../shared/ui/components';
-import { WorkerTypeModal } from '../../components';
 import { useScreenSizes } from '../../../../shared/constants/screen-width';
+import { useProviderStore } from '../../../../hooks';
+import { ProviderModal } from '../../components';
 
-export const WorkerTypePage = () => {
+export const ProviderPage = () => {
   const {
-    workerTypes,
+    provider,
     total,
     loading,
     searchTerm,
@@ -22,26 +22,28 @@ export const WorkerTypePage = () => {
     setPageGlobal,
     setOrderBy,
     setOrder,
-    startLoadingWorkerTypesPaginated,
-    setSelectedWorkerType,
-  } = useWorkerTypesStore();
+    startLoadingProviderPaginated,
+    setSelectedProvider,
+  } = useProviderStore();
   const { isLg } = useScreenSizes();
 
   const [isModalOpen, setIsModalOpen] = useState(false); 
 
   useEffect(() => {
-    startLoadingWorkerTypesPaginated();
+    startLoadingProviderPaginated();
   }, [currentPage, rowsPerPage, searchTerm, orderBy, order]);
 
   const openModal = (payload) => {
-    setSelectedWorkerType(payload);
+    setSelectedProvider(payload);
     setIsModalOpen(true); 
   };
 
   const columns = [
     { id: 'name', label: 'Nombre', sortable: true },
-    { id: 'description', label: 'Descripción', sortable: true },
-    { id: 'status', label: 'Estado', sortable: true },
+    { id: 'contact_name', label: 'Nombre de contacto', sortable: true },
+    { id: 'phone', label: 'Numero', sortable: true },
+    { id: 'email', label: 'Email', sortable: true },
+    { id: 'status', label: 'Estado' , sortable: true },
   ];
 
   const actions = [
@@ -62,8 +64,8 @@ export const WorkerTypePage = () => {
       >
         <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ px: 3, py: 2 }}>
           <Box>
-            <Typography sx={{ fontWeight: 600, fontSize: 24 }}>Listado de Tipos de Trabajadores</Typography>
-            <Typography sx={{ color: 'text.secondary', fontSize: 16 }}>Administra los tipos de trabajadores</Typography>
+            <Typography sx={{ fontWeight: 600, fontSize: 24 }}>Listado de Proveedores</Typography>
+            <Typography sx={{ color: 'text.secondary', fontSize: 16 }}>Administra los proveedores</Typography>
           </Box>
           <Button
             variant="contained"
@@ -71,7 +73,7 @@ export const WorkerTypePage = () => {
             sx={{ backgroundColor: '#212121', color: '#fff', borderRadius: 2, textTransform: 'none', px: 3, py: 1.5 }}
             onClick={() => openModal()} 
           >
-            {isLg ? 'Agregar Tipo de Trabajador' : 'Agregar'}
+            {isLg ? 'Agregar Proveedor' : 'Agregar'}
           </Button>
         </Box>
 
@@ -94,7 +96,7 @@ export const WorkerTypePage = () => {
           <Box display="flex" justifyContent="center" alignItems="center" sx={{ py: 5 }}>
             <CircularProgress />
           </Box>
-        ) : workerTypes.length === 0 ? (
+        ) : provider.length === 0 ? (
           <Box display="flex" justifyContent="center" alignItems="center" sx={{ py: 5 }}>
             <Typography sx={{ color: 'text.secondary', fontSize: 16 }}>
               No se encontraron resultados.
@@ -102,7 +104,7 @@ export const WorkerTypePage = () => {
           </Box>
         ) : (
           <TableComponent
-            rows={workerTypes}
+            rows={provider}
             columns={columns}
             order={order}
             orderBy={orderBy}
@@ -124,12 +126,11 @@ export const WorkerTypePage = () => {
         )}
       </Box>
 
-      <WorkerTypeModal
+      <ProviderModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        workerType={selected}
-        setWorkerType={setSelectedWorkerType}
-        loading={loading}
+        provider={selected}
+        setProvider={setSelectedProvider}
       />
     </Box>
   );
