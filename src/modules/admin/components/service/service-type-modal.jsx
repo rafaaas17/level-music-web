@@ -16,6 +16,7 @@ setServiceType }) => {
       if (success) onClose();
     }
   };
+  
   return (
     <Modal open={open} onClose={onClose}>
       <Box
