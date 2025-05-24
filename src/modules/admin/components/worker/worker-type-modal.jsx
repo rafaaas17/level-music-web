@@ -9,10 +9,12 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  FormHelperText,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { useWorkerTypesStore } from "../../../../hooks";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
+import { useForm } from "react-hook-form";
 
 export const WorkerTypeModal = ({
   open,
@@ -24,14 +26,33 @@ export const WorkerTypeModal = ({
   const isEditing = !!workerType?._id;
   const { startCreateWorkerType, startUpdateWorkerType } = useWorkerTypesStore();
 
-  const handleSave = async () => {
-    if (!isEditing) {
-      const success = await startCreateWorkerType(workerType);
-      if (success) onClose();
-    } else {
-      const success = await startUpdateWorkerType(workerType._id, workerType);
-      if (success) onClose();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+    setValue,
+  } = useForm({
+    mode: "onBlur",
+  });
+
+  useEffect(() => {
+    if (open) {
+      reset({
+        name: workerType?.name ?? "",
+        description: workerType?.description ?? "",
+        status: workerType?.status ?? "Activo",
+      });
     }
+  }, [open, reset, workerType]);
+
+  const onSubmit = async (data) => {
+    setWorkerType(data);
+    const success = isEditing
+      ? await startUpdateWorkerType(workerType._id, data)
+      : await startCreateWorkerType(data);
+    if (success) onClose();
   };
 
   const isButtonDisabled = useMemo(() => loading, [loading]);
@@ -39,6 +60,8 @@ export const WorkerTypeModal = ({
   return (
     <Modal open={open} onClose={onClose}>
       <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
         sx={{
           position: "absolute",
           top: "50%",
@@ -51,12 +74,7 @@ export const WorkerTypeModal = ({
           p: 4,
         }}
       >
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={3}
-        >
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
           <Typography variant="h6" fontWeight={600}>
             {isEditing ? "Editar tipo de trabajador" : "Agregar tipo de trabajador"}
           </Typography>
@@ -70,43 +88,46 @@ export const WorkerTypeModal = ({
           <TextField
             label="Nombre"
             fullWidth
-            value={workerType?.name || ""}
-            onChange={(e) =>
-              setWorkerType({ ...workerType, name: e.target.value })
-            }
+            {...register("name", {
+              required: "El nombre es obligatorio",
+            })}
+            error={!!errors.name}
+            helperText={errors.name?.message}
           />
 
-          {/* Descripcion */}
+          {/* Descripción */}
           <TextField
             label="Descripción"
             fullWidth
-            value={workerType?.description || ""}
-            onChange={(e) =>
-              setWorkerType({ ...workerType, description: e.target.value })
-            }
+            {...register("description", {
+              required: "La descripción es obligatoria",
+            })}
+            error={!!errors.description}
+            helperText={errors.description?.message}
           />
 
           {/* Estado */}
-          <FormControl fullWidth>
+          <FormControl fullWidth error={!!errors.status}>
             <InputLabel id="status-label">Estado</InputLabel>
             <Select
               labelId="status-label"
-              id="status"
-              value={workerType?.status || "Activo"}
-              onChange={(e) =>
-                setWorkerType({ ...workerType, status: e.target.value })
-              }
+              value={watch("status") || "Activo"}
+              {...register("status", {
+                required: "Selecciona un estado",
+              })}
+              onChange={(e) => setValue("status", e.target.value)}
             >
               <MenuItem value="Activo">Activo</MenuItem>
               <MenuItem value="Inactivo">Inactivo</MenuItem>
             </Select>
+            <FormHelperText>{errors.status?.message}</FormHelperText>
           </FormControl>
         </Box>
 
         <Button
+          type="submit"
           variant="contained"
           fullWidth
-          onClick={handleSave}
           disabled={isButtonDisabled}
           sx={{
             mt: 1,

@@ -12,7 +12,8 @@ import {
 } from "@mui/material";
 import { useEventTypeStore } from "../../../../hooks";
 import { Close } from "@mui/icons-material";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
+import { useForm } from "react-hook-form";
 
 export const EventTypeModal = ({
   open,
@@ -21,9 +22,9 @@ export const EventTypeModal = ({
   setEventType,
   loading,
 }) => {
-  const isEditing = !!eventType && !!eventType._id;
+  const isEditing = !!eventType?._id;
   const { startCreateEventType, startUpdateEventType } = useEventTypeStore();
-   
+
   const handleSave = async () => {
     if (!isEditing) {
       const success = await startCreateEventType(eventType);
