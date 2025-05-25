@@ -1,6 +1,7 @@
 export const updateUserModel = (user) => ({
   email: user.email,
-  full_name: null,
+  first_name: null,
+  last_name: null,
   phone: null,
   document_type: null,
   document_number: null,
