@@ -31,6 +31,7 @@ export const TableComponent = ({
   onPageChange,
   onRowsPerPageChange,
   actions,
+  hasActions = false, // Nuevo prop, por defecto false
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [menuRow, setMenuRow] = useState(null);
@@ -82,7 +83,7 @@ export const TableComponent = ({
                 position: 'relative' 
               }}
             >
-              {actions && (
+              {hasActions && actions && (
                 <IconButton
                   size="small"
                   onClick={(e) => handleMenuOpen(e, row)}
@@ -116,48 +117,50 @@ export const TableComponent = ({
                   </Box>
                 ))}
               </CardContent>
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-                PaperProps={{
-                  sx: {
-                    borderRadius: 4,
-                    backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgb(0, 0, 0)' : '#FFFFFF',
-                    boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.08)',
-                    py: 1,
-                  },
-                }}
-              >
-                {actions.map((action, index) => (
-                  <MenuItem
-                    key={`${menuRow?._id}-action-${index}`}
-                    onClick={() => {
-                      action.onClick(menuRow);
-                      handleMenuClose();
-                    }}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
+              {hasActions && actions && (
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleMenuClose}
+                  PaperProps={{
+                    sx: {
+                      borderRadius: 4,
+                      backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgb(0, 0, 0)' : '#FFFFFF',
+                      boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.08)',
                       py: 1,
-                      px: 2,
-                      fontSize: 14,
-                      color: (theme) => theme.palette.mode === 'dark' ? '#fff' : '#212121',
-                      '&:hover': {
-                        backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(36, 36, 36, 0.54)' : 'rgba(0, 0, 0, 0.04)',
-                      },
-                    }}
-                  >
-                    {action.icon && (
-                      <span style={{ fontSize: 18, display: 'flex', alignItems: 'center', color: action.label === 'Eliminar' ? '#d32f2f' : 'inherit' }}>
-                        {action.icon}
-                      </span>
-                    )}
-                    {action.label}
-                  </MenuItem>
-                ))}
-              </Menu>
+                    },
+                  }}
+                >
+                  {actions.map((action, index) => (
+                    <MenuItem
+                      key={`${menuRow?._id}-action-${index}`}
+                      onClick={() => {
+                        action.onClick(menuRow);
+                        handleMenuClose();
+                      }}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        py: 1,
+                        px: 2,
+                        fontSize: 14,
+                        color: (theme) => theme.palette.mode === 'dark' ? '#fff' : '#212121',
+                        '&:hover': {
+                          backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(36, 36, 36, 0.54)' : 'rgba(0, 0, 0, 0.04)',
+                        },
+                      }}
+                    >
+                      {action.icon && (
+                        <span style={{ fontSize: 18, display: 'flex', alignItems: 'center', color: action.label === 'Eliminar' ? '#d32f2f' : 'inherit' }}>
+                          {action.icon}
+                        </span>
+                      )}
+                      {action.label}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              )}
             </Card>
           ))}
         </Box>
@@ -201,7 +204,7 @@ export const TableComponent = ({
                     )}
                   </TableCell>
                 ))}
-                {actions && (
+                {hasActions && actions && (
                   <TableCell 
                     align="right"
                     sx={{ 
@@ -216,7 +219,6 @@ export const TableComponent = ({
                 )}
               </TableRow>
             </TableHead>
-
             <TableBody>
               {sortedRows.map((row, index) => (
                 <TableRow
@@ -250,7 +252,7 @@ export const TableComponent = ({
                       )}
                     </TableCell>
                   ))}
-                  {actions && (
+                  {hasActions && actions && (
                     <TableCell align="right" sx={{ py: 1, px: 2 }}>
                       <IconButton size="small" onClick={(e) => handleMenuOpen(e, row)}>
                         <MoreVertIcon fontSize="small" />

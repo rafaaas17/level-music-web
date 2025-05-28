@@ -33,7 +33,8 @@ export const useAuthStore = () => {
         dispatch(login({ 
           uid: newUser.auth_id, 
           email: newUser.email, 
-          displayName: null, 
+          firstName: null, 
+          lastName: null,
           phone: null,
           documentType: null,
           documentNumber: null,
@@ -51,7 +52,8 @@ export const useAuthStore = () => {
         dispatch(login({ 
           uid: data.auth_id, 
           email: data.email, 
-          displayName: data.full_name, 
+          firstName: data.first_name,
+          lastName: data.last_name, 
           phone: data.phone,
           documentType: data.document_type,
           documentNumber: data.document_number,
@@ -86,7 +88,8 @@ export const useAuthStore = () => {
         dispatch(login({ 
           uid: data.auth_id, 
           email: data.email, 
-          displayName: data.full_name, 
+          firstName: data.first_name, 
+          lastName: data.last_name,
           phone: data.phone,
           documentType: data.document_type,
           documentNumber: data.document_number,
