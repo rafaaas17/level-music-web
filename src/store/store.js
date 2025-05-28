@@ -8,7 +8,9 @@ import {
   providerSlice,
   serviceTypeSlice,
   uiSlice,
-  eventTypeSlice
+  eventTypeSlice,
+  resourceSlice,
+  maintenanceSlice
 } from './';
 
 export const store = configureStore({
@@ -21,6 +23,8 @@ export const store = configureStore({
     workerTypes: workerTypesSlice.reducer,
     ui: uiSlice.reducer,
     provider: providerSlice.reducer,
-    serviceType: serviceTypeSlice.reducer
+    serviceType: serviceTypeSlice.reducer,
+    resource: resourceSlice.reducer,
+    maintenance: maintenanceSlice.reducer,
   },
 });

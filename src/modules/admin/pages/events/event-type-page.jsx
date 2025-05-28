@@ -121,6 +121,7 @@ export const EventTypePage = () => {
               setPageGlobal(0); 
             }}
             actions={actions}
+            hasActions={!!actions}
           />
         )}
       </Box>
