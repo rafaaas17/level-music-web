@@ -110,7 +110,7 @@ export const TableComponent = ({
                           sx={{ color: '#fff !important' }}
                         />
                       ) : (
-                        row[column.id]
+                        column.accessor ? column.accessor(row) : row[column.id]
                       )}
                     </Typography>
                   </Box>
@@ -246,7 +246,7 @@ export const TableComponent = ({
                           size="small"
                         />
                       ) : (
-                        row[column.id]
+                        column.accessor ? column.accessor(row) : row[column.id]
                       )}
                     </TableCell>
                   ))}
