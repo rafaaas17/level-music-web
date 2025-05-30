@@ -1,25 +1,49 @@
-import { Box, Button, IconButton, Modal, TextField, Typography } from "@mui/material";
+import { Box, Button, IconButton, Modal, TextField, Typography, FormControl, InputLabel, Select, MenuItem, FormHelperText } from "@mui/material";
 import { useServiceTypeStore } from "../../../../hooks";
 import { Close } from "@mui/icons-material";
+import { useMemo, useEffect } from "react";
+import { useForm } from "react-hook-form";
 
-export const ServiceTypeModal = ({ open, onClose, serviceType  = {},
-setServiceType }) => {
+export const ServiceTypeModal = ({ open, onClose, serviceType  = {}, setServiceType, loading }) => {
   const isEditing = !!serviceType?._id;
   const { startCreateServiceType, startUpdateServiceType } = useServiceTypeStore();
 
-  const handleSave = async () => {
-    if (!isEditing) {
-      const success = await startCreateServiceType(serviceType); 
-      if (success) onClose(); 
-    } else {
-      const success = await startUpdateServiceType(serviceType._id, serviceType); 
-      if (success) onClose();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+    setValue,
+  } = useForm({
+    mode: "onBlur",
+  });
+
+  useEffect(() => {
+    if (open) {
+      reset({
+        name: serviceType?.name ?? "",
+        description: serviceType?.description ?? "",
+        status: serviceType?.status ?? "Activo",
+      });
     }
+  }, [open, reset, serviceType]);
+
+  const onSubmit = async (data) => {
+    setServiceType(data);
+    const success = isEditing
+      ? await startUpdateServiceType(serviceType._id, data)
+      : await startCreateServiceType(data);
+    if (success) onClose();
   };
-  
+
+  const isButtonDisabled = useMemo(() => loading, [loading]);
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
         sx={{
           position: 'absolute',
           top: '50%',
@@ -42,24 +66,51 @@ setServiceType }) => {
         </Box>
 
         <Box display="flex" gap={2} mb={2} sx={{ flexDirection: 'column' }}>
+          {/* Nombre */}
           <TextField
             label="Nombre"
             fullWidth
-            value={serviceType?.name || ''} 
-            onChange={(e) => setServiceType({ ...serviceType, name: e.target.value })}
+            {...register("name", {
+              required: "El nombre es obligatorio",
+            })}
+            error={!!errors.name}
+            helperText={errors.name?.message}
           />
+
+          {/* Descripción */}
           <TextField
             label="Descripción"
             fullWidth
-            value={serviceType?.description || ''} 
-            onChange={(e) => setServiceType({ ...serviceType, description: e.target.value })}
+            {...register("description", {
+              required: "La descripción es obligatoria",
+            })}
+            error={!!errors.description}
+            helperText={errors.description?.message}
           />
+
+          {/* Estado */}
+          <FormControl fullWidth error={!!errors.status}>
+            <InputLabel id="status-label">Estado</InputLabel>
+            <Select
+              labelId="status-label"
+              value={watch("status") || "Activo"}
+              {...register("status", {
+                required: "Selecciona un estado",
+              })}
+              onChange={(e) => setValue("status", e.target.value)}
+            >
+              <MenuItem value="Activo">Activo</MenuItem>
+              <MenuItem value="Inactivo">Inactivo</MenuItem>
+            </Select>
+            <FormHelperText>{errors.status?.message}</FormHelperText>
+          </FormControl>
         </Box>
 
         <Button
+          type="submit"
           variant="contained"
           fullWidth
-          onClick={handleSave}
+          disabled={isButtonDisabled}
           sx={{
             mt: 1,
             backgroundColor: '#212121',

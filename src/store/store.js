@@ -11,7 +11,8 @@ import {
   serviceSlice,
   eventTypeSlice,
   resourceSlice,
-  maintenanceSlice
+  maintenanceSlice,
+  clientSlice
 } from './';
 
 export const store = configureStore({
@@ -28,5 +29,6 @@ export const store = configureStore({
     serviceType: serviceTypeSlice.reducer,
     resource: resourceSlice.reducer,
     maintenance: maintenanceSlice.reducer,
+    client: clientSlice.reducer,
   },
 });

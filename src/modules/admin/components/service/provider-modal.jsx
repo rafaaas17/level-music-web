@@ -9,37 +9,61 @@ import {
   Select,
   FormControl,
   InputLabel,
+  FormHelperText,
 } from "@mui/material";
 import { useProviderStore } from "../../../../hooks";
 import { Close } from "@mui/icons-material";
+import { useForm } from "react-hook-form";
+import { useMemo, useEffect } from "react";
 
 export const ProviderModal = ({
   open,
   onClose,
   provider = {},
   setProvider,
+  loading,
 }) => {
   const isEditing = !!provider?._id;
   const { startCreateProvider, startUpdateProvider } = useProviderStore();
 
-  const handleSave = async () => {
-    const providerToSave = {
-      ...provider,
-      status: provider.status || "Activo",
-    };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+    setValue,
+  } = useForm({
+    mode: "onBlur",
+  });
 
-    if (!isEditing) {
-      const success = await startCreateProvider(providerToSave);
-      if (success) onClose();
-    } else {
-      const success = await startUpdateProvider(provider._id, providerToSave);
-      if (success) onClose();
+  useEffect(() => {
+    if (open) {
+      reset({
+        name: provider?.name ?? "",
+        contact_name: provider?.contact_name ?? "",
+        phone: provider?.phone ?? "",
+        email: provider?.email ?? "",
+        status: provider?.status ?? "Activo",
+      });
     }
+  }, [open, reset, provider]);
+
+  const onSubmit = async (data) => {
+    setProvider(data);
+    const success = isEditing
+      ? await startUpdateProvider(provider._id, data)
+      : await startCreateProvider(data);
+    if (success) onClose();
   };
+
+  const isButtonDisabled = useMemo(() => loading, [loading]);
 
   return (
     <Modal open={open} onClose={onClose}>
       <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
         sx={{
           position: "absolute",
           top: "50%",
@@ -70,54 +94,70 @@ export const ProviderModal = ({
           <TextField
             label="Nombre"
             fullWidth
-            value={provider?.name || ""}
-            onChange={(e) => setProvider({ ...provider, name: e.target.value })}
+            {...register("name", {
+              required: "El nombre es obligatorio",
+            })}
+            error={!!errors.name}
+            helperText={errors.name?.message}
           />
           <TextField
             label="Nombre de contacto"
             fullWidth
-            value={provider?.contact_name || ""}
-            onChange={(e) =>
-              setProvider({ ...provider, contact_name: e.target.value })
-            }
+            {...register("contact_name", {
+              required: "El nombre de contacto es obligatorio",
+            })}
+            error={!!errors.contact_name}
+            helperText={errors.contact_name?.message}
           />
           <TextField
             label="Numero"
             fullWidth
-            value={provider?.phone || ""}
-            onChange={(e) =>
-              setProvider({ ...provider, phone: e.target.value })
-            }
+            {...register("phone", {
+              required: "El número es obligatorio",
+              pattern: {
+                value: /^[0-9]{9}$/,
+                message: "El número debe tener 9 dígitos",
+              },
+            })}
+            error={!!errors.phone}
+            helperText={errors.phone?.message}
           />
           <TextField
             label="Email"
             fullWidth
-            value={provider?.email || ""}
-            onChange={(e) =>
-              setProvider({ ...provider, email: e.target.value })
-            }
+            {...register("email", {
+              required: "El correo es obligatorio",
+              pattern: {
+                value: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/,
+                message: "Correo electrónico inválido",
+              },
+            })}
+            error={!!errors.email}
+            helperText={errors.email?.message}
           />
 
-          <FormControl fullWidth>
+          <FormControl fullWidth error={!!errors.status}>
             <InputLabel id="status-label">Estado</InputLabel>
             <Select
               labelId="status-label"
-              id="status"
-              value={provider?.status || "Activo"}
-              onChange={(e) =>
-                setProvider({ ...provider, status: e.target.value })
-              }
+              value={watch("status") || "Activo"}
+              {...register("status", {
+                required: "Selecciona un estado",
+              })}
+              onChange={(e) => setValue("status", e.target.value)}
             >
               <MenuItem value="Activo">Activo</MenuItem>
               <MenuItem value="Inactivo">Inactivo</MenuItem>
             </Select>
+            <FormHelperText>{errors.status?.message}</FormHelperText>
           </FormControl>
         </Box>
 
         <Button
+          type="submit"
           variant="contained"
           fullWidth
-          onClick={handleSave}
+          disabled={isButtonDisabled}
           sx={{
             mt: 1,
             backgroundColor: "#212121",
