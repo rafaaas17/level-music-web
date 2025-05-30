@@ -11,20 +11,20 @@ import {
   InputLabel,
   FormHelperText,
 } from "@mui/material";
-import { useProviderStore } from "../../../../hooks";
+import { useClientStore } from "../../../../hooks";
 import { Close } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
 import { useMemo, useEffect } from "react";
 
-export const ProviderModal = ({
+export const ClientModal = ({
   open,
   onClose,
-  provider = {},
-  setProvider,
+  client = {},
+  setClient,
   loading,
 }) => {
-  const isEditing = !!provider?._id;
-  const { startCreateProvider, startUpdateProvider } = useProviderStore();
+  const isEditing = !!client?._id;
+  const { startCreateClient, startUpdateClient } = useClientStore();
 
   const {
     register,
@@ -40,20 +40,20 @@ export const ProviderModal = ({
   useEffect(() => {
     if (open) {
       reset({
-        name: provider?.name ?? "",
-        contact_name: provider?.contact_name ?? "",
-        phone: provider?.phone ?? "",
-        email: provider?.email ?? "",
-        status: provider?.status ?? "Activo",
+        name: client?.name ?? "",
+        lastname: client?.lastname ?? "",
+        email: client?.email ?? "",
+        phone: client?.phone ?? "",
+        status: client?.status ?? "Activo",
       });
     }
-  }, [open, reset, provider]);
+  }, [open, reset, client]);
 
   const onSubmit = async (data) => {
-    setProvider(data);
+    setClient(data);
     const success = isEditing
-      ? await startUpdateProvider(provider._id, data)
-      : await startCreateProvider(data);
+      ? await startUpdateClient(client._id, data)
+      : await startCreateClient(data);
     if (success) onClose();
   };
 
@@ -83,7 +83,7 @@ export const ProviderModal = ({
           mb={3}
         >
           <Typography variant="h6" fontWeight={600}>
-            {isEditing ? "Editar proveedor" : "Agregar proveedor"}
+            {isEditing ? "Editar cliente" : "Agregar cliente"}
           </Typography>
           <IconButton onClick={onClose}>
             <Close />
@@ -101,29 +101,16 @@ export const ProviderModal = ({
             helperText={errors.name?.message}
           />
           <TextField
-            label="Nombre de contacto"
+            label="Apellido"
             fullWidth
-            {...register("contact_name", {
-              required: "El nombre de contacto es obligatorio",
+            {...register("lastname", {
+              required: "El apellido es obligatorio",
             })}
-            error={!!errors.contact_name}
-            helperText={errors.contact_name?.message}
+            error={!!errors.lastname}
+            helperText={errors.lastname?.message}
           />
           <TextField
-            label="Numero"
-            fullWidth
-            {...register("phone", {
-              required: "El número es obligatorio",
-              pattern: {
-                value: /^[0-9]{9}$/,
-                message: "El número debe tener 9 dígitos",
-              },
-            })}
-            error={!!errors.phone}
-            helperText={errors.phone?.message}
-          />
-          <TextField
-            label="Email"
+            label="Correo"
             fullWidth
             {...register("email", {
               required: "El correo es obligatorio",
@@ -135,7 +122,19 @@ export const ProviderModal = ({
             error={!!errors.email}
             helperText={errors.email?.message}
           />
-
+          <TextField
+            label="Teléfono"
+            fullWidth
+            {...register("phone", {
+              required: "El número es obligatorio",
+              pattern: {
+                value: /^[0-9]{9}$/,
+                message: "El número debe tener 9 dígitos",
+              },
+            })}
+            error={!!errors.phone}
+            helperText={errors.phone?.message}
+          />
           <FormControl fullWidth error={!!errors.status}>
             <InputLabel id="status-label">Estado</InputLabel>
             <Select

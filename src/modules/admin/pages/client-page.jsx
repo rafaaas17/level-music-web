@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Box, Typography, Button, TextField, CircularProgress } from '@mui/material';
 import { AddCircleOutline, Edit } from '@mui/icons-material';
-import { useUsersStore } from '../../../hooks';
+import { useClientStore, useUsersStore } from '../../../hooks';
 import { TableComponent } from '../../../shared/ui/components';
 import { EventTypeModal } from '../components';
 import { useScreenSizes } from '../../../shared/constants/screen-width';
+import { ClientModal } from '../components/client/client-modal';
 
 export const ClientPage = () => {
   const {
-    users,
+    clients,
     total,
     loading,
     searchTerm,
@@ -22,19 +23,19 @@ export const ClientPage = () => {
     setPageGlobal,
     setOrderBy,
     setOrder,
-    startLoadingUsersPaginated,
-    setSelectedUser,
-  } = useUsersStore();
+    startLoadingClientsPaginated,
+    setSelectedClient,
+  } = useClientStore();
   const { isLg } = useScreenSizes();
 
   const [isModalOpen, setIsModalOpen] = useState(false); 
 
   useEffect(() => {
-    startLoadingUsersPaginated();
+    startLoadingClientsPaginated();
   }, [currentPage, rowsPerPage, searchTerm, orderBy, order]);
 
   const openModal = (payload) => {
-    setSelectedUser(payload);
+    setSelectedClient(payload);
     setIsModalOpen(true); 
   };
 
@@ -98,7 +99,7 @@ export const ClientPage = () => {
           <Box display="flex" justifyContent="center" alignItems="center" sx={{ py: 5 }}>
             <CircularProgress />
           </Box>
-        ) : users.length === 0 ? (
+        ) : clients.length === 0 ? (
           <Box display="flex" justifyContent="center" alignItems="center" sx={{ py: 5 }}>
             <Typography sx={{ color: 'text.secondary', fontSize: 16 }}>
               No se encontraron resultados.
@@ -106,7 +107,7 @@ export const ClientPage = () => {
           </Box>
         ) : (
           <TableComponent
-            rows={users}
+            rows={clients}
             columns={columns}
             order={order}
             orderBy={orderBy}
@@ -129,11 +130,11 @@ export const ClientPage = () => {
         )}
       </Box>
 
-      <EventTypeModal
+      <ClientModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         eventType={selected}
-        setEventType={setSelectedUser}
+        setEventType={setSelectedClient}
         loading={loading}
       />
 
