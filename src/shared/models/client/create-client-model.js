@@ -1,4 +1,5 @@
-export const createClientModel = (client) => ({
+export const createClientModel = (uid, client) => ({
+  auth_id: uid,
   first_name: client.first_name,
   last_name: client.last_name,
   phone: client.phone,

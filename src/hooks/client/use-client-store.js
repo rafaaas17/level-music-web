@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { userApi } from "../../api";
+import { firebaseAuthApi, mailApi, userApi } from "../../api";
 import {
   refreshClients,
   selectedClient,
@@ -8,8 +8,14 @@ import {
   setRowsPerPageClient,
   showSnackbar,
 } from "../../store";
-import { createClientModel, updateClientModel } from "../../shared/models";
+import { 
+  createClientModel, 
+  createFirebaseUserModel, 
+  createTemporalCredentialsMailModel, 
+  updateClientModel 
+} from "../../shared/models";
 import { useState } from "react";
+import { generateRandomPassword } from '../../shared/utils';
 
 export const useClientStore = () => {
   const dispatch = useDispatch();
@@ -29,8 +35,13 @@ export const useClientStore = () => {
   const startCreateClient = async (client) => {
     dispatch(setLoadingClient(true));
     try {
-      const newClient = createClientModel(client);
-      await clientApi.post("/", newClient);
+      const password = generateRandomPassword();
+      const newFirebaseUser = createFirebaseUserModel(client, password);
+      const { data } = await firebaseAuthApi.post("/", newFirebaseUser);
+      const newClient = createClientModel(data.uid, client);
+      await userApi.post("/", newClient);
+      const credentialsMail = createTemporalCredentialsMailModel(client, password);
+      await mailApi.post("send-temporal-credentials", credentialsMail);
       await startLoadingClientsPaginated();
       dispatch(showSnackbar({
         message: `El cliente fue creado exitosamente.`,
@@ -81,7 +92,7 @@ export const useClientStore = () => {
     dispatch(setLoadingClient(true));
     try {
       const payload = updateClientModel(client);
-      await clientApi.put(`/${id}`, payload);
+      await userApi.put(`/${id}`, payload);
       await startLoadingClientsPaginated();
       dispatch(showSnackbar({
         message: `El cliente fue actualizado exitosamente.`,

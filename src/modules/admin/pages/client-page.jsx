@@ -3,7 +3,6 @@ import { Box, Typography, Button, TextField, CircularProgress } from '@mui/mater
 import { AddCircleOutline, Edit } from '@mui/icons-material';
 import { useClientStore, useUsersStore } from '../../../hooks';
 import { TableComponent } from '../../../shared/ui/components';
-import { EventTypeModal } from '../components';
 import { useScreenSizes } from '../../../shared/constants/screen-width';
 import { ClientModal } from '../components/client/client-modal';
 
@@ -133,8 +132,8 @@ export const ClientPage = () => {
       <ClientModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        eventType={selected}
-        setEventType={setSelectedClient}
+        client={selected}
+        setClient={setSelectedClient}
         loading={loading}
       />
 
