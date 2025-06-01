@@ -3,8 +3,8 @@ import { Box, Typography, Button, TextField, CircularProgress } from '@mui/mater
 import { AddCircleOutline, Edit } from '@mui/icons-material';
 import { useServiceStore } from '../../../../hooks';
 import { TableComponent } from '../../../../shared/ui/components';
-import { WorkerTypeModal } from '../../components';
 import { useScreenSizes } from '../../../../shared/constants/screen-width';
+import { Link } from 'react-router-dom';
 
 export const ServicePage = () => {
   const {
@@ -27,16 +27,9 @@ export const ServicePage = () => {
   } = useServiceStore();
   const { isLg } = useScreenSizes();
 
-  const [isModalOpen, setIsModalOpen] = useState(false); 
-
   useEffect(() => {
     startLoadingServicePaginated();
   }, [currentPage, rowsPerPage, searchTerm, orderBy, order]);
-
-  const openModal = (payload) => {
-    setSelectedService(payload);
-    setIsModalOpen(true); 
-  };
 
   const columns = [
     { 
@@ -63,7 +56,7 @@ export const ServicePage = () => {
     { 
       label: 'Editar', 
       icon: <Edit />, 
-      onClick: (row) => openModal(row),
+      url: (row) => `/admin/service/${row._id}`,
     },
   ];
 
@@ -80,14 +73,15 @@ export const ServicePage = () => {
             <Typography sx={{ fontWeight: 600, fontSize: 24 }}>Listado de Servicios</Typography>
             <Typography sx={{ color: 'text.secondary', fontSize: 16 }}>Administra los servicios</Typography>
           </Box>
-          <Button
-            variant="contained"
-            startIcon={<AddCircleOutline />}
-            sx={{ backgroundColor: '#212121', color: '#fff', borderRadius: 2, textTransform: 'none', px: 3, py: 1.5 }}
-            onClick={() => openModal()} 
-          >
-            {isLg ? 'Agregar Servicio' : 'Agregar'}
-          </Button>
+          <Link to="/admin/service/new" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <Button
+              variant="contained"
+              startIcon={<AddCircleOutline />}
+              sx={{ backgroundColor: '#212121', color: '#fff', borderRadius: 2, textTransform: 'none', px: 3, py: 1.5 }}
+            >
+              {isLg ? 'Agregar Servicio' : 'Agregar'}
+            </Button>
+          </Link>
         </Box>
 
         <Box
@@ -126,26 +120,19 @@ export const ServicePage = () => {
               setOrder(isAsc ? 'desc' : 'asc');
               setOrderBy(prop);
             }}
-            page={currentPage} 
+            page={currentPage}
             rowsPerPage={rowsPerPage}
             total={total}
             onPageChange={(_, newPage) => setPageGlobal(newPage)}
             onRowsPerPageChange={(e) => {
-              setRowsPerPageGlobal(parseInt(e.target.value, 10)); 
-              setPageGlobal(0); 
+              setRowsPerPageGlobal(parseInt(e.target.value, 10));
+              setPageGlobal(0);
             }}
             actions={actions}
+            hasActions
           />
         )}
       </Box>
-
-      <WorkerTypeModal
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        workerType={selected}
-        setWorkerType={setSelectedService}
-        loading={loading}
-      />
     </Box>
   );
 };

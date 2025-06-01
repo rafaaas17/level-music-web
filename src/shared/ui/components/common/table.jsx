@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useScreenSizes } from '../../../constants/screen-width';
+import { useNavigate } from 'react-router-dom';
 
 export const TableComponent = ({
   rows,
@@ -36,6 +37,7 @@ export const TableComponent = ({
   const [anchorEl, setAnchorEl] = useState(null);
   const [menuRow, setMenuRow] = useState(null);
   const { isMd, isLg } = useScreenSizes();
+  const navigate = useNavigate();
 
   const handleMenuOpen = (event, row) => {
     setAnchorEl(event.currentTarget);
@@ -135,8 +137,13 @@ export const TableComponent = ({
                     <MenuItem
                       key={`${menuRow?._id}-action-${index}`}
                       onClick={() => {
-                        action.onClick(menuRow);
                         handleMenuClose();
+                        if (action.onClick) {
+                          action.onClick(menuRow);
+                        }
+                        if (action.url) {
+                          navigate(action.url(menuRow));
+                        }
                       }}
                       sx={{
                         display: 'flex',
@@ -274,8 +281,12 @@ export const TableComponent = ({
                           <MenuItem
                             key={`${menuRow?._id}-action-${index}`}
                             onClick={() => {
-                              action.onClick(menuRow);
                               handleMenuClose();
+                              if (action.onClick && typeof action.onClick === 'function') {
+                                action.onClick(menuRow);
+                              } else if (action.url && typeof action.url === 'function') {
+                                navigate(action.url(menuRow));
+                              }
                             }}
                             sx={{
                               display: 'flex',

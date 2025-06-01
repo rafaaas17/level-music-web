@@ -122,7 +122,7 @@ export const ProviderPage = () => {
               setPageGlobal(0); 
             }}
             actions={actions}
-            hasActions={!!actions}
+            hasActions
           />
         )}
       </Box>

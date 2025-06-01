@@ -10,13 +10,29 @@ export const Breadcrumbs = ({ menuItems, homeLabel = 'Inicio', homeHref = '/admi
   }
 
   const findMenuItem = (path) => {
+    console.log('Searching for path:', path);
     for (const item of menuItems) {
-      if (item.href === path) return item; 
+      if (item.href === path) {
+        console.log('Found item:', item);
+        return item; 
+      }
       if (item.subItems) {
-        const subItem = item.subItems.find((sub) => sub.href === path); 
-        if (subItem) return subItem;
+        for (const subItem of item.subItems) {
+          if (subItem.href === path) {
+            console.log('Found subItem:', subItem);
+            return subItem;
+          }
+          if (subItem.subItems) {
+            const nestedSubItem = subItem.subItems.find((nested) => nested.href === path);
+            if (nestedSubItem) {
+              console.log('Found nestedSubItem:', nestedSubItem);
+              return nestedSubItem;
+            }
+          }
+        }
       }
     }
+    console.log('No item found for path:', path);
     return null; 
   };
 

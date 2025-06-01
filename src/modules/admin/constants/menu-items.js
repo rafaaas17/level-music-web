@@ -81,7 +81,19 @@ export const menuItems = [
       { 
         text: 'Servicios', 
         breadcrumb: 'Servicios',
-        href: '/admin/service' 
+        href: '/admin/service',
+        subItems: [
+          {
+            text: 'Nuevo Servicio',
+            breadcrumb: 'Nuevo Servicio',
+            href: '/admin/service/new',
+          },
+          {
+            text: 'Editar Servicio',
+            breadcrumb: 'Editar Servicio',
+            href: '/admin/service/:serviceId',
+          },
+        ],
       },
       { 
         text: 'Tipo de Servicios', 
