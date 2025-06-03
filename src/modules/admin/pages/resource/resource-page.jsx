@@ -135,7 +135,7 @@ export const EquipmentPage = () => {
               setPageGlobal(0);
             }}
             actions={actions}
-            hasActions={!!actions}
+            hasActions
           />
         )}
       </Box>

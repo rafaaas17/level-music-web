@@ -124,7 +124,7 @@ export const ClientPage = () => {
               setPageGlobal(0); 
             }}
             actions={actions}
-            hasActions={!!actions}
+            hasActions
           />
         )}
       </Box>

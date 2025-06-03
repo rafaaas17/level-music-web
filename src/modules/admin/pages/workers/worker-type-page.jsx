@@ -120,7 +120,7 @@ export const WorkerTypePage = () => {
               setPageGlobal(0); 
             }}
             actions={actions}
-            hasActions={!!actions}
+            hasActions
           />
         )}
       </Box>
