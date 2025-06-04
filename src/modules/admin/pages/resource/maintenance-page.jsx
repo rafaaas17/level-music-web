@@ -5,6 +5,7 @@ import { useMaintenanceStore } from '../../../../hooks/resource/use-maintenance-
 import { TableComponent, MessageDialog } from '../../../../shared/ui/components';
 import { MaintenanceModal } from '../../components/resource/maintenance-modal';
 import { useScreenSizes } from '../../../../shared/constants/screen-width';
+import { formatDay } from '../../../../shared/utils';
 
 export const EquipmentMaintenancePage = () => {
   const {
@@ -42,10 +43,29 @@ export const EquipmentMaintenancePage = () => {
   };
 
   const columns = [
-    { id: 'resource_id', label: 'Nombre del equipo', sortable: false },
-    { id: 'type', label: 'Tipo de mantenimiento', sortable: true },
-    { id: 'description', label: 'Descripción', sortable: true },
-    { id: 'date', label: 'Fecha', sortable: true },
+    { 
+      id: 'resource.name', 
+      label: 'Nombre del equipo', 
+      sortable: false,
+      accessor: (row) => row.resource.name 
+    },
+    { 
+      id: 'type', 
+      label: 'Tipo de mantenimiento', 
+      sortable: true,
+      accessor: (row) => row.type 
+    },
+    { id: 'description', 
+      label: 'Descripción', 
+      sortable: true,
+      accessor: (row) => row.description
+    },
+    { 
+      id: 'date', 
+      label: 'Fecha',
+      sortable: true,
+      accessor: (row) => formatDay(row.date)
+    },
   ];
 
   const actions = [

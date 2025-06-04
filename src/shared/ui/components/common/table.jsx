@@ -108,9 +108,14 @@ export const TableComponent = ({
                       {column.id === 'status' ? (
                         <Chip
                           label={row[column.id]}
-                          color={row[column.id] === 'Activo' ? 'success' : 'error'}
+                          color={
+                            row[column.id] === 'Activo'
+                              ? 'success'
+                              : row[column.id] === 'Inactivo'
+                              ? 'error'
+                              : 'default'
+                          }
                           size="small"
-                          sx={{ color: '#fff !important' }}
                         />
                       ) : (
                         column.accessor ? column.accessor(row) : row[column.id]
@@ -251,7 +256,13 @@ export const TableComponent = ({
                       {column.id === 'status' ? (
                         <Chip
                           label={row[column.id]}
-                          color={row[column.id] === 'Activo' ? 'success' : 'error'}
+                          color={
+                            row[column.id] === 'Activo'
+                              ? 'success'
+                              : row[column.id] === 'Inactivo'
+                              ? 'error'
+                              : 'default'
+                          }
                           size="small"
                         />
                       ) : (

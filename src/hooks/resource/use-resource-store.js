@@ -103,6 +103,26 @@ export const useResourceStore = () => {
       dispatch(setLoadingResource(false));
     }
   };
+
+  const startSearchingResource = async (term) => {
+    if (term.length !== 12) return;
+    dispatch(setLoadingResource(true));
+    try {
+      const { data } = await resourceApi.get(`/by-serial?serial=${term}`);
+      return { data, ok: true };
+    } catch (error) {
+      dispatch(
+        showSnackbar({
+          message: "Ocurrió un error al buscar el recurso.",
+          severity: "error",
+        })
+      );
+      return false;
+    } finally {
+      dispatch(setLoadingResource(false));
+    }
+  };
+
   const setSelectedResource = (resource) => {
     dispatch(selectedResource({ ...resource }));
   };
@@ -139,5 +159,6 @@ export const useResourceStore = () => {
     startLoadingResourcesPaginated,
     startUpdateResource,
     setSelectedResource,
+    startSearchingResource,
   };
 };
