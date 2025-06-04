@@ -51,11 +51,17 @@ export const ClientModal = ({
   }, [open, reset, client]);
 
   const onSubmit = async (data) => {
-    setClient(data);
-    const success = isEditing
-      ? await startUpdateClient(client._id, data)
-      : await startCreateClient(data);
-    if (success) onClose();
+    try {
+      const success = isEditing
+        ? await startUpdateClient(client._id, data)
+        : await startCreateClient(data);
+      if (success) {
+        setClient(data); 
+        onClose();
+      } 
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   const isButtonDisabled = useMemo(() => loading, [loading]);

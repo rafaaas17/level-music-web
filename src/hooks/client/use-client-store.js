@@ -12,7 +12,8 @@ import {
   createClientModel, 
   createFirebaseUserModel, 
   createTemporalCredentialsMailModel, 
-  updateClientModel 
+  updateClientModel, 
+  updateFirebaseUserModel
 } from "../../shared/models";
 import { useState } from "react";
 import { generateRandomPassword } from '../../shared/utils';
@@ -49,11 +50,11 @@ export const useClientStore = () => {
       }));
       return true;
     } catch (error) {
-      console.log(error);
-      dispatch(showSnackbar({
-        message: `Ocurrió un error al crear el cliente.`,
-        severity: 'error',
-      }));
+      let errorMessage = 'Ocurrió un error al crear el cliente.';
+      if (error?.response?.data?.message?.includes('duplicate key error')) {
+        errorMessage = 'El correo electrónico ya está registrado.';
+      }
+      dispatch(showSnackbar({ message: errorMessage, severity: 'error' }));
       return false;
     } finally {
       dispatch(setLoadingClient(false));
@@ -93,6 +94,8 @@ export const useClientStore = () => {
     try {
       const payload = updateClientModel(client);
       await userApi.put(`/${id}`, payload);
+      const updatedClient = updateFirebaseUserModel(client);
+      await firebaseAuthApi.patch(`/${client.auth_id}`, updatedClient);
       await startLoadingClientsPaginated();
       dispatch(showSnackbar({
         message: `El cliente fue actualizado exitosamente.`,
@@ -100,11 +103,11 @@ export const useClientStore = () => {
       }));
       return true;
     } catch (error) {
-      console.log(error);
-      dispatch(showSnackbar({
-        message: `Ocurrió un error al actualizar el cliente.`,
-        severity: 'error',
-      }));
+      let errorMessage = 'Ocurrió un error al actualizar el cliente.';
+      if (error?.response?.data?.message?.includes('duplicate key error')) {
+        errorMessage = 'El correo electrónico ya está registrado.';
+      }
+      dispatch(showSnackbar({ message: errorMessage, severity: 'error' }));
       return false;
     } finally {
       dispatch(setLoadingClient(false));
