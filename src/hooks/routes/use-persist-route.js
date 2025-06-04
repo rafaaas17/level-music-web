@@ -5,7 +5,8 @@ export const usePersistRoute = () => {
   const location = useLocation();
 
   useEffect(() => {
-    if (!location.pathname.startsWith('/auth')) {
+    // Guardar la última ruta válida, incluyendo /auth/change-password
+    if (!location.pathname.startsWith('/auth') || location.pathname.startsWith('/auth/change-password')) {
       sessionStorage.setItem('lastRoute', location.pathname);
     }
   }, [location.pathname]);

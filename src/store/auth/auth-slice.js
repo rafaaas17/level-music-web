@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 export const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    status: 'not-authenticated', // 'authenticated' | 'not-authenticated' | 'checking'
+    status: 'not-authenticated', // 'authenticated' | 'not-authenticated' | 'checking' | 'change-password'
     uid: null, 
     email: null,
     firstName: null,
@@ -12,6 +12,7 @@ export const authSlice = createSlice({
     documentType: null,
     documentNumber: null,
     role: null,
+    needs_password_change: null, 
     userStatus: null, // Activo, Inactivo
     photoURL: null, 
     errorMessage: null,
@@ -19,7 +20,6 @@ export const authSlice = createSlice({
   },
   reducers: {
     login: (state, { payload }) => {
-      state.status = 'authenticated';
       state.uid = payload.uid; 
       state.email = payload.email;
       state.firstName = payload.firstName ?? null; 
@@ -28,10 +28,12 @@ export const authSlice = createSlice({
       state.documentType = payload.documentType ?? null;
       state.documentNumber = payload.documentNumber ?? null;
       state.role = payload.role;
+      state.needs_password_change = payload.needs_password_change ?? null; 
       state.userStatus = payload.userStatus;
       state.photoURL = payload.photoURL; 
       state.errorMessage = null;
       state.token = payload.token;
+      state.status = payload.needs_password_change ? 'change-password' : 'authenticated';
     },
     logout: (state, { payload }) => {
       state.status = 'not-authenticated';
@@ -43,6 +45,7 @@ export const authSlice = createSlice({
       state.documentType = null;
       state.documentNumber = null;
       state.role = null;
+      state.needs_password_change = null; 
       state.userStatus = null;
       state.photoURL = null;
       state.errorMessage = payload?.errorMessage ?? null;
@@ -53,7 +56,7 @@ export const authSlice = createSlice({
     },
     clearErrorMessage: (state) => {
       state.errorMessage = null;
-    }
+    },
   }
 });
 
@@ -61,5 +64,5 @@ export const {
   login, 
   logout, 
   checkingCredentials, 
-  clearErrorMessage 
+  clearErrorMessage
 } = authSlice.actions;
