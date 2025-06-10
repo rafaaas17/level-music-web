@@ -1,38 +1,26 @@
-import { useState } from "react";
-import { useSelector } from "react-redux";
-import { Button, TextField, Typography, IconButton, InputAdornment, Box } from "@mui/material";
-import { AuthLayout } from "../layout/auth-layout";
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { Button, useTheme, CircularProgress } from "@mui/material";
+import { AuthLayout } from "../layout/auth-layout";
+import { FormInputText } from "../../../shared/ui/components";
+import { useAuthStore } from "../../../hooks";
 
-export const ChangePasswordPage = ({ onPasswordChange }) => {
-  const { email } = useSelector((state) => state.auth);
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+export const ChangePasswordPage = () => {
+  const theme = useTheme();
+  const { status, startChangePassword } = useAuthStore();
+  
+  const {
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    register,
+  } = useForm({
+    mode: "onBlur",
+  });
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handleClickShowConfirmPassword = () => setShowConfirmPassword((show) => !show);
+  const isAuthenticated = useMemo(() => status === "checking", [status]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    if (password !== confirmPassword) {
-      setError("Las contraseñas no coinciden.");
-      setLoading(false);
-      return;
-    }
-    try {
-      await onPasswordChange(password);
-    } catch (err) {
-      setError("Error al cambiar la contraseña.");
-    } finally {
-      setLoading(false);
-    }
+  const onSubmit = async (data) => {
+    await startChangePassword(data);
   };
 
   return (
@@ -40,70 +28,52 @@ export const ChangePasswordPage = ({ onPasswordChange }) => {
       title="Cambiar contraseña"
       subtitle="Por seguridad, debes cambiar tu contraseña antes de continuar."
     >
-      <form onSubmit={handleSubmit} style={{ width: "100%" }}>
-        <TextField
+      <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
+        {/* Nueva contraseña */}
+        <FormInputText
           name="password"
+          register={register}
           label="Nueva contraseña"
-          type={showPassword ? "text" : "password"}
-          fullWidth
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          sx={{ mb: 2, background: password ? '#eaf2ff' : 'white' }}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={handleClickShowPassword} edge="end">
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            )
+          type="password"
+          error={errors.password}
+          rules={{ 
+            required: "La contraseña es obligatoria",
+            minLength: { value: 6, message: "Mínimo 6 caracteres" },
+            maxLength: { value: 12, message: "Máximo 12 caracteres" }
           }}
         />
-        <TextField
+
+        {/* Confirmar nueva contraseña */}
+        <FormInputText
           name="confirmPassword"
+          register={register}
           label="Confirmar nueva contraseña"
-          type={showConfirmPassword ? "text" : "password"}
-          fullWidth
-          required
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          sx={{ mb: 2, background: confirmPassword ? '#eaf2ff' : 'white' }}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={handleClickShowConfirmPassword} edge="end">
-                  {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            )
+          type="password"
+          error={errors.confirmPassword}
+          rules={{ 
+            required: "La contraseña es obligatoria",
+            minLength: { value: 6, message: "Mínimo 6 caracteres" },
+            maxLength: { value: 12, message: "Máximo 12 caracteres" }
           }}
         />
-        {error && (
-          <Box sx={{ mt: 2, mb: 1 }}>
-            <Typography color="error" sx={{ width: "100%" }}>
-              {error}
-            </Typography>
-          </Box>
-        )}
+
         <Button
           type="submit"
           fullWidth
           variant="text"
           color="primary"
           sx={{
-            mt: 1,
+            mt: 3,
             padding: "10px",
             textTransform: "none",
             fontSize: 16,
-            fontWeight: 600,
-            backgroundColor: 'primary.main',
-            color: 'white',
-            '&:hover': {
-              backgroundColor: 'primary.hover',
+            backgroundColor: theme.palette.primary.main,
+            color: "white",
+            "&:hover": {
+              backgroundColor: theme.palette.primary.hover,
             },
           }}
-          disabled={loading}
+          disabled={isSubmitting || isAuthenticated}
         >
           Actualizar
         </Button>

@@ -1,19 +1,15 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
-import { Button, Alert, Box, Typography, useTheme } from "@mui/material";
+import { Link } from "react-router-dom";
+import { Button, Box, Typography, useTheme } from "@mui/material";
 import { AuthLayout } from "../layout/auth-layout";
 import { useAuthStore } from "../../../hooks";
 import { CircProgress, FormInputText } from '../../../shared/ui/components';
-import { useDispatch } from "react-redux";
-import { clearErrorMessage } from "../../../store";
 import googleLogo from "../../../assets/images/logo/google.png";
 
 export const RegisterPage = () => {
-  const navigate = useNavigate();
   const theme = useTheme();
-  const dispatch = useDispatch();
-  const { status, errorMessage, startRegisterUser, onGoogleSignIn } = useAuthStore();
+  const { status, startRegisterUser, onGoogleSignIn } = useAuthStore();
 
   const { 
     handleSubmit, 
@@ -25,18 +21,12 @@ export const RegisterPage = () => {
   
   const isAuthenticated = useMemo(() => status === "checking", [status]);
 
-  useEffect(() => {
-    dispatch(clearErrorMessage());
-  }, []);
-
   const onSubmit = async (data) => {
-    const success = await startRegisterUser(data);
-    if (success) navigate('/');
+    await startRegisterUser(data);
   };
 
   const signInWithGoogle = async () => {
-    const success = await onGoogleSignIn();
-    if (success) navigate('/');
+    await onGoogleSignIn();
   };
 
   return (
@@ -74,8 +64,9 @@ export const RegisterPage = () => {
             minLength: { value: 6, message: "Mínimo 6 caracteres" },
             maxLength: { value: 12, message: "Máximo 12 caracteres" }
           }}
+          isPasswordInput
         />
-        {errorMessage && <Alert severity="error" sx={{ mt: 2 }}>{errorMessage}</Alert>}
+
         <Button
           type="submit"
           fullWidth

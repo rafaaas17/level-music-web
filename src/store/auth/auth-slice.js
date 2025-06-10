@@ -15,11 +15,15 @@ export const authSlice = createSlice({
     needs_password_change: null, 
     userStatus: null, // Activo, Inactivo
     photoURL: null, 
-    errorMessage: null,
     token: null,
   },
   reducers: {
     login: (state, { payload }) => {
+      if (payload.userStatus === "Inactivo") {
+        state.status = "not-authenticated";
+        return;
+      }
+
       state.uid = payload.uid; 
       state.email = payload.email;
       state.firstName = payload.firstName ?? null; 
@@ -31,11 +35,10 @@ export const authSlice = createSlice({
       state.needs_password_change = payload.needs_password_change ?? null; 
       state.userStatus = payload.userStatus;
       state.photoURL = payload.photoURL; 
-      state.errorMessage = null;
       state.token = payload.token;
-      state.status = payload.needs_password_change ? 'change-password' : 'authenticated';
+      state.status = payload.needs_password_change ? "change-password" : "authenticated";
     },
-    logout: (state, { payload }) => {
+    logout: (state) => {
       state.status = 'not-authenticated';
       state.uid = null;
       state.email = null;
@@ -48,14 +51,14 @@ export const authSlice = createSlice({
       state.needs_password_change = null; 
       state.userStatus = null;
       state.photoURL = null;
-      state.errorMessage = payload?.errorMessage ?? null;
       state.token = null;
     },
     checkingCredentials: (state) => {
       state.status = 'checking';
     },
-    clearErrorMessage: (state) => {
-      state.errorMessage = null;
+    authenticated: (state) => {
+      state.status = 'authenticated';
+      state.needs_password_change = false;
     },
   }
 });
@@ -64,5 +67,5 @@ export const {
   login, 
   logout, 
   checkingCredentials, 
-  clearErrorMessage
+  authenticated,
 } = authSlice.actions;

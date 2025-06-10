@@ -9,4 +9,5 @@ export const createClientModel = (uid, client) => ({
   role: "Cliente",
   status: "Activo",
   needs_password_change: true,
+  created_by_admin: true
 });
