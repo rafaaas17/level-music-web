@@ -26,14 +26,9 @@ export const ResourceModal = ({
   // Solo habilita el botón si el número de serie tiene exactamente 12 caracteres alfanuméricos
   const isButtonDisabled = useMemo(() => {
     return (
-      loading ||
-      !resource?.name ||
-      !resource?.type ||
-      !resource?.serialNumber ||
-      !resource?.status ||
-      !/^[A-Z0-9]{12}$/.test(resource.serialNumber)
+      loading 
     );
-  }, [loading, resource]);
+  }, [loading]);
 
   // Forzar location a "Almacen" siempre
   const handleChange = (field, value) => {
@@ -93,33 +88,14 @@ export const ResourceModal = ({
             <Select
               labelId="type-label"
               id="type"
-              value={resource?.type || ""}
+              value={resource?.resource_type || ""}
               label="Tipo de recurso"
-              onChange={(e) => handleChange("type", e.target.value)}
+              onChange={(e) => handleChange("resource_type", e.target.value)}
             >
               <MenuItem value="Equipo">Equipo</MenuItem>
               <MenuItem value="Luz">Luz</MenuItem>
             </Select>
           </FormControl>
-
-          {/* Numero de serie */}
-          <TextField
-            label="Número de serie"
-            fullWidth
-            value={resource?.serialNumber || ""}
-            inputProps={{ maxLength: 12, style: { textTransform: "uppercase" } }}
-            onChange={(e) =>
-              handleChange(
-                "serialNumber",
-                e.target.value.replace(/[^A-Z0-9]/gi, "").toUpperCase()
-              )
-            }
-            helperText="Debe contener 12 caracteres alfanuméricos (ej: A1B2C3D4E5F6)"
-            error={
-              !!resource?.serialNumber &&
-              !/^[A-Z0-9]{12}$/.test(resource.serialNumber)
-            }
-          />
 
           {/* Estado */}
           <FormControl fullWidth>
@@ -131,9 +107,9 @@ export const ResourceModal = ({
               label="Estado"
               onChange={(e) => handleChange("status", e.target.value)}
             >
-              <MenuItem value="Activo">Activo</MenuItem>
-              <MenuItem value="Inactivo">Inactivo</MenuItem>
-              <MenuItem value="En reparación">En reparación</MenuItem>
+              <MenuItem value="Disponible">Disponible</MenuItem>
+              <MenuItem value="Mantenimiento">Mantenimiento</MenuItem>
+              <MenuItem value="Dañado">Dañado</MenuItem>
             </Select>
           </FormControl>
         </Box>
