@@ -25,6 +25,7 @@ export const useCheckAuth = () => {
         documentType: data.document_type || null,
         documentNumber: data.document_number || null,
         role: data.role,
+        needs_password_change: data.needs_password_change || null,
         userStatus: data.status, // Activo, Inactivo
         photoURL: data.profile_picture || null,
         token: user.accessToken

@@ -19,6 +19,8 @@ export const LandingDrawer = ({ drawerOpen, handleDrawerToggle }) => {
     handleDrawerToggle(); 
   };
 
+  const isLoggedIn = status === 'authenticated' || status === 'change-password';
+
   return (
     <Drawer
       variant="temporary"
@@ -84,15 +86,15 @@ export const LandingDrawer = ({ drawerOpen, handleDrawerToggle }) => {
           <Divider color="white" sx={{ mx: -2, mb: 1 }} />
           <ListItem disablePadding sx={{ mb: -1 }}>
             <ListItemButton
-              onClick={status === 'authenticated' ? handleLogout : handleDrawerToggle}
-              component={status === 'authenticated' ? 'button' : Link}
-              to={status === 'authenticated' ? undefined : '/auth/login'}
+              onClick={isLoggedIn ? handleLogout : handleDrawerToggle}
+              component={isLoggedIn ? 'button' : Link}
+              to={isLoggedIn ? undefined : '/auth/login'}
               sx={{ gap: 1 }}
             >
               <ListItemIcon sx={{ color: 'white', minWidth: 'auto' }}>
-                {status === 'authenticated' ? <Logout /> : <Login />}
+                {isLoggedIn ? <Logout /> : <Login />}
               </ListItemIcon>
-              <ListItemText primary={status === 'authenticated' ? 'CERRAR SESIÓN' : 'INICIAR SESIÓN'} />
+              <ListItemText primary={isLoggedIn ? 'CERRAR SESIÓN' : 'INICIAR SESIÓN'} />
             </ListItemButton>
           </ListItem>
         </Box>
