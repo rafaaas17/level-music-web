@@ -5,10 +5,18 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   signOut,
+  updatePassword,
 } from 'firebase/auth';
 import { FirebaseAuth } from '../../modules/auth/firebase/config';
-import { checkingCredentials, login, logout } from '../../store/auth';
+import { 
+  checkingCredentials, 
+  login, 
+  logout,
+  showSnackbar,
+  authenticated
+} from '../../store';
 import { useUsersStore } from '../../hooks';
+import { userApi } from '../../api';
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });
@@ -18,7 +26,7 @@ export const useAuthStore = () => {
   const dispatch = useDispatch();
   const checkingAuthentication = () => dispatch(checkingCredentials());
 
-  const { status, uid, email, displayName, photoURL, role, errorMessage } = useSelector((state) => state.auth);
+  const { status, uid, email, displayName, photoURL, role } = useSelector((state) => state.auth);
   const { startCreateUser, findUserByEmail } = useUsersStore();
 
   const onGoogleSignIn = async () => {
@@ -27,7 +35,6 @@ export const useAuthStore = () => {
       const { user } = await signInWithPopup(FirebaseAuth, googleProvider);
       const { data, ok } = await findUserByEmail(user.providerData[0].email); 
 
-      console.log(user)
       if (!ok) {
         const { data: newUser } = await startCreateUser(user, "Cliente", "google");
         dispatch(login({ 
@@ -46,30 +53,38 @@ export const useAuthStore = () => {
         return true;
       } else {
         if (data.status === "Inactivo") {
-          dispatch(logout({ errorMessage: "Usuario inactivo." }));
+          dispatch(logout());
           return false;
         } 
-        dispatch(login({ 
-          uid: data.auth_id, 
-          email: data.email, 
+        const needsPassword = !!data.needs_password_change;
+        dispatch(login({
+          uid: data.auth_id,
+          email: data.email,
           firstName: data.first_name,
-          lastName: data.last_name, 
+          lastName: data.last_name,
           phone: data.phone,
           documentType: data.document_type,
           documentNumber: data.document_number,
           role: data.role,
-          userStatus: data.status, // Activo, Inactivo
+          needs_password_change: needsPassword,
+          userStatus: data.status,
           photoURL: data.profile_picture,
           token: user.accessToken
         }));
-        return true;
+        return !needsPassword;
       }
     } catch (error) {
-      dispatch(logout(error.message));
+      dispatch(logout());
       if (error.code === "auth/error-code:-47") {
-        dispatch(logout({ errorMessage: "Este correo ya está registrado con otro método de autenticación." }));
+        dispatch(showSnackbar({
+          message: 'Este correo ya está registrado con otro método de autenticación.',
+          severity: 'error',
+        }));
       } else {
-        dispatch(logout({ errorMessage: "Error al iniciar sesión." }));
+        dispatch(showSnackbar({
+          message: 'Error al iniciar sesión.',
+          severity: 'error',
+        }));
       }
       return false;
     }
@@ -82,31 +97,37 @@ export const useAuthStore = () => {
       const { data } = await findUserByEmail(user.providerData[0].email); 
 
       if (data.status === "Inactivo") {
-        dispatch(logout({ errorMessage: "Usuario inactivo." }));
+        dispatch(logout());
         return false;
-      } else {
-        dispatch(login({ 
-          uid: data.auth_id, 
-          email: data.email, 
-          firstName: data.first_name, 
-          lastName: data.last_name,
-          phone: data.phone,
-          documentType: data.document_type,
-          documentNumber: data.document_number,
-          role: data.role,
-          userStatus: data.status, // Activo, Inactivo
-          photoURL: data.profile_picture,
-          token: user.accessToken
-        }));
-        return true;
       }
+      const needsPassword = !!data.needs_password_change;
+      dispatch(login({
+        uid: data.auth_id,
+        email: data.email,
+        firstName: data.first_name,
+        lastName: data.last_name,
+        phone: data.phone,
+        documentType: data.document_type,
+        documentNumber: data.document_number,
+        role: data.role,
+        needs_password_change: needsPassword,
+        userStatus: data.status,
+        photoURL: data.profile_picture,
+        token: user.accessToken
+      }));
+      return !needsPassword;
     } catch (error) {
-      console.log(error)
-      dispatch(logout(error.message));
+      dispatch(logout());
       if (error.code === "auth/invalid-credential") {
-        dispatch(logout({ errorMessage: "Credenciales incorrectas" }));
+        dispatch(showSnackbar({
+          message: 'Credenciales incorrectas',
+          severity: 'success',
+        }));
       } else {
-        dispatch(logout({ errorMessage: "Error al iniciar sesión." }));
+        dispatch(showSnackbar({
+          message: 'Error al iniciar sesión.',
+          severity: 'success',
+        }));
       }
       return false;
     }
@@ -118,7 +139,11 @@ export const useAuthStore = () => {
       const { ok } = await findUserByEmail(email); 
 
       if (ok) {
-        dispatch(logout({ errorMessage: "Este correo ya está registrado." }));
+        dispatch(logout());
+        dispatch(showSnackbar({
+          message: 'Este correo ya está registrado.',
+          severity: 'success',
+        }));
         return false;
       } else {
         const { user } = await createUserWithEmailAndPassword(FirebaseAuth, email, password);
@@ -138,10 +163,17 @@ export const useAuthStore = () => {
         return true;
       }
     } catch (error) {
+      dispatch(logout());
       if (error.code === "auth/email-already-in-use") {
-        dispatch(logout({ errorMessage: "Este correo ya está en uso." }));
+        dispatch(showSnackbar({
+          message: 'Este correo ya está en uso.',
+          severity: 'success',
+        }));
       } else {
-        dispatch(logout({ errorMessage: "Error al crear usuario." }));
+        dispatch(showSnackbar({
+          message: 'Error al crear usuario.',
+          severity: 'success',
+        }));
       }
       return false;
     }
@@ -152,6 +184,41 @@ export const useAuthStore = () => {
     dispatch(logout());
   };
 
+  const startChangePassword = async ({ password, confirmPassword }) => {
+    if (password !== confirmPassword) {
+      dispatch(showSnackbar({
+        message: 'Las contraseñas no coinciden.',
+        severity: 'error',
+      }));
+      return false;
+    }
+
+    try {
+      const user = FirebaseAuth.currentUser;
+      await updatePassword(user, password);
+      await userApi.patch(`/reset-password-flag/${uid}`);
+      dispatch(authenticated());
+      dispatch(showSnackbar({
+        message: 'Contraseña actualizada exitosamente.',
+        severity: 'success',
+      }));
+      return true;
+    } catch (error) {
+      if (error.code === "auth/requires-recent-login") {
+        dispatch(showSnackbar({
+          message: 'Por seguridad, vuelve a iniciar sesión para cambiar tu contraseña.',
+          severity: 'error',
+        }));
+      } else {
+        dispatch(showSnackbar({
+          message: 'Error al cambiar la contraseña.',
+          severity: 'error',
+        }));
+      }
+      return false;
+    }
+  }
+
   return { 
     status, 
     uid, 
@@ -159,11 +226,12 @@ export const useAuthStore = () => {
     displayName, 
     photoURL, 
     role,
-    errorMessage,
+    
     checkingAuthentication, 
     onGoogleSignIn, 
     startLogin, 
     startRegisterUser,
-    onLogout 
+    onLogout,
+    startChangePassword
   };
 };

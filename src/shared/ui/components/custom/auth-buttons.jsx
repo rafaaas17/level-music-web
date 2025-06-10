@@ -12,7 +12,9 @@ export const AuthButtons = () => {
 
   const handleLogout = () => onLogout() && navigate('/auth/login');
 
-  if (status === 'authenticated') {
+  const isLoggedIn = status === 'authenticated' || status === 'change-password';
+
+  if (isLoggedIn) {
     return (
       <Box sx={{ flexGrow: 0, mx: { lg: -3, xs: 0 } }}>
         {isMd ? (

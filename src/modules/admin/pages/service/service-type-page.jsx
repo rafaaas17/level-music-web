@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useServiceTypeStore } from "../../../../hooks";
 import { useScreenSizes } from "../../../../shared/constants/screen-width";
 import { Box, Button, CircularProgress, TextField, Typography } from "@mui/material";
-import { AddCircleOutline, Delete, Edit } from "@mui/icons-material";
-import { MessageDialog, TableComponent } from "../../../../shared/ui/components";
+import { AddCircleOutline, Edit } from "@mui/icons-material";
+import { TableComponent } from "../../../../shared/ui/components";
 import { ServiceTypeModal } from "../../components";
 
 

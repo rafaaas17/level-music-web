@@ -35,7 +35,7 @@ export const AuthLayout = ({ children, title = '', subtitle = '', isLogin = fals
         }}
       >
         {isLogin && <Logo />}
-        <Typography sx={{ fontSize: isLogin ? 16 : 22, fontWeight: 600, pt: 2 }}>
+        <Typography sx={{ fontSize: isLogin ? 16 : 22, fontWeight: 600, pt: isLogin ? 2 : 0 }}>
           {title}
         </Typography>
         <Typography sx={{ fontSize: 16, fontWeight: 200, py: 2 }}>

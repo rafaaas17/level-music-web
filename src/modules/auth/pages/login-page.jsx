@@ -1,19 +1,15 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { Button, Alert, Box, Typography, useTheme } from "@mui/material";
+import { Link } from "react-router-dom";
+import { Button, Box, Typography, useTheme } from "@mui/material";
 import { AuthLayout } from "../layout/auth-layout";
 import { useAuthStore } from "../../../hooks";
-import { clearErrorMessage } from "../../../store";
 import { CircProgress, FormInputText } from "../../../shared/ui/components";
 import googleLogo from "../../../assets/images/logo/google.png";
 
 export const LoginPage = () => {
-  const navigate = useNavigate();
   const theme = useTheme();
-  const dispatch = useDispatch();
-  const { status, errorMessage, startLogin, onGoogleSignIn } = useAuthStore();
+  const { status, startLogin, onGoogleSignIn } = useAuthStore();
   
   const {
     handleSubmit,
@@ -25,13 +21,8 @@ export const LoginPage = () => {
 
   const isAuthenticated = useMemo(() => status === "checking", [status]);
 
-  useEffect(() => {
-    dispatch(clearErrorMessage());
-  }, []);
-
   const onSubmit = async (data) => {
-    const success = await startLogin(data);
-    if (success) navigate('/');
+    await startLogin(data);
   };
 
   return (
@@ -68,16 +59,8 @@ export const LoginPage = () => {
           rules={{ 
             required: "La contraseña es obligatoria",
           }}
+          isPasswordInput
         />
-
-        {/* Mensaje de error */}
-        {errorMessage && (
-          <Box sx={{ mt: 2, mb: 1 }}>
-            <Alert severity="error" sx={{ width: "100%" }}>
-              {errorMessage}
-            </Alert>
-          </Box>
-        )}
 
         <Box sx={{ display: "flex", justifyContent: "flex-end", my: 2 }}>
           <Link 

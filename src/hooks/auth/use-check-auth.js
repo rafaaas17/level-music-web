@@ -15,7 +15,13 @@ export const useCheckAuth = () => {
     dispatch(checkingCredentials());
     const unsubscribe = onAuthStateChanged(FirebaseAuth, async (user) => {
       if (!user) return dispatch(logout());
-      const { data } = await findUserByEmail(user.providerData[0].email); 
+      const { data } = await findUserByEmail(user.providerData[0].email);
+
+      if (data?.status === "Inactivo") {
+        dispatch(logout());
+        return;
+      }
+
       dispatch(login({ 
         uid: data.auth_id, 
         email: data.email, 
@@ -25,6 +31,7 @@ export const useCheckAuth = () => {
         documentType: data.document_type || null,
         documentNumber: data.document_number || null,
         role: data.role,
+        needs_password_change: data.needs_password_change || null,
         userStatus: data.status, // Activo, Inactivo
         photoURL: data.profile_picture || null,
         token: user.accessToken

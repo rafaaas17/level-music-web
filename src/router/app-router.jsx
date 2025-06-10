@@ -36,6 +36,17 @@ export const AppRouter = () => {
     }
   }
 
+  if (status === 'change-password') {
+    // Si no está en /auth/change-password exactamente, redirige siempre a esa ruta
+    if (!location.pathname.startsWith('/auth/change-password')) {
+      return <Navigate to="/auth/change-password" replace />;
+    }
+    // Si está en /auth o cualquier subruta de /auth que no sea /auth/change-password, también redirige
+    if (location.pathname === '/auth' || location.pathname === '/auth/') {
+      return <Navigate to="/auth/change-password" replace />;
+    }
+  }
+
   return (
     <Routes>
       {/* Rutas del Landing */}
