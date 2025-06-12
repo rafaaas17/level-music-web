@@ -9,6 +9,7 @@ import {
   showSnackbar,
 } from "../../store";
 import { useState } from "react";
+import { createResourceModel, updateResourceModel } from "../../shared/models";
 
 export const useResourceStore = () => {
   const dispatch = useDispatch();
@@ -28,7 +29,9 @@ export const useResourceStore = () => {
   const startCreateResource = async (resource) => {
     dispatch(setLoadingResource(true));
     try {
-      await resourceApi.post("/", resource);
+      console.log(resource)
+      const payload = createResourceModel(resource);
+      await resourceApi.post("/", payload);
       await startLoadingResourcesPaginated();
       dispatch(
         showSnackbar({
@@ -82,7 +85,8 @@ export const useResourceStore = () => {
   const startUpdateResource = async (id, resource) => {
     dispatch(setLoadingResource(true));
     try {
-      await resourceApi.put(`/${id}`, resource);
+      const payload = updateResourceModel(resource)
+      await resourceApi.put(`/${id}`, payload);
       await startLoadingResourcesPaginated();
       dispatch(
         showSnackbar({

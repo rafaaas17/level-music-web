@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button, TextField, CircularProgress } from '@mui/material';
-import { AddCircleOutline, Delete } from '@mui/icons-material';
+import { AddCircleOutline, Edit } from '@mui/icons-material';
 import { useMaintenanceStore } from '../../../../hooks/resource/use-maintenance-store';
-import { TableComponent, MessageDialog } from '../../../../shared/ui/components';
+import { TableComponent } from '../../../../shared/ui/components';
 import { MaintenanceModal } from '../../components/resource/maintenance-modal';
 import { useScreenSizes } from '../../../../shared/constants/screen-width';
 import { formatDay } from '../../../../shared/utils';
@@ -25,20 +25,17 @@ export const EquipmentMaintenancePage = () => {
     setOrder,
     startLoadingMaintenancesPaginated,
     setSelectedMaintenance,
-    startCreateMaintenance,
-    startDeleteMaintenance,
   } = useMaintenanceStore();
   const { isLg } = useScreenSizes();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [deleteDialog, setDeleteDialog] = useState({ open: false, row: null });
 
   useEffect(() => {
     startLoadingMaintenancesPaginated();
   }, [currentPage, rowsPerPage, searchTerm, orderBy, order]);
 
-  const openModal = () => {
-    setSelectedMaintenance({});
+  const openModal = (payload) => {
+    setSelectedMaintenance(payload);
     setIsModalOpen(true);
   };
 
@@ -55,38 +52,28 @@ export const EquipmentMaintenancePage = () => {
       sortable: true,
       accessor: (row) => row.type 
     },
-    { id: 'description', 
-      label: 'Descripción', 
+    { id: 'status', 
+      label: 'Estado', 
       sortable: true,
-      accessor: (row) => row.description
+      accessor: (row) => row.status
     },
     { 
       id: 'date', 
       label: 'Fecha',
       sortable: true,
-      accessor: (row) => formatDay(row.date)
+      accessor: (row) => { 
+        return formatDay(row.date) 
+      }
     },
   ];
 
   const actions = [
-    {
-      label: 'Eliminar',
-      icon: <Delete />,
-      onClick: (row) => setDeleteDialog({ open: true, row }),
+    { 
+      label: 'Cambiar estado', 
+      icon: <Edit />, 
+      onClick: (row) => openModal(row),
     },
   ];
-
-  const handleSave = async (maintenance) => {
-    const success = await startCreateMaintenance(maintenance);
-    if (success) setIsModalOpen(false);
-  };
-
-  const handleDelete = async () => {
-    if (deleteDialog.row && deleteDialog.row._id) {
-      await startDeleteMaintenance(deleteDialog.row._id);
-      setDeleteDialog({ open: false, row: null });
-    }
-  };
 
   return (
     <Box>
@@ -157,7 +144,7 @@ export const EquipmentMaintenancePage = () => {
               setPageGlobal(0);
             }}
             actions={actions}
-            hasActions={false}
+            hasActions
           />
         )}
       </Box>
@@ -165,16 +152,9 @@ export const EquipmentMaintenancePage = () => {
       <MaintenanceModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSave={handleSave}
+        maintenance={selected}
+        setMaintenance={setSelectedMaintenance}
         loading={loading}
-      />
-
-      <MessageDialog
-        open={deleteDialog.open}
-        title="Eliminar mantenimiento"
-        message="¿Estás seguro que deseas eliminar este mantenimiento?"
-        onClose={() => setDeleteDialog({ open: false, row: null })}
-        onConfirm={handleDelete}
       />
     </Box>
   );

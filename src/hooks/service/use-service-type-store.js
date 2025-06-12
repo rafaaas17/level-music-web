@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { createServiceTypeModel, updateServiceTypeModel } from "../../shared/models/service";
+import { createServiceTypeModel, updateServiceTypeModel } from "../../shared/models";
 import { 
   refreshServiceType, 
   selectedServiceType, 
