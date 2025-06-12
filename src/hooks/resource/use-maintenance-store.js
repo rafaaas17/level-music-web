@@ -9,6 +9,7 @@ import {
   showSnackbar,
 } from "../../store";
 import { useState } from "react";
+import { createMaintenanceModel, updateMaintenanceStatusModel } from "../../shared/models";
 
 export const useMaintenanceStore = () => {
   const dispatch = useDispatch();
@@ -28,7 +29,8 @@ export const useMaintenanceStore = () => {
   const startCreateMaintenance = async (maintenance) => {
     dispatch(setLoadingMaintenance(true));
     try {
-      await maintenanceApi.post("/", maintenance);
+      const payload = createMaintenanceModel(maintenance)
+      await maintenanceApi.post("/", payload);
       await startLoadingMaintenancesPaginated();
       dispatch(
         showSnackbar({
@@ -79,15 +81,15 @@ export const useMaintenanceStore = () => {
     }
   };
 
-
-  const startDeleteMaintenance = async (id) => {
+  const startChangeManteinanceStatus = async (id, maintenance) => {
     dispatch(setLoadingMaintenance(true));
     try {
-      await maintenanceApi.delete(`/${id}`);
+      const payload = updateMaintenanceStatusModel(maintenance)
+      await maintenanceApi.patch(`/${id}/status`, payload)
       await startLoadingMaintenancesPaginated();
       dispatch(
         showSnackbar({
-          message: "El mantenimiento fue eliminado exitosamente.",
+          message: "El mantenimiento fue creado exitosamente.",
           severity: "success",
         })
       );
@@ -95,7 +97,7 @@ export const useMaintenanceStore = () => {
     } catch (error) {
       dispatch(
         showSnackbar({
-          message: "Ocurrió un error al eliminar el mantenimiento.",
+          message: "Ocurrió un error al crear el mantenimiento.",
           severity: "error",
         })
       );
@@ -103,7 +105,7 @@ export const useMaintenanceStore = () => {
     } finally {
       dispatch(setLoadingMaintenance(false));
     }
-  };
+  }
 
   const setSelectedMaintenance = (maintenance) => {
     dispatch(selectedMaintenance({ ...maintenance }));
@@ -139,7 +141,7 @@ export const useMaintenanceStore = () => {
     // actions
     startCreateMaintenance,
     startLoadingMaintenancesPaginated,
-    startDeleteMaintenance,
+    startChangeManteinanceStatus,
     setSelectedMaintenance,
   };
 };

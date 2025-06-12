@@ -5,88 +5,110 @@ import {
   TextField,
   Button,
   IconButton,
-  CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormHelperText,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
-import { useState, useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { useMaintenanceStore, useResourceStore } from "../../../../hooks";
+import { useForm } from "react-hook-form";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import dayjs from "dayjs";
 
-// Simula una búsqueda de recurso por número de serie (reemplaza por tu lógica real)
-const fetchResourceBySerial = async (serial) => {
-  // ...aquí deberías hacer la petición real...
-  // Ejemplo simulado:
-  if (serial === "A1B2C3D4E5F6") return { name: "Equipo Demo" };
-  return null;
-};
-
-export const MaintenanceModal = ({
+export const MaintenanceModal = ({ 
   open,
   onClose,
-  onSave,
+  maintenance = {},
+  setMaintenance,
   loading,
 }) => {
-  const [form, setForm] = useState({
-    type: "",
-    description: "",
-    serialNumber: "",
-    resourceName: "",
-    date: new Date().toISOString().slice(0, 10),
-  });
-  const [resourceLoading, setResourceLoading] = useState(false);
-  const [resourceFound, setResourceFound] = useState(null);
+  const isChangingStatus = !!maintenance?._id; 
+  const { startSearchingResource } = useResourceStore();
+  const { startCreateMaintenance, startChangeManteinanceStatus } = useMaintenanceStore();
 
-  // Busca el recurso cuando el número de serie es válido
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+    setValue,
+  } = useForm({
+    mode: "onBlur",
+  });
+
+  console.log(maintenance)
+
+  useEffect(() => {
+    if (open) {
+      reset({
+        type: maintenance?.type ?? "",
+        description: maintenance?.description ?? "",
+        resource_id: maintenance?.resource?._id ?? "",
+        serialNumber: maintenance?.resource?.serial_number ?? "",
+        resourceName: maintenance?.resource?.name ?? "",
+        date: maintenance?.date ? dayjs(maintenance.date).format("YYYY-MM-DD") : "",
+        status: maintenance?.status ?? "Programado",
+      });
+    }
+  }, [open, reset, maintenance]);
+
+  const handleChange = (field, value) => {
+    setValue(field, value);
+  };
+
   const handleSerialChange = async (value) => {
-    const serial = value.replace(/[^A-Z0-9]/gi, "").toUpperCase();
-    setForm((f) => ({ ...f, serialNumber: serial, resourceName: "" }));
-    setResourceFound(null);
-    if (/^[A-Z0-9]{12}$/.test(serial)) {
-      setResourceLoading(true);
-      const resource = await fetchResourceBySerial(serial);
-      setResourceLoading(false);
-      setResourceFound(resource);
-      setForm((f) => ({
-        ...f,
-        resourceName: resource ? resource.name : "",
-      }));
+    const formattedValue = value.toUpperCase();
+    setValue("serialNumber", formattedValue);
+    if (/^[A-Z0-9]{12}$/.test(formattedValue)) {
+      const { ok, data } = await startSearchingResource(formattedValue);
+      if (ok) {
+        setValue("resourceName", data.name);
+      } else {
+        setValue("resourceName", "");
+      }
+    } else {
+      setValue("resourceName", "");
     }
   };
 
-  const isButtonDisabled = useMemo(() => {
-    return (
-      loading ||
-      !form.type ||
-      !form.description ||
-      !/^[A-Z0-9]{12}$/.test(form.serialNumber) ||
-      !form.resourceName
-    );
-  }, [loading, form]);
-
-  const handleChange = (field, value) => {
-    setForm((f) => ({ ...f, [field]: value }));
+  const getStatusOptions = (currentStatus) => {
+    if (currentStatus === "Programado") {
+      return ["En Progreso", "Cancelado"];
+    } else if (currentStatus === "En Progreso") {
+      return ["Finalizado", "Cancelado"];
+    } else {
+      return [];
+    }
   };
 
-  const handleSubmit = async () => {
-    if (isButtonDisabled) return;
-    await onSave({
-      type: form.type,
-      description: form.description,
-      serialNumber: form.serialNumber,
-      resourceName: form.resourceName,
-      date: form.date,
-    });
-    setForm({
-      type: "",
-      description: "",
-      serialNumber: "",
-      resourceName: "",
-      date: new Date().toISOString().slice(0, 10),
-    });
-    setResourceFound(null);
+  const onSubmit = async (data) => {
+    try {
+      const success = isChangingStatus
+        ? await startChangeManteinanceStatus(maintenance._id, data)
+        : await startCreateMaintenance(data)
+      if (success) {
+        setMaintenance(data);
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error creating maintenance:", error);
+    }
   };
+
+  const isButtonDisabled = useMemo(() => loading, [loading]);
 
   return (
     <Modal open={open} onClose={onClose}>
       <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
         sx={{
           position: "absolute",
           top: "50%",
@@ -99,80 +121,116 @@ export const MaintenanceModal = ({
           p: 4,
         }}
       >
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={ isChangingStatus ? 3 : 1 }
+        >
           <Typography variant="h6" fontWeight={600}>
-            Crear mantenimiento
+            {isChangingStatus ? "Cambiar estado de mantenimiento" : "Registrar mantenimiento"}
           </Typography>
           <IconButton onClick={onClose}>
             <Close />
           </IconButton>
         </Box>
 
-        <Box display="flex" gap={2} mb={2} sx={{ flexDirection: "column" }}>
-          {/* Tipo de mantenimiento */}
-          <TextField
-            label="Tipo de mantenimiento"
-            fullWidth
-            value={form.type}
-            onChange={(e) => handleChange("type", e.target.value)}
-          />
+        {!isChangingStatus &&
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={2}
+          >
+            <Typography sx={{ fontWeight: 300, fontSize: 16 }}>
+              Los mantenimientos registrados en el sistema son exclusivamente de tipo{" "}
+              <span style={{ fontWeight: 600 }}>Correctivo</span>.
+            </Typography>
+          </Box>
+        }
 
+        <Box display="flex" gap={2} mb={2} sx={{ flexDirection: "column" }}>
+          
           {/* Descripción */}
           <TextField
             label="Descripción"
             fullWidth
             multiline
             minRows={4}
-            value={form.description}
+            {...register("description")}
             onChange={(e) => handleChange("description", e.target.value)}
+            error={!!errors.description}
+            helperText={errors.description?.message}
+            disabled={isChangingStatus}
           />
 
-          {/* Número de serie */}
+          {/* Numero de serie */}
           <TextField
             label="Número de serie del recurso"
             fullWidth
-            value={form.serialNumber}
-            inputProps={{ maxLength: 12, style: { textTransform: "uppercase" } }}
+            {...register("serialNumber")}
+            inputProps={{
+              maxLength: 12,
+              style: { textTransform: "uppercase" },
+            }}
             onChange={(e) => handleSerialChange(e.target.value)}
             helperText="12 caracteres alfanuméricos (ej: A1B2C3D4E5F6)"
-            error={
-              !!form.serialNumber && !/^[A-Z0-9]{12}$/.test(form.serialNumber)
-            }
+            error={!!watch("serialNumber") && !/^[A-Z0-9]{12}$/.test(watch("serialNumber"))}
+            disabled={isChangingStatus}
           />
+         
+          {/* Nombre del recurso ingresado */}
+          <TextField
+            label="Nombre del equipo"
+            fullWidth
+            value={watch("resourceName") || ""}
+            InputProps={{
+              readOnly: true,
+              style: { whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" },
+            }}
+            disabled
+          />
+          
+          {/* Fecha del mantenimiento */}
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DemoContainer components={["DatePicker"]}>
+              <DatePicker
+                label="Fecha del mantenimiento"
+                value={watch("date") ? dayjs(watch("date")) : null}
+                onChange={(date) => setValue("date", date ? date.format("YYYY-MM-DD") : "")}
+                slotProps={{ textField: { fullWidth: true } }}
+                disabled={isChangingStatus}
+              />
+            </DemoContainer>
+          </LocalizationProvider>
 
-          {/* Nombre del equipo */}
-          {resourceLoading ? (
-            <Box display="flex" alignItems="center" gap={1}>
-              <CircularProgress size={18} /> <Typography variant="body2">Buscando equipo...</Typography>
-            </Box>
-          ) : form.resourceName ? (
-            <TextField
-              label="Nombre del equipo"
-              fullWidth
-              value={form.resourceName}
-              InputProps={{ readOnly: true }}
-            />
-          ) : (
-            !!form.serialNumber &&
-            /^[A-Z0-9]{12}$/.test(form.serialNumber) &&
-            <Typography color="error" variant="body2">
-              Equipo no encontrado
-            </Typography>
+          {/* Estado del mantenimiento */}
+          {isChangingStatus && (
+            <FormControl fullWidth error={!!errors.status}>
+              <InputLabel id="status-label">Estado del mantenimiento</InputLabel>
+              <Select
+                labelId="status-label"
+                value={watch("status") || ""}
+                displayEmpty
+                {...register("status", {
+                  required: "Selecciona un estado de mantenimiento",
+                })}
+                onChange={(e) => setValue("status", e.target.value)}
+                renderValue={(selected) => selected ? selected : "Seleccione el nuevo estado"}
+              >
+                {getStatusOptions(maintenance?.status).map((status) => (
+                  <MenuItem key={status} value={status}>{status}</MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>{errors.status?.message}</FormHelperText>
+            </FormControl>
           )}
 
-          {/* Fecha (actual, no editable) */}
-          <TextField
-            label="Fecha"
-            fullWidth
-            value={form.date}
-            InputProps={{ readOnly: true }}
-          />
         </Box>
-
         <Button
+          type="submit"
           variant="contained"
           fullWidth
-          onClick={handleSubmit}
           disabled={isButtonDisabled}
           sx={{
             mt: 1,
@@ -184,7 +242,7 @@ export const MaintenanceModal = ({
             fontWeight: 600,
           }}
         >
-          Crear
+          { isChangingStatus ? "Cambiar estado" : "Registrar mantenimiento" }
         </Button>
       </Box>
     </Modal>

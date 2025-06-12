@@ -1,12 +1,31 @@
-import { Box, Button, IconButton, Modal, TextField, Typography, FormControl, InputLabel, Select, MenuItem, FormHelperText } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  Modal,
+  TextField,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormHelperText,
+} from "@mui/material";
 import { useServiceTypeStore } from "../../../../hooks";
 import { Close } from "@mui/icons-material";
 import { useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
-export const ServiceTypeModal = ({ open, onClose, serviceType  = {}, setServiceType, loading }) => {
+export const ServiceTypeModal = ({
+  open,
+  onClose,
+  serviceType = {},
+  setServiceType,
+  loading,
+}) => {
   const isEditing = !!serviceType?._id;
-  const { startCreateServiceType, startUpdateServiceType } = useServiceTypeStore();
+  const { startCreateServiceType, startUpdateServiceType } =
+    useServiceTypeStore();
 
   const {
     register,
@@ -45,27 +64,32 @@ export const ServiceTypeModal = ({ open, onClose, serviceType  = {}, setServiceT
         component="form"
         onSubmit={handleSubmit(onSubmit)}
         sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
           width: { xs: "90%", sm: 500 },
-          bgcolor: 'background.paper',
+          bgcolor: "background.paper",
           borderRadius: 4,
           boxShadow: 24,
           p: 4,
         }}
       >
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={3}
+        >
           <Typography variant="h6" fontWeight={600}>
-            {isEditing ? 'Editar tipo de servicio' : 'Agregar tipo de servicio'}
+            {isEditing ? "Editar tipo de servicio" : "Agregar tipo de servicio"}
           </Typography>
           <IconButton onClick={onClose}>
             <Close />
           </IconButton>
         </Box>
 
-        <Box display="flex" gap={2} mb={2} sx={{ flexDirection: 'column' }}>
+        <Box display="flex" gap={2} mb={2} sx={{ flexDirection: "column" }}>
           {/* Nombre */}
           <TextField
             label="Nombre"
@@ -113,15 +137,15 @@ export const ServiceTypeModal = ({ open, onClose, serviceType  = {}, setServiceT
           disabled={isButtonDisabled}
           sx={{
             mt: 1,
-            backgroundColor: '#212121',
-            color: '#fff',
-            textTransform: 'none',
+            backgroundColor: "#212121",
+            color: "#fff",
+            textTransform: "none",
             py: 1.5,
             borderRadius: 2,
             fontWeight: 600,
           }}
         >
-          {isEditing ? 'Guardar cambios' : 'Agregar'}
+          {isEditing ? "Guardar cambios" : "Agregar"}
         </Button>
       </Box>
     </Modal>

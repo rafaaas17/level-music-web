@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Typography, Button, TextField, CircularProgress } from '@mui/material';
 import { AddCircleOutline, Edit } from '@mui/icons-material';
 import { useResourceStore } from '../../../../hooks/resource/use-resource-store';
 import { TableComponent } from '../../../../shared/ui/components';
 import { ResourceModal } from '../../components/resource/resource-modal';
 import { useScreenSizes } from '../../../../shared/constants/screen-width';
+import { formatDay } from '../../../../shared/utils';
 
 export const EquipmentPage = () => {
   const {
@@ -46,6 +47,10 @@ export const EquipmentPage = () => {
     { id: 'serial_number', label: 'N° de Serie', sortable: true },
     { id: 'status', label: 'Estado', sortable: true },
     { id: 'location', label: 'Locación', sortable: true },
+    { 
+      id: 'next_maintenance_date', 
+      label: 'Próximo Mantenimiento', 
+      sortable: true, accessor: (row) => row.next_maintenance_date ? formatDay(row.next_maintenance_date) : 'N/A' },
   ];
 
   const actions = [

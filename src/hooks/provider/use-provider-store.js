@@ -7,7 +7,7 @@ import {
   setRowsPerPageProvider,
   showSnackbar,
 } from "../../store";
-import { createProviderModel, updateProviderModel } from "../../shared/models/provider";
+import { createProviderModel, updateProviderModel } from "../../shared/models";
 import { useState } from "react";
 import { providerApi } from "../../api";
 

@@ -9,9 +9,19 @@ import {
   Select,
   FormControl,
   InputLabel,
+  FormHelperText,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useResourceStore } from "../../../../hooks";
+import { useForm } from "react-hook-form";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import dayjs from "dayjs";
 
 export const ResourceModal = ({
   open,
@@ -19,39 +29,85 @@ export const ResourceModal = ({
   resource = {},
   setResource,
   loading,
-  onSave,
 }) => {
   const isEditing = !!resource?._id;
+  const { startCreateResource, startUpdateResource } = useResourceStore();
 
-  // Solo habilita el botón si el número de serie tiene exactamente 12 caracteres alfanuméricos
-  const isButtonDisabled = useMemo(() => {
-    return (
-      loading ||
-      !resource?.name ||
-      !resource?.type ||
-      !resource?.serialNumber ||
-      !resource?.status ||
-      !/^[A-Z0-9]{12}$/.test(resource.serialNumber)
-    );
-  }, [loading, resource]);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+    setValue,
+  } = useForm({
+    mode: "onBlur",
+  });
 
-  // Forzar location a "Almacen" siempre
-  const handleChange = (field, value) => {
-    setResource({
-      ...resource,
-      [field]: value,
-      location: "Almacen",
-    });
+  const [showLastMaintenanceDate, setShowLastMaintenanceDate] = useState(
+    !!resource?.last_maintenance_date
+  );
+
+  useEffect(() => {
+    if (open) {
+      const today = new Date().toISOString().split("T")[0];
+
+      reset({
+        name: resource?.name ?? "",
+        description: resource?.description ?? "",
+        resource_type: resource?.resource_type ?? "Sonido",
+        maintenance_interval_days: resource?.maintenance_interval_days ?? 0,
+        next_maintenance_date: resource?.next_maintenance_date ?? today, 
+        last_maintenance_date: resource?.last_maintenance_date ?? "",
+      });
+    }
+  }, [open, reset, resource]);
+
+  useEffect(() => {
+    const intervalDays = parseInt(watch("maintenance_interval_days"), 10);
+    const lastMaintenanceDate = watch("last_maintenance_date");
+
+    if (!isNaN(intervalDays) && intervalDays >= 30) {
+      if (showLastMaintenanceDate && lastMaintenanceDate) {
+        const lastDate = dayjs(lastMaintenanceDate);
+        const nextDate = lastDate.add(intervalDays, 'day');
+        setValue("next_maintenance_date", nextDate.format("YYYY-MM-DD"));
+      } else {
+        const today = dayjs();
+        const nextDate = today.add(intervalDays, 'day');
+        setValue("next_maintenance_date", nextDate.format("YYYY-MM-DD"));
+      }
+    } else {
+      setValue("next_maintenance_date", "");
+    }
+  }, [
+    watch("maintenance_interval_days"),
+    watch("last_maintenance_date"),
+    showLastMaintenanceDate,
+    setValue
+  ]);
+
+  const onSubmit = async (data) => {
+    try {
+      const success = isEditing
+        ? await startUpdateResource(resource._id, data)
+        : await startCreateResource(data);
+      if (success) {
+        setResource(data); 
+        onClose();
+      } 
+    } catch (error) {
+      console.log(error)
+    }
   };
 
-  const handleSave = async () => {
-    // location siempre es "Almacen"
-    await onSave({ ...resource, location: "Almacen" });
-  };
+  const isButtonDisabled = useMemo(() => loading, [loading]);
 
   return (
     <Modal open={open} onClose={onClose}>
       <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
         sx={{
           position: "absolute",
           top: "50%",
@@ -83,65 +139,105 @@ export const ResourceModal = ({
           <TextField
             label="Nombre"
             fullWidth
-            value={resource?.name || ""}
-            onChange={(e) => handleChange("name", e.target.value)}
+            {...register("name", {
+              required: "El nombre es obligatorio",
+            })}
+            error={!!errors.name}
+            helperText={errors.name?.message}
+          />
+
+          {/* Descripción */}
+          <TextField
+            label="Descripción"
+            fullWidth
+            {...register("description", {
+              required: "La descripción es obligatoria",
+            })}
+            error={!!errors.description}
+            helperText={errors.description?.message}
           />
 
           {/* Tipo de recurso */}
-          <FormControl fullWidth>
+          <FormControl fullWidth error={!!errors.resource_type}>
             <InputLabel id="type-label">Tipo de recurso</InputLabel>
             <Select
               labelId="type-label"
-              id="type"
-              value={resource?.type || ""}
-              label="Tipo de recurso"
-              onChange={(e) => handleChange("type", e.target.value)}
+              value={watch("resource_type") || "Sonido"}
+              {...register("resource_type", {
+                required: "Selecciona un tipo de recurso",
+              })}
+              onChange={(e) => setValue("resource_type", e.target.value)}
             >
-              <MenuItem value="Equipo">Equipo</MenuItem>
+              <MenuItem value="Sonido">Sonido</MenuItem>
               <MenuItem value="Luz">Luz</MenuItem>
             </Select>
+            <FormHelperText>{errors.resource_type?.message}</FormHelperText>
           </FormControl>
 
-          {/* Numero de serie */}
+          {/* Intervalo de mantenimiento */}
           <TextField
-            label="Número de serie"
+            label="Intervalo de mantenimiento (días)"
+            type="number"
             fullWidth
-            value={resource?.serialNumber || ""}
-            inputProps={{ maxLength: 12, style: { textTransform: "uppercase" } }}
-            onChange={(e) =>
-              handleChange(
-                "serialNumber",
-                e.target.value.replace(/[^A-Z0-9]/gi, "").toUpperCase()
-              )
-            }
-            helperText="Debe contener 12 caracteres alfanuméricos (ej: A1B2C3D4E5F6)"
-            error={
-              !!resource?.serialNumber &&
-              !/^[A-Z0-9]{12}$/.test(resource.serialNumber)
-            }
+            {...register("maintenance_interval_days", {
+              required: "El intervalo de mantenimiento es obligatorio",
+              valueAsNumber: true,
+              min: {
+                value: 30,
+                message: "El intervalo debe ser de al menos 30 días",
+              },
+              validate: value =>
+                Number.isInteger(value) || "Debe ingresar un número válido",
+            })}
+            error={!!errors.maintenance_interval_days}
+            helperText={errors.maintenance_interval_days?.message}
           />
 
-          {/* Estado */}
-          <FormControl fullWidth>
-            <InputLabel id="status-label">Estado</InputLabel>
-            <Select
-              labelId="status-label"
-              id="status"
-              value={resource?.status || ""}
-              label="Estado"
-              onChange={(e) => handleChange("status", e.target.value)}
-            >
-              <MenuItem value="Activo">Activo</MenuItem>
-              <MenuItem value="Inactivo">Inactivo</MenuItem>
-              <MenuItem value="En reparación">En reparación</MenuItem>
-            </Select>
-          </FormControl>
+          {/* Última fecha de mantenimiento */}
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={showLastMaintenanceDate}
+                onChange={(e) => {
+                  setShowLastMaintenanceDate(e.target.checked);
+                  if (!e.target.checked) setValue("last_maintenance_date", "");
+                }}
+              />
+            }
+            label="¿Registrar última fecha de mantenimiento? Si no la recuerda, se usará la fecha actual."
+          />
+          {showLastMaintenanceDate && (
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DemoContainer components={["DatePicker"]}>
+                <DatePicker
+                  label="Última fecha de mantenimiento"
+                  value={watch("last_maintenance_date") ? dayjs(watch("last_maintenance_date")) : null}
+                  onChange={(date) => setValue("last_maintenance_date", date ? date.format("YYYY-MM-DD") : "")}
+                  slotProps={{ textField: { fullWidth: true } }}
+                />
+              </DemoContainer>
+            </LocalizationProvider>
+          )}
+
+          {/* Próxima fecha de mantenimiento */}
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DemoContainer components={["DatePicker"]}>
+              <DatePicker
+                label="Próxima fecha de mantenimiento"
+                value={watch("next_maintenance_date") ? dayjs(watch("next_maintenance_date")) : null}
+                onChange={(date) => setValue("next_maintenance_date", date ? date.format("YYYY-MM-DD") : "")}
+                slotProps={{ textField: { fullWidth: true } }}
+                disabled
+              />
+            </DemoContainer>
+          </LocalizationProvider>
+
         </Box>
 
         <Button
+          type="submit"
           variant="contained"
           fullWidth
-          onClick={handleSave}
           disabled={isButtonDisabled}
           sx={{
             mt: 1,
