@@ -32,24 +32,9 @@ export const ServicePage = () => {
   }, [currentPage, rowsPerPage, searchTerm, orderBy, order]);
 
   const columns = [
-    { 
-      id: 'provider', 
-      label: 'Proveedor', 
-      sortable: true, 
-      accessor: (row) => row.provider.name
-    },
-    { 
-      id: 'service_type', 
-      label: 'Tipo de Servicio', 
-      sortable: true, 
-      accessor: (row) => row.service_type?.name
-    },
-    { 
-      id: 'status', 
-      label: 'Estado', 
-      sortable: true, 
-      accessor: (row) => row.status
-    },
+    { id: 'provider_name', label: 'Proveedor', sortable: true },
+    { id: 'service_type_name', label: 'Tipo de Servicio', sortable: true },
+    { id: 'status', label: 'Estado' , sortable: true },
   ];
 
   const actions = [

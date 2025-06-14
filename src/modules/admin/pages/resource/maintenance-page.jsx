@@ -40,31 +40,10 @@ export const EquipmentMaintenancePage = () => {
   };
 
   const columns = [
-    { 
-      id: 'resource.name', 
-      label: 'Nombre del equipo', 
-      sortable: false,
-      accessor: (row) => row.resource.name 
-    },
-    { 
-      id: 'type', 
-      label: 'Tipo de mantenimiento', 
-      sortable: true,
-      accessor: (row) => row.type 
-    },
-    { id: 'status', 
-      label: 'Estado', 
-      sortable: true,
-      accessor: (row) => row.status
-    },
-    { 
-      id: 'date', 
-      label: 'Fecha',
-      sortable: true,
-      accessor: (row) => { 
-        return formatDay(row.date) 
-      }
-    },
+    { id: 'resource_name', label: 'Nombre del equipo', sortable: true },
+    { id: 'type', label: 'Tipo de mantenimiento', sortable: true },
+    { id: 'status', label: 'Estado' , sortable: true },
+    { is: 'date', label: 'Fecha', sortable: true } 
   ];
 
   const actions = [
