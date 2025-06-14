@@ -42,15 +42,36 @@ export const EquipmentPage = () => {
   };
 
   const columns = [
-    { id: 'name', label: 'Nombre', sortable: true },
-    { id: 'resource_type', label: 'Tipo', sortable: true },
-    { id: 'serial_number', label: 'N° de Serie', sortable: true },
-    { id: 'status', label: 'Estado', sortable: true },
-    { id: 'location', label: 'Locación', sortable: true },
+    { 
+      id: 'name', 
+      label: 'Nombre', 
+      sortable: true 
+    },
+    { 
+      id: 'resource_type', 
+      label: 'Tipo', 
+      sortable: true 
+    },
+    { 
+      id: 'serial_number', 
+      label: 'N° de Serie', 
+      sortable: true 
+    },
+    { 
+      id: 'status', 
+      label: 'Estado', 
+      sortable: true 
+    },
+    { 
+      id: 'location', 
+      label: 'Locación', 
+      sortable: true 
+    },
     { 
       id: 'next_maintenance_date', 
       label: 'Próximo Mantenimiento', 
-      sortable: true, accessor: (row) => row.next_maintenance_date ? formatDay(row.next_maintenance_date) : 'N/A' },
+      sortable: true, accessor: (row) => row.next_maintenance_date ? formatDay(row.next_maintenance_date) : 'N/A' 
+    },
   ];
 
   const actions = [
