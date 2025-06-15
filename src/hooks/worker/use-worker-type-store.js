@@ -14,7 +14,7 @@ import {
 } from '../../shared/models';
 import { useState } from 'react';
 
-export const useWorkerTypesStore = () => {
+export const useWorkerTypeStore = () => {
   const dispatch = useDispatch();
   const { 
     workerTypes, 
@@ -34,7 +34,7 @@ export const useWorkerTypesStore = () => {
     try {
       const payload = createWorkerTypeModel(workerType);
       await workerTypeApi.post('/', payload);
-      startLoadingWorkerTypesPaginated();
+      startLoadingWorkerTypePaginated();
       dispatch(showSnackbar({
         message: `El tipo de trabajador fue creado exitosamente.`,
         severity: 'success',
@@ -52,7 +52,7 @@ export const useWorkerTypesStore = () => {
     }
   };
 
-  const startLoadingWorkerTypesPaginated = async () => {
+  const startLoadingWorkerTypePaginated = async () => {
     dispatch(setLoadingWorkerType(true));
     try {
       const limit  = rowsPerPage;
@@ -85,7 +85,7 @@ export const useWorkerTypesStore = () => {
     try {
       const payload = updateWorkerTypeModel(workerType);
       await workerTypeApi.put(`/${id}`, payload);
-      startLoadingWorkerTypesPaginated();
+      startLoadingWorkerTypePaginated();
       dispatch(showSnackbar({
         message: `El tipo de trabajador fue actualizado exitosamente.`,
         severity: 'success',
@@ -107,7 +107,7 @@ export const useWorkerTypesStore = () => {
     dispatch(setLoadingWorkerType(true));
     try {
       await workerTypeApi.delete(`/${id}`);
-      startLoadingWorkerTypesPaginated();
+      startLoadingWorkerTypePaginated();
       dispatch(showSnackbar({
         message: `El tipo de trabajador fue eliminado exitosamente.`,
         severity: 'success',
@@ -158,7 +158,7 @@ export const useWorkerTypesStore = () => {
 
     // actions
     startCreateWorkerType,
-    startLoadingWorkerTypesPaginated,
+    startLoadingWorkerTypePaginated,
     startUpdateWorkerType,
     startDeleteWorkerType,
     setSelectedWorkerType,

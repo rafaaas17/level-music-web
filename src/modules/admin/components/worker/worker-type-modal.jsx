@@ -12,7 +12,7 @@ import {
   FormHelperText,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
-import { useWorkerTypesStore } from "../../../../hooks";
+import { useWorkerTypeStore } from "../../../../hooks";
 import { useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
@@ -24,7 +24,7 @@ export const WorkerTypeModal = ({
   loading,
 }) => {
   const isEditing = !!workerType?._id;
-  const { startCreateWorkerType, startUpdateWorkerType } = useWorkerTypesStore();
+  const { startCreateWorkerType, startUpdateWorkerType } = useWorkerTypeStore();
 
   const {
     register,
