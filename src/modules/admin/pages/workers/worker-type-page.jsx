@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Box, Typography, Button, TextField, CircularProgress } from '@mui/material';
 import { AddCircleOutline, Edit, Delete } from '@mui/icons-material';
-import { useWorkerTypesStore } from '../../../../hooks';
+import { useWorkerTypeStore } from '../../../../hooks';
 import { TableComponent, MessageDialog } from '../../../../shared/ui/components';
 import { WorkerTypeModal } from '../../components';
 import { useScreenSizes } from '../../../../shared/constants/screen-width';
@@ -22,15 +22,15 @@ export const WorkerTypePage = () => {
     setPageGlobal,
     setOrderBy,
     setOrder,
-    startLoadingWorkerTypesPaginated,
+    startLoadingWorkerTypePaginated,
     setSelectedWorkerType,
-  } = useWorkerTypesStore();
+  } = useWorkerTypeStore();
   const { isLg } = useScreenSizes();
 
   const [isModalOpen, setIsModalOpen] = useState(false); 
 
   useEffect(() => {
-    startLoadingWorkerTypesPaginated();
+    startLoadingWorkerTypePaginated();
   }, [currentPage, rowsPerPage, searchTerm, orderBy, order]);
 
   const openModal = (payload) => {
