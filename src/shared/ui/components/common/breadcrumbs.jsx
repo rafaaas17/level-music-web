@@ -1,5 +1,6 @@
 import { Breadcrumbs as MuiBreadcrumbs, Link, useTheme } from '@mui/material';
 import { useLocation } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 
 export const Breadcrumbs = ({ menuItems, homeLabel = 'Inicio', homeHref = '/admin' }) => {
   const location = useLocation();
@@ -51,14 +52,18 @@ export const Breadcrumbs = ({ menuItems, homeLabel = 'Inicio', homeHref = '/admi
         return (
           <Link
             key={to}
-            underline="hover"
+            underline="hover" 
             color="inherit"
-            href={to}
+            to={to} 
+            component={RouterLink}
             sx={{
               fontWeight: 500,
               fontSize: '18px',
               color: theme.palette.text.primary,
-              textDecoration: 'underline',
+              textDecoration: index === pathnames.length - 1 ? 'underline' : 'none', 
+              '&:hover': {
+                textDecoration: 'underline', 
+              },
             }}
           >
             {menuItem.breadcrumb} 
@@ -84,7 +89,8 @@ export const Breadcrumbs = ({ menuItems, homeLabel = 'Inicio', homeHref = '/admi
       <Link 
         underline="hover" 
         color="inherit" 
-        href={homeHref}
+        to={homeHref}
+        component={RouterLink}
         sx={{
           fontWeight: 500,
           fontSize: '18px',

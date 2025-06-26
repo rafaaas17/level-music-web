@@ -1,2 +1,2 @@
-export * from './provider-modal';
-export * from './service-type-modal';
+export * from './provider';
+export * from './service-type';
