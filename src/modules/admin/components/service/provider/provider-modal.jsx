@@ -11,7 +11,7 @@ import {
   InputLabel,
   FormHelperText,
 } from "@mui/material";
-import { useProviderStore } from "../../../../hooks";
+import { useProviderStore } from "../../../../../hooks";
 import { Close } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
 import { useMemo, useEffect } from "react";
