@@ -26,6 +26,9 @@ export const useServiceTypeStore = () => {
   const [order, setOrder] = useState('asc');
 
   const startCreateServiceType = async (serviceType) => {
+    if (!validateAttributes(serviceType.attributes)) {
+      return false;
+    } 
     dispatch(setLoadingServiceType(true));
     try {
       const payload = createServiceTypeModel(serviceType);
@@ -77,8 +80,12 @@ export const useServiceTypeStore = () => {
   };
 
   const startUpdateServiceType = async (id, serviceType) => {
+    if (!validateAttributes(serviceType.attributes)) {
+      return false;
+  } 
     dispatch(setLoadingServiceType(true));
     try {
+      console.log(serviceType);
       const payload = updateServiceTypeModel(serviceType);
       await serviceTypeApi.put(`/${id}`, payload);
       startLoadingServiceTypePaginated();
@@ -97,6 +104,17 @@ export const useServiceTypeStore = () => {
     } finally {
       dispatch(setLoadingServiceType(false));
     }
+  };
+
+  const validateAttributes = (attributes) => {
+    if (attributes.length === 0) {
+      dispatch(showSnackbar({
+        message: 'Debe agregar al menos un atributo al tipo de servicio.',
+        severity: 'error',
+      }));
+      return false;
+    }
+    return true;
   };
 
   const setSelectedServiceType = (serviceType) => {
