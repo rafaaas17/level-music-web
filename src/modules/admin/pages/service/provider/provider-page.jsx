@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Box, Typography, Button, TextField, CircularProgress } from '@mui/material';
-import { AddCircleOutline, Edit } from '@mui/icons-material';
-import { useServiceStore } from '../../../../hooks';
-import { TableComponent } from '../../../../shared/ui/components';
-import { useScreenSizes } from '../../../../shared/constants/screen-width';
-import { Link } from 'react-router-dom';
+import { AddCircleOutline, Edit, Delete } from '@mui/icons-material';
+import { TableComponent, MessageDialog } from '../../../../../shared/ui/components';
+import { useScreenSizes } from '../../../../../shared/constants/screen-width';
+import { useProviderStore } from '../../../../../hooks';
+import { ProviderModal } from '../../../components';
 
-export const ServicePage = () => {
+export const ProviderPage = () => {
   const {
-    services,
+    provider,
     total,
     loading,
     searchTerm,
@@ -22,18 +22,27 @@ export const ServicePage = () => {
     setPageGlobal,
     setOrderBy,
     setOrder,
-    startLoadingServicePaginated,
-    setSelectedService,
-  } = useServiceStore();
+    startLoadingProviderPaginated,
+    setSelectedProvider,
+  } = useProviderStore();
   const { isLg } = useScreenSizes();
 
+  const [isModalOpen, setIsModalOpen] = useState(false); 
+
   useEffect(() => {
-    startLoadingServicePaginated();
+    startLoadingProviderPaginated();
   }, [currentPage, rowsPerPage, searchTerm, orderBy, order]);
 
+  const openModal = (payload) => {
+    setSelectedProvider(payload);
+    setIsModalOpen(true); 
+  };
+
   const columns = [
-    { id: 'provider_name', label: 'Proveedor', sortable: true },
-    { id: 'service_type_name', label: 'Tipo de Servicio', sortable: true },
+    { id: 'name', label: 'Nombre', sortable: true },
+    { id: 'contact_name', label: 'Nombre de contacto', sortable: true },
+    { id: 'phone', label: 'Numero', sortable: true },
+    { id: 'email', label: 'Email', sortable: true },
     { id: 'status', label: 'Estado' , sortable: true },
   ];
 
@@ -41,7 +50,7 @@ export const ServicePage = () => {
     { 
       label: 'Editar', 
       icon: <Edit />, 
-      url: (row) => `/admin/service/${row._id}`,
+      onClick: (row) => openModal(row),
     },
   ];
 
@@ -55,18 +64,17 @@ export const ServicePage = () => {
       >
         <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ px: 3, py: 2 }}>
           <Box>
-            <Typography sx={{ fontWeight: 600, fontSize: 24 }}>Listado de Servicios</Typography>
-            <Typography sx={{ color: 'text.secondary', fontSize: 16 }}>Administra los servicios</Typography>
+            <Typography sx={{ fontWeight: 600, fontSize: 24 }}>Listado de Proveedores</Typography>
+            <Typography sx={{ color: 'text.secondary', fontSize: 16 }}>Administra los proveedores</Typography>
           </Box>
-          <Link to="/admin/service/new" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <Button
-              variant="contained"
-              startIcon={<AddCircleOutline />}
-              sx={{ backgroundColor: '#212121', color: '#fff', borderRadius: 2, textTransform: 'none', px: 3, py: 1.5 }}
-            >
-              {isLg ? 'Agregar Servicio' : 'Agregar'}
-            </Button>
-          </Link>
+          <Button
+            variant="contained"
+            startIcon={<AddCircleOutline />}
+            sx={{ backgroundColor: '#212121', color: '#fff', borderRadius: 2, textTransform: 'none', px: 3, py: 1.5 }}
+            onClick={() => openModal()} 
+          >
+            {isLg ? 'Agregar Proveedor' : 'Agregar'}
+          </Button>
         </Box>
 
         <Box
@@ -88,7 +96,7 @@ export const ServicePage = () => {
           <Box display="flex" justifyContent="center" alignItems="center" sx={{ py: 5 }}>
             <CircularProgress />
           </Box>
-        ) : services.length === 0 ? (
+        ) : provider.length === 0 ? (
           <Box display="flex" justifyContent="center" alignItems="center" sx={{ py: 5 }}>
             <Typography sx={{ color: 'text.secondary', fontSize: 16 }}>
               No se encontraron resultados.
@@ -96,7 +104,7 @@ export const ServicePage = () => {
           </Box>
         ) : (
           <TableComponent
-            rows={services}
+            rows={provider}
             columns={columns}
             order={order}
             orderBy={orderBy}
@@ -105,19 +113,27 @@ export const ServicePage = () => {
               setOrder(isAsc ? 'desc' : 'asc');
               setOrderBy(prop);
             }}
-            page={currentPage}
+            page={currentPage} 
             rowsPerPage={rowsPerPage}
             total={total}
             onPageChange={(_, newPage) => setPageGlobal(newPage)}
             onRowsPerPageChange={(e) => {
-              setRowsPerPageGlobal(parseInt(e.target.value, 10));
-              setPageGlobal(0);
+              setRowsPerPageGlobal(parseInt(e.target.value, 10)); 
+              setPageGlobal(0); 
             }}
             actions={actions}
             hasActions
           />
         )}
       </Box>
+
+      <ProviderModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        provider={selected}
+        setProvider={setSelectedProvider}
+        loading={loading}
+      />
     </Box>
   );
 };

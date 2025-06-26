@@ -25,9 +25,8 @@ export const ServiceTypeModal = ({
   setServiceType,
   loading,
 }) => {
-  const isEditing = Boolean(serviceType?._id);
-  const { startCreateServiceType, startUpdateServiceType } =
-    useServiceTypeStore();
+  const isEditing = !!serviceType?._id;
+  const { startCreateServiceType, startUpdateServiceType } = useServiceTypeStore();
 
   const {
     register,
@@ -52,7 +51,6 @@ export const ServiceTypeModal = ({
     name: "attributes",
   });
 
-  // Cargar valores al abrir para editar
   useEffect(() => {
     if (open) {
       reset({
@@ -65,16 +63,21 @@ export const ServiceTypeModal = ({
   }, [open, reset, serviceType]);
 
   const onSubmit = async (data) => {
-    setServiceType(data);
-    const success = isEditing
-      ? await startUpdateServiceType(serviceType._id, data)
-      : await startCreateServiceType(data);
-    if (success) onClose();
+    try {
+      const success = isEditing
+        ? await startUpdateServiceType(serviceType._id, data)
+        : await startCreateServiceType(data);
+      if (success) {
+        setServiceType(data);
+        onClose();
+      }
+    } catch (error) {
+      console.log(error)
+    }
   };
 
-  const isDisabled = useMemo(() => loading, [loading]);
+  const isButtonDisabled = useMemo(() => loading, [loading]);
 
-  // Control del modal secundario
   const [fieldModalOpen, setFieldModalOpen] = useState(false);
   const [selectedField, setSelectedField] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null);
@@ -176,6 +179,7 @@ export const ServiceTypeModal = ({
               variant="contained"
               size="small"
               onClick={handleAddField}
+              disabled={isButtonDisabled}
               sx={{
                 backgroundColor: "#212121",
                 color: "#fff",
@@ -255,7 +259,7 @@ export const ServiceTypeModal = ({
             type="submit"
             variant="contained"
             fullWidth
-            disabled={isDisabled}
+            disabled={isButtonDisabled}
             sx={{
               mt: 1,
               backgroundColor: "#212121",
