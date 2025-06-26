@@ -24,9 +24,7 @@ export const EquipmentPage = () => {
     setOrderBy,
     setOrder,
     startLoadingResourcesPaginated,
-    setSelectedResource,
-    startCreateResource,
-    startUpdateResource,
+    setSelectedResource
   } = useResourceStore();
   const { isLg } = useScreenSizes();
 
@@ -81,16 +79,6 @@ export const EquipmentPage = () => {
       onClick: (row) => openModal(row),
     },
   ];
-
-  const handleSave = async (resource) => {
-    if (resource._id) {
-      const success = await startUpdateResource(resource._id, resource);
-      if (success) setIsModalOpen(false);
-    } else {
-      const success = await startCreateResource(resource);
-      if (success) setIsModalOpen(false);
-    }
-  };
 
   return (
     <Box>
@@ -172,7 +160,6 @@ export const EquipmentPage = () => {
         resource={selected}
         setResource={setSelectedResource}
         loading={loading}
-        onSave={handleSave}
       />
     </Box>
   );

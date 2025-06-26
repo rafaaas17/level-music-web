@@ -48,11 +48,17 @@ export const WorkerTypeModal = ({
   }, [open, reset, workerType]);
 
   const onSubmit = async (data) => {
-    setWorkerType(data);
-    const success = isEditing
-      ? await startUpdateWorkerType(workerType._id, data)
-      : await startCreateWorkerType(data);
-    if (success) onClose();
+    try {
+      const success = isEditing
+        ? await startUpdateWorkerType(workerType._id, data)
+        : await startCreateWorkerType(data);
+      if (success) {
+        setWorkerType(data);
+        onClose();
+      }
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   const isButtonDisabled = useMemo(() => loading, [loading]);

@@ -1,55 +1,53 @@
-import { useEffect, useState } from 'react';
-import { Box, Typography, Button, TextField, CircularProgress } from '@mui/material';
-import { AddCircleOutline, Edit, Delete } from '@mui/icons-material';
-import { TableComponent, MessageDialog } from '../../../../shared/ui/components';
-import { useScreenSizes } from '../../../../shared/constants/screen-width';
-import { useProviderStore } from '../../../../hooks';
-import { ProviderModal } from '../../components';
+import { useEffect, useState } from "react";
+import { useServiceTypeStore } from "../../../../../hooks";
+import { useScreenSizes } from "../../../../../shared/constants/screen-width";
+import { Box, Button, CircularProgress, TextField, Typography } from "@mui/material";
+import { AddCircleOutline, Edit } from "@mui/icons-material";
+import { TableComponent } from "../../../../../shared/ui/components";
+import { ServiceTypeModal } from "../../../components";
 
-export const ProviderPage = () => {
+export const ServiceTypePage = () => {
   const {
-    provider,
+    serviceTypes, 
     total,
     loading,
     searchTerm,
     rowsPerPage,
-    currentPage, 
+    currentPage,
     orderBy,
     order,
-    selected, 
+    selected,
     setSearchTerm,
     setRowsPerPageGlobal,
     setPageGlobal,
     setOrderBy,
     setOrder,
-    startLoadingProviderPaginated,
-    setSelectedProvider,
-  } = useProviderStore();
+    startLoadingServiceTypePaginated,
+    setSelectedServiceType,
+  } = useServiceTypeStore();
   const { isLg } = useScreenSizes();
-
-  const [isModalOpen, setIsModalOpen] = useState(false); 
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    startLoadingProviderPaginated();
+    startLoadingServiceTypePaginated();
   }, [currentPage, rowsPerPage, searchTerm, orderBy, order]);
 
   const openModal = (payload) => {
-    setSelectedProvider(payload);
-    setIsModalOpen(true); 
+    setSelectedServiceType(payload);
+    setIsModalOpen(true);
   };
 
   const columns = [
-    { id: 'name', label: 'Nombre', sortable: true },
-    { id: 'contact_name', label: 'Nombre de contacto', sortable: true },
-    { id: 'phone', label: 'Numero', sortable: true },
-    { id: 'email', label: 'Email', sortable: true },
-    { id: 'status', label: 'Estado' , sortable: true },
+    { id: "name", label: "Nombre", sortable: true },
+    { id: "description", label: "Descripción", sortable: true },
+    { id: "status", label: "Estado", sortable: true },
   ];
 
   const actions = [
-    { 
-      label: 'Editar', 
-      icon: <Edit />, 
+    {
+      label: "Editar",
+      icon: <Edit />,
       onClick: (row) => openModal(row),
     },
   ];
@@ -64,8 +62,8 @@ export const ProviderPage = () => {
       >
         <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ px: 3, py: 2 }}>
           <Box>
-            <Typography sx={{ fontWeight: 600, fontSize: 24 }}>Listado de Proveedores</Typography>
-            <Typography sx={{ color: 'text.secondary', fontSize: 16 }}>Administra los proveedores</Typography>
+            <Typography sx={{ fontWeight: 600, fontSize: 24 }}>Listado de Tipos de Servicios</Typography>
+            <Typography sx={{ color: 'text.secondary', fontSize: 16 }}>Administra los tipos de servicios</Typography>
           </Box>
           <Button
             variant="contained"
@@ -73,7 +71,7 @@ export const ProviderPage = () => {
             sx={{ backgroundColor: '#212121', color: '#fff', borderRadius: 2, textTransform: 'none', px: 3, py: 1.5 }}
             onClick={() => openModal()} 
           >
-            {isLg ? 'Agregar Proveedor' : 'Agregar'}
+            {isLg ? 'Agregar Tipo de Servicio' : 'Agregar'}
           </Button>
         </Box>
 
@@ -96,7 +94,7 @@ export const ProviderPage = () => {
           <Box display="flex" justifyContent="center" alignItems="center" sx={{ py: 5 }}>
             <CircularProgress />
           </Box>
-        ) : provider.length === 0 ? (
+        ) : serviceTypes.length === 0 ? (
           <Box display="flex" justifyContent="center" alignItems="center" sx={{ py: 5 }}>
             <Typography sx={{ color: 'text.secondary', fontSize: 16 }}>
               No se encontraron resultados.
@@ -104,7 +102,7 @@ export const ProviderPage = () => {
           </Box>
         ) : (
           <TableComponent
-            rows={provider}
+            rows={serviceTypes}
             columns={columns}
             order={order}
             orderBy={orderBy}
@@ -127,12 +125,14 @@ export const ProviderPage = () => {
         )}
       </Box>
 
-      <ProviderModal
+      <ServiceTypeModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        provider={selected}
-        setProvider={setSelectedProvider}
+        serviceType={selected}
+        setServiceType={setSelectedServiceType}
+        loading={loading}
       />
     </Box>
   );
 };
+

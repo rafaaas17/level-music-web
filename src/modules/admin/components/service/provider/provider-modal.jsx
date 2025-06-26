@@ -50,11 +50,17 @@ export const ProviderModal = ({
   }, [open, reset, provider]);
 
   const onSubmit = async (data) => {
-    setProvider(data);
-    const success = isEditing
-      ? await startUpdateProvider(provider._id, data)
-      : await startCreateProvider(data);
-    if (success) onClose();
+    try {
+      const success = isEditing
+        ? await startUpdateProvider(provider._id, data)
+        : await startCreateProvider(data);
+      if (success) {
+        setProvider(data); 
+        onClose();
+      }
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   const isButtonDisabled = useMemo(() => loading, [loading]);
