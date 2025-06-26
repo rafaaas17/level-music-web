@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -13,10 +13,9 @@ import {
   FormHelperText,
   Checkbox,
 } from "@mui/material";
-import { useServiceTypeStore } from "../../../../../hooks";
 import { Close, Delete, Edit } from "@mui/icons-material";
-import { useMemo, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
+import { useServiceTypeStore } from "../../../../../hooks";
 import { ServiceTypeFieldModal } from "./service-type-field-modal";
 
 export const ServiceTypeModal = ({
@@ -26,27 +25,41 @@ export const ServiceTypeModal = ({
   setServiceType,
   loading,
 }) => {
-  const isEditing = !!serviceType?._id;
+  const isEditing = Boolean(serviceType?._id);
   const { startCreateServiceType, startUpdateServiceType } =
     useServiceTypeStore();
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    control,
     reset,
     watch,
     setValue,
+    formState: { errors },
   } = useForm({
     mode: "onBlur",
+    defaultValues: {
+      name: "",
+      description: "",
+      status: "Activo",
+      attributes: [],
+    },
   });
 
+  const { fields, append, remove, update } = useFieldArray({
+    control,
+    name: "attributes",
+  });
+
+  // Cargar valores al abrir para editar
   useEffect(() => {
     if (open) {
       reset({
         name: serviceType?.name ?? "",
         description: serviceType?.description ?? "",
         status: serviceType?.status ?? "Activo",
+        attributes: serviceType?.attributes ?? [],
       });
     }
   }, [open, reset, serviceType]);
@@ -59,29 +72,32 @@ export const ServiceTypeModal = ({
     if (success) onClose();
   };
 
-  const isButtonDisabled = useMemo(() => loading, [loading]);
+  const isDisabled = useMemo(() => loading, [loading]);
 
-  const [fieldModalOpen, setFieldModalOpen] = React.useState(false);
-  const [selectedField, setSelectedField] = React.useState(null);
+  // Control del modal secundario
+  const [fieldModalOpen, setFieldModalOpen] = useState(false);
+  const [selectedField, setSelectedField] = useState(null);
+  const [editingIndex, setEditingIndex] = useState(null);
 
   const handleAddField = () => {
     setSelectedField(null);
+    setEditingIndex(null);
     setFieldModalOpen(true);
   };
 
-  const handleEditField = (field) => {
+  const handleEditField = (field, index) => {
     setSelectedField(field);
+    setEditingIndex(index);
     setFieldModalOpen(true);
   };
 
-  const handleFieldSubmit = (fieldData) => {
-    console.log("Field submitted:", fieldData);
-    // Aquí puedes agregar lógica para actualizar el estado de los campos
-  };
-
-  const onDeleteField = (fieldName) => {
-    console.log("Field deleted:", fieldName);
-    // Aquí puedes agregar lógica para eliminar el campo
+  const handleFieldSubmit = (fieldData, index = null) => {
+    if (index !== null) {
+      update(index, fieldData);
+    } else {
+      append(fieldData);
+    }
+    setFieldModalOpen(false);
   };
 
   return (
@@ -91,6 +107,7 @@ export const ServiceTypeModal = ({
         onClose={() => setFieldModalOpen(false)}
         onSubmit={handleFieldSubmit}
         field={selectedField}
+        index={editingIndex}
       />
 
       <Modal open={open} onClose={onClose}>
@@ -109,12 +126,8 @@ export const ServiceTypeModal = ({
             p: 4,
           }}
         >
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mb={3}
-          >
+          {/* Encabezado */}
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
             <Typography variant="h6" fontWeight={600}>
               {isEditing ? "Editar Tipo de Servicio" : "Agregar Tipo de Servicio"}
             </Typography>
@@ -123,38 +136,28 @@ export const ServiceTypeModal = ({
             </IconButton>
           </Box>
 
-          <Box display="flex" gap={2} mb={2} sx={{ flexDirection: "column" }}>
-            {/* Nombre */}
+          {/* Campos básicos */}
+          <Box display="flex" flexDirection="column" gap={2} mb={2}>
             <TextField
               label="Nombre"
               fullWidth
-              {...register("name", {
-                required: "El nombre es obligatorio",
-              })}
-              error={!!errors.name}
+              {...register("name", { required: "El nombre es obligatorio" })}
+              error={Boolean(errors.name)}
               helperText={errors.name?.message}
             />
-
-            {/* Descripción */}
             <TextField
               label="Descripción"
               fullWidth
-              {...register("description", {
-                required: "La descripción es obligatoria",
-              })}
-              error={!!errors.description}
+              {...register("description", { required: "La descripción es obligatoria" })}
+              error={Boolean(errors.description)}
               helperText={errors.description?.message}
             />
-
-            {/* Estado */}
-            <FormControl fullWidth error={!!errors.status}>
+            <FormControl fullWidth error={Boolean(errors.status)}>
               <InputLabel id="status-label">Estado</InputLabel>
               <Select
                 labelId="status-label"
                 value={watch("status") || "Activo"}
-                {...register("status", {
-                  required: "Selecciona un estado",
-                })}
+                {...register("status", { required: "Selecciona un estado" })}
                 onChange={(e) => setValue("status", e.target.value)}
               >
                 <MenuItem value="Activo">Activo</MenuItem>
@@ -164,6 +167,7 @@ export const ServiceTypeModal = ({
             </FormControl>
           </Box>
 
+          {/* Sección de atributos */}
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} mt={1}>
             <Typography fontSize={18} fontWeight={500}>
               Estructura de campos
@@ -171,6 +175,7 @@ export const ServiceTypeModal = ({
             <Button
               variant="contained"
               size="small"
+              onClick={handleAddField}
               sx={{
                 backgroundColor: "#212121",
                 color: "#fff",
@@ -180,13 +185,12 @@ export const ServiceTypeModal = ({
                 borderRadius: 2,
                 fontWeight: 600,
               }}
-              onClick={handleAddField}
             >
               + Agregar campo
             </Button>
           </Box>
 
-          {/* Estructura de campos como cartas */}
+          {/* Lista de atributos */}
           <Box
             sx={{
               maxHeight: 280,
@@ -197,60 +201,48 @@ export const ServiceTypeModal = ({
               mb: 2,
             }}
           >
-            {[].length === 0 ? (
-              <Typography textAlign="center" color="text.secondary" fontSize={14} marginY={3}>
+            {fields.length === 0 ? (
+              <Typography textAlign="center" color="text.secondary" fontSize={14} my={3}>
                 No hay campos disponibles. Agrega un nuevo campo.
               </Typography>
             ) : (
-              [].map((field, i) => (
+              fields.map((field, index) => (
                 <Box
-                  key={i}
+                  key={field.id}
                   sx={{
-                    border: (theme) => `1px solid ${theme.palette.mode === 'dark' ? '#494949' : '#C4C4C4'}`,
-                    justifyContent: "space-between",
+                    border: (theme) =>
+                      `1px solid ${theme.palette.mode === "dark" ? "#494949" : "#C4C4C4"}`,
                     display: "flex",
+                    justifyContent: "space-between",
                     borderRadius: 3,
                     gap: 2,
                     p: 2,
                   }}
                 >
-                  {/* Lado izquierdo: Campo y Tipo de dato */}
                   <Box display="flex" flexDirection="column" gap={1}>
-                    <Box>
-                      <Typography fontWeight={600} fontSize={14}>
-                        Campo
-                      </Typography>
-                      <Typography>{field.name}</Typography>
-                    </Box>
-                    <Box>
-                      <Typography fontWeight={600} fontSize={14}>
-                        Tipo de dato
-                      </Typography>
-                      <Typography>{field.type}</Typography>
-                    </Box>
+                    <Typography fontWeight={600} fontSize={14}>
+                      Campo
+                    </Typography>
+                    <Typography>{field.name}</Typography>
+                    <Typography fontWeight={600} fontSize={14}>
+                      Tipo de dato
+                    </Typography>
+                    <Typography>{field.type}</Typography>
                   </Box>
-
-                  {/* Lado derecho: Acciones y Requerido */}
-                  <Box 
-                    sx={{ 
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',                  
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-                      <IconButton size="small" onClick={() => handleEditField(field)} sx={{ p: 0, m: 0 }}>
+                  <Box display="flex" flexDirection="column" justifyContent="space-between">
+                    <Box display="flex" gap={1} justifyContent="flex-end">
+                      <IconButton onClick={() => handleEditField(field, index)} size="small">
                         <Edit fontSize="small" />
                       </IconButton>
-                      <IconButton size="small" onClick={() => onDeleteField(field.name)} sx={{ p: 0, m: 0 }}>
+                      <IconButton onClick={() => remove(index)} size="small">
                         <Delete fontSize="small" />
                       </IconButton>
                     </Box>
-                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                    <Box display="flex" gap={1} alignItems="center">
                       <Typography fontWeight={600} fontSize={14}>
                         Requerido:
                       </Typography>
-                      <Checkbox checked={field.required} disabled size="small" sx={{ p: 0, m: 0 }} />
+                      <Checkbox checked={field.required} disabled size="small" />
                     </Box>
                   </Box>
                 </Box>
@@ -258,11 +250,12 @@ export const ServiceTypeModal = ({
             )}
           </Box>
 
+          {/* Botón enviar */}
           <Button
             type="submit"
             variant="contained"
             fullWidth
-            disabled={isButtonDisabled}
+            disabled={isDisabled}
             sx={{
               mt: 1,
               backgroundColor: "#212121",
