@@ -1,16 +1,15 @@
-import { Box, Container } from '@mui/material'
-import { Outlet } from 'react-router-dom'
+import { Container } from '@mui/material'
 
-export const LandingLayout = () => {
+export const LandingLayout = ({ children }) => {
   return (
-    <Container 
-      sx={{ 
+    <Container
+      sx={{
         minHeight: "calc(100vh - 64px)",
         paddingTop: 1,
         backgroundColor: 'background.default',
       }}
-    > 
-      <Outlet />
+    >
+      {children}
     </Container>
-  )
-}
+  );
+};
