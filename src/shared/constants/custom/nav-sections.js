@@ -7,11 +7,11 @@ export const sections = [
   {
     id: 2,
     title: 'EVENTOS',
-    url: '/eventos'
+    url: '/events'
   },
   {
     id: 3,
     title: 'COTIZAR',
-    url: '/solicitar-cotizacion'
+    url: '/quotation'
   }
 ]

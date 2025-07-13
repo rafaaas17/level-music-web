@@ -1,33 +1,39 @@
 import { Box, TextField } from '@mui/material';
-import { useEventStore } from '../../../../hooks';
+import { useFormContext } from 'react-hook-form';
 
 export const PersonalInfoForm = () => {
-  const { sections, updateEventSection, currentPage } = useEventStore();
-  const { fullName, email, phone } = sections.find((section) => section.id === currentPage).data;
-  console.log('Valores actuales:', { fullName, email, phone }); // Depuración
+  const {
+    register,
+    formState: { errors }
+  } = useFormContext();
 
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <TextField
-        fullWidth
         label="Nombre Completo"
-        margin="normal"
-        value={fullName } // Asegúrate de que no sea undefined
-        onChange={(e) => updateEventSection(currentPage, { fullName: e.target.value })}
+        error={!!errors.fullName}
+        helperText={errors.fullName?.message}
+        {...register('fullName', { required: 'El nombre es obligatorio' })}
       />
+
       <TextField
-        fullWidth
         label="Correo Electrónico"
-        margin="normal"
-        value={email } // Asegúrate de que no sea undefined
-        onChange={(e) => updateEventSection(currentPage, { email: e.target.value })}
+        error={!!errors.email}
+        helperText={errors.email?.message}
+        {...register('email', {
+          required: 'El correo es obligatorio',
+          pattern: { value: /^\S+@\S+$/i, message: 'Formato inválido' }
+        })}
       />
+
       <TextField
-        fullWidth
         label="Teléfono de Contacto"
-        margin="normal"
-        value={phone } // Asegúrate de que no sea undefined
-        onChange={(e) => updateEventSection(currentPage, { phone: e.target.value })}
+        error={!!errors.phone}
+        helperText={errors.phone?.message}
+        {...register('phone', {
+          required: 'El teléfono es obligatorio',
+          pattern: { value: /^[0-9()+\-\s]+$/, message: 'Formato inválido' }
+        })}
       />
     </Box>
   );

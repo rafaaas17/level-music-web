@@ -1,11 +1,10 @@
 import { Box, TextField, MenuItem } from '@mui/material';
-import { useEventStore } from '../../../../hooks';
-
+// import { useEventStore } from '../../../../hooks';
 
 export const EventDetailsForm = () => {
-  const { sections, updateEventSection, currentPage } = useEventStore();
+  // const { sections, updateEventSection, currentPage } = useEventStore();
 
-  const { eventCategory, eventType, attendeesCount, eventSchedule, eventDescription} = sections.find((section) => section.id === currentPage).data;
+  // const { eventCategory, eventType, attendeesCount, eventSchedule, eventDescription} = sections.find((section) => section.id === currentPage).data;
   
   // const handleNext = () => {
   //   // Validar los datos de la página actual antes de avanzar
@@ -23,8 +22,8 @@ export const EventDetailsForm = () => {
         select
         label="Categoría del Evento"
         margin="normal"
-        value={eventCategory}
-        onChange={(e) => updateEventSection(currentPage,{ eventCategory: e.target.value })}
+        // value={eventCategory}
+        // onChange={(e) => updateEventSection(currentPage,{ eventCategory: e.target.value })}
       >
         <MenuItem value="Social">Social</MenuItem>
         <MenuItem value="Corporativo">Corporativo</MenuItem>
@@ -34,8 +33,8 @@ export const EventDetailsForm = () => {
         select
         label="Tipo del Evento"
         margin="normal"
-        value={eventType}
-        onChange={(e) => updateEventSection(currentPage,{ eventType: e.target.value })}
+        // value={eventType}
+        // onChange={(e) => updateEventSection(currentPage,{ eventType: e.target.value })}
       >
         <MenuItem value="Formal">Formal</MenuItem>
         <MenuItem value="Informal">Informal</MenuItem>
@@ -45,15 +44,15 @@ export const EventDetailsForm = () => {
         label="Cantidad de Asistentes"
         type="number"
         margin="normal"
-        value={attendeesCount}
-        onChange={(e) => updateEventSection(currentPage,{ attendeesCount: parseInt(e.target.value, 10) })}
+        // value={attendeesCount}
+        // onChange={(e) => updateEventSection(currentPage,{ attendeesCount: parseInt(e.target.value, 10) })}
       />
       <TextField
         fullWidth
         label="Horario del Evento"
         margin="normal"
-        value={eventSchedule}
-        onChange={(e) => updateEventSection(currentPage,{ eventSchedule: e.target.value })}
+        // value={eventSchedule}
+        // onChange={(e) => updateEventSection(currentPage,{ eventSchedule: e.target.value })}
       />
       <TextField
         fullWidth
@@ -61,8 +60,8 @@ export const EventDetailsForm = () => {
         rows={3}
         label="Descripción del Evento"
         margin="normal"
-        value={eventDescription}
-        onChange={(e) => updateEventSection(currentPage,{ eventDescription: e.target.value })}
+        // value={eventDescription}
+        // onChange={(e) => updateEventSection(currentPage,{ eventDescription: e.target.value })}
       />
     </Box>
   );
