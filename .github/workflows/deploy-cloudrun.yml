@@ -31,19 +31,23 @@ jobs:
         run: gcloud config set run/region ${{ secrets.GCP_REGION }}
 
       # 5. Build & Push con Buildpacks
-      - name: Build & push with Buildpacks
+      - name: Build & push with Cloud Buildpacks
         run: |
           gcloud builds submit \
+            --project=${{ secrets.GCP_PROJECT_ID }} \
+            --region=${{ secrets.GCP_REGION }} \
             --tag=gcr.io/${{ secrets.GCP_PROJECT_ID }}/lm-frontend:${{ github.sha }} \
-            --pack=gcr.io/buildpacks/builder:v1 \
-            --pack-env=VITE_BASE_URL=${{ secrets.VITE_BASE_URL }} \
-            --pack-env=VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }} \
-            --pack-env=VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }} \
-            --pack-env=VITE_FIREBASE_PROJECT_ID=${{ secrets.VITE_FIREBASE_PROJECT_ID }} \
-            --pack-env=VITE_FIREBASE_STORAGE_BUCKET=${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }} \
-            --pack-env=VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }} \
-            --pack-env=VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }} \
-            --pack-env=VITE_FIREBASE_MEASUREMENT_ID=${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
+            --pack="builder=gcr.io/buildpacks/builder:v1,\
+              env=VITE_BASE_URL=${{ secrets.VITE_BASE_URL }},\
+              env=VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }},\
+              env=VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }},\
+              env=VITE_FIREBASE_PROJECT_ID=${{ secrets.VITE_FIREBASE_PROJECT_ID }},\
+              env=VITE_FIREBASE_STORAGE_BUCKET=${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }},\
+              env=VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }},\
+              env=VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }},\
+              env=VITE_FIREBASE_MEASUREMENT_ID=${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }},\
+              image=gcr.io/${{ secrets.GCP_PROJECT_ID }}/lm-frontend:${{ github.sha }}"
+
 
       # 6. Despliega en Cloud Run
       - name: Deploy to Cloud Run
