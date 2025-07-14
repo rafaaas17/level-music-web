@@ -26,12 +26,12 @@ COPY . .
 RUN npm run build
 
 # Production Stage
-FROM node:18.17.1-alpine
+FROM nginx:stable-alpine AS production
 
-WORKDIR /app
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-RUN npm install -g serve
+RUN sed -i 's/listen       80;/listen       8080;/' /etc/nginx/conf.d/default.conf
 
 EXPOSE 8080
-CMD ["serve", "-s", "dist", "-l", "8080"]
+CMD ["nginx", "-g", "daemon off;"]
+
