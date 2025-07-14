@@ -75,6 +75,7 @@ export const useAuthStore = () => {
       }
     } catch (error) {
       dispatch(logout());
+      console.log(error)
       if (error.code === "auth/error-code:-47") {
         dispatch(showSnackbar({
           message: 'Este correo ya está registrado con otro método de autenticación.',
