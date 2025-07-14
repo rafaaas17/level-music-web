@@ -1,4 +1,5 @@
-name: Deploy Frontend to Cloud Run
+# .github/workflows/deploy-frontend-buildpacks.yml
+name: Deploy Frontend to Cloud Run (Buildpacks)
 
 on:
   push:
@@ -19,54 +20,37 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      # 3. Configura gcloud con tu proyecto
+      # 3. Configura gcloud
       - name: Set up gcloud
         uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      # 4. Fija la región por defecto para Cloud Run
+      # 4. Fija la región por defecto
       - name: Set default Cloud Run region
         run: gcloud config set run/region ${{ secrets.GCP_REGION }}
 
-      # 5. Instala dependencias
-      - name: Install dependencies
-        run: npm ci
+      # 5. Build & Push con Buildpacks
+      - name: Build & push with Cloud Buildpacks
+        run: |
+          gcloud builds submit \
+            --tag=gcr.io/${{ secrets.GCP_PROJECT_ID }}/lm-frontend:${{ github.sha }} \
+            --pack \
+            --pack-builder=gcr.io/buildpacks/builder:v1 \
+            --pack-env=VITE_BASE_URL=${{ secrets.VITE_BASE_URL }} \
+            --pack-env=VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }} \
+            --pack-env=VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }} \
+            --pack-env=VITE_FIREBASE_PROJECT_ID=${{ secrets.VITE_FIREBASE_PROJECT_ID }} \
+            --pack-env=VITE_FIREBASE_STORAGE_BUCKET=${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }} \
+            --pack-env=VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }} \
+            --pack-env=VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }} \
+            --pack-env=VITE_FIREBASE_MEASUREMENT_ID=${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}  # buildpacks remote build :contentReference[oaicite:0]{index=0}
 
-      # 6. Build de producción bailable con las VITE_… en el entorno
-      - name: Build production bundle
-        env:
-          VITE_BASE_URL:         ${{ secrets.VITE_BASE_URL }}
-          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
-          VITE_FIREBASE_AUTH_DOMAIN:       ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
-          VITE_FIREBASE_PROJECT_ID:        ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET:    ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
-          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
-          VITE_FIREBASE_APP_ID:            ${{ secrets.VITE_FIREBASE_APP_ID }}
-          VITE_FIREBASE_MEASUREMENT_ID:    ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
-        run: npm run build
-
-      # 7. Se autentica en Google Container Registry
-      - name: Log in to GCR
-        uses: docker/login-action@v2
-        with:
-          registry: gcr.io
-          username: _json_key
-          password: ${{ secrets.GCP_SA_KEY }}
-
-      # 8. Construye y sube la imagen Docker
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          push: true
-          tags: gcr.io/${{ secrets.GCP_PROJECT_ID }}/lm-frontend:${{ github.sha }}
-
-      # 9. Despliega en Cloud Run
+      # 6. Despliega en Cloud Run
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v1
         with:
-          service: lm-frontend
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          region: ${{ secrets.GCP_REGION }}
-          image: gcr.io/${{ secrets.GCP_PROJECT_ID }}/lm-frontend:${{ github.sha }}
+          service:               lm-frontend
+          project_id:            ${{ secrets.GCP_PROJECT_ID }}
+          region:                ${{ secrets.GCP_REGION }}
+          image:                 gcr.io/${{ secrets.GCP_PROJECT_ID }}/lm-frontend:${{ github.sha }}
