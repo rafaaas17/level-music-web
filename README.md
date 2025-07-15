@@ -40,12 +40,12 @@
 
 - 📅 **Event Management:** Create, edit, and manage music events.
 - 👥 **Worker Management:** Administration of production and event support teams.
-- 💼 **Contract Management:** Track payments and staff availability.
-- 🔐 **Secure Authentication:** Login with Google and Facebook.
+- 💳 **Event Payment:** Track payments and staff availability.
+- 🔐 **Secure Authentication:** Login with Google and email/password.
 
 ## Technologies Used
 
-- **Frontend:** React + Vite 🚀
+- **Frontend:** React + Vite 
 - **State Management:** Redux
 - **UI:** Material UI
 - **Authentication:** Firebase Auth (Google Sign-In, Email/Password)
@@ -57,8 +57,8 @@
 Clone the repository and install dependencies:
 
 ```bash
-$ git clone https://github.com/LevelMusic/LevelMusicFrontend.git
-$ cd LevelMusicFrontend
+$ git clone https://github.com/gastonrodrig/level-music-web.git
+$ cd level-music-web
 $ npm install
 ```
 
