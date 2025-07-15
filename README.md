@@ -54,7 +54,7 @@
 
 ## Installation
 
-Clone the repository and install dependencies:
+Clone the repository and install dependencies: 
 
 ```bash
 $ git clone https://github.com/LevelMusic/LevelMusicFrontend.git
