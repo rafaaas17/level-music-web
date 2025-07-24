@@ -1,13 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button, TextField, CircularProgress } from '@mui/material';
+import { useEffect, useState } from 'react';
+import {
+  Box,
+  Typography,
+  Button,
+  TextField,
+  CircularProgress
+} from '@mui/material';
 import { AddCircleOutline, Edit } from '@mui/icons-material';
 import { useMaintenanceStore } from '../../../../hooks/resource/use-maintenance-store';
 import { TableComponent } from '../../../../shared/ui/components';
-import { MaintenanceModal } from '../../components/resource/maintenance-modal';
+import { MaintenanceModal } from '../../components';
 import { useScreenSizes } from '../../../../shared/constants/screen-width';
 import { formatDay } from '../../../../shared/utils';
 
-export const EquipmentMaintenancePage = () => {
+export const ResourceMaintenancePage = () => {
   const {
     maintenances,
     total,
@@ -35,22 +41,29 @@ export const EquipmentMaintenancePage = () => {
   }, [currentPage, rowsPerPage, searchTerm, orderBy, order]);
 
   const openModal = (payload) => {
-    setSelectedMaintenance(payload);
+    setSelectedMaintenance(payload || {});
     setIsModalOpen(true);
   };
 
   const columns = [
-    { id: 'resource_name', label: 'Nombre del equipo', sortable: true },
+    { id: 'resource_serial_number', label: 'Número de serie', sortable: true },
+    { id: 'resource_name', label: 'Nombre del recurso', sortable: true },
+    { id: 'resource_type', label: 'Tipo de recurso', sortable: true },
     { id: 'type', label: 'Tipo de mantenimiento', sortable: true },
-    { id: 'status', label: 'Estado' , sortable: true },
-    { is: 'date', label: 'Fecha', sortable: true } 
+    { id: 'status', label: 'Estado', sortable: true },
+    {
+      id: 'date',
+      label: 'Fecha',
+      sortable: true,
+      accessor: row => row.date ? formatDay(row.date) : 'N/A'
+    },
   ];
 
   const actions = [
-    { 
-      label: 'Cambiar estado', 
-      icon: <Edit />, 
-      onClick: (row) => openModal(row),
+    {
+      label: 'Cambiar estado',
+      icon: <Edit />,
+      onClick: row => openModal(row)
     },
   ];
 
@@ -60,21 +73,41 @@ export const EquipmentMaintenancePage = () => {
         sx={{
           borderRadius: 2,
           border: (theme) =>
-            `1px solid ${theme.palette.mode === 'dark' ? 'rgb(140, 140, 140)' : 'rgba(0,0,0,0.12)'}`
+            `1px solid ${
+              theme.palette.mode === "dark"
+                ? "rgb(140, 140, 140)"
+                : "rgba(0,0,0,0.12)"
+            }`,
         }}
       >
-        <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ px: 3, py: 2 }}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ px: 3, py: 2 }}
+        >
           <Box>
-            <Typography sx={{ fontWeight: 600, fontSize: 24 }}>Listado de Mantenimientos</Typography>
-            <Typography sx={{ color: 'text.secondary', fontSize: 16 }}>Administra los mantenimientos</Typography>
+            <Typography sx={{ fontWeight: 600, fontSize: 24 }}>
+              Listado de Mantenimientos
+            </Typography>
+            <Typography sx={{ color: "text.secondary", fontSize: 16 }}>
+              Administra los mantenimientos
+            </Typography>
           </Box>
           <Button
             variant="contained"
             startIcon={<AddCircleOutline />}
-            sx={{ backgroundColor: '#212121', color: '#fff', borderRadius: 2, textTransform: 'none', px: 3, py: 1.5 }}
-            onClick={openModal}
+            sx={{
+              backgroundColor: "#212121",
+              color: "#fff",
+              borderRadius: 2,
+              textTransform: "none",
+              px: 3,
+              py: 1.5,
+            }}
+            onClick={() => openModal()}
           >
-            {isLg ? 'Agregar Mantenimiento' : 'Agregar'}
+            {isLg ? "Agregar Mantenimiento" : "Agregar"}
           </Button>
         </Box>
 
@@ -82,7 +115,11 @@ export const EquipmentMaintenancePage = () => {
           display="flex"
           justifyContent="start"
           alignItems="center"
-          sx={{ px: 3, pb: { xs: 1, lg: 3 }, width: { xs: '100%', sm: '300px' } }}
+          sx={{
+            px: 3,
+            pb: { xs: 1, lg: 3 },
+            width: { xs: "100%", sm: "300px" },
+          }}
         >
           <TextField
             size="small"
@@ -94,12 +131,22 @@ export const EquipmentMaintenancePage = () => {
         </Box>
 
         {loading ? (
-          <Box display="flex" justifyContent="center" alignItems="center" sx={{ py: 5 }}>
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            sx={{ py: 5 }}
+          >
             <CircularProgress />
           </Box>
         ) : maintenances.length === 0 ? (
-          <Box display="flex" justifyContent="center" alignItems="center" sx={{ py: 5 }}>
-            <Typography sx={{ color: 'text.secondary', fontSize: 16 }}>
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            sx={{ py: 5 }}
+          >
+            <Typography sx={{ color: "text.secondary", fontSize: 16 }}>
               No se encontraron resultados.
             </Typography>
           </Box>
@@ -110,8 +157,8 @@ export const EquipmentMaintenancePage = () => {
             order={order}
             orderBy={orderBy}
             onRequestSort={(prop) => {
-              const isAsc = orderBy === prop && order === 'asc';
-              setOrder(isAsc ? 'desc' : 'asc');
+              const isAsc = orderBy === prop && order === "asc";
+              setOrder(isAsc ? "desc" : "asc");
               setOrderBy(prop);
             }}
             page={currentPage}

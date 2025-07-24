@@ -53,18 +53,18 @@ export const menuItems = [
     ]
   },
   { 
-    text: 'Gestionar Equipos', 
+    text: 'Gestionar Recursos', 
     icon: VolumeUp, 
     subItems: [
       { 
-        text: 'Equipos', 
-        breadcrumb: 'Equipos',
-        href: '/admin/equipment' 
+        text: 'Recursos', 
+        breadcrumb: 'Recursos',
+        href: '/admin/resource' 
       },
       { 
         text: 'Mantenimiento', 
-        breadcrumb: 'Mantenimiento de Equipos',
-        href: '/admin/equipment-maintenance' 
+        breadcrumb: 'Mantenimiento de Recursos',
+        href: '/admin/resource-maintenance' 
       }
     ]
   },

@@ -18,7 +18,7 @@ const CustomAlert = styled(Alert)(({ theme }) => ({
 
 export const GlobalSnackbar = () => {
   const dispatch = useDispatch();
-  const { open, message, severity } = useSelector((state) => state.ui.snackbar);
+  const { open, message } = useSelector((state) => state.ui.snackbar);
 
   const handleClose = () => {
     dispatch({ type: 'ui/closeSnackbar' });
@@ -31,7 +31,7 @@ export const GlobalSnackbar = () => {
       onClose={handleClose}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
     >
-      <CustomAlert onClose={handleClose} severity={severity} sx={{ width: '100%' }}>
+      <CustomAlert onClose={handleClose} sx={{ width: '100%' }}>
         {message}
       </CustomAlert>
     </Snackbar>

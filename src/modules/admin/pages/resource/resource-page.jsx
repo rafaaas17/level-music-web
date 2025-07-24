@@ -7,7 +7,7 @@ import { ResourceModal } from '../../components/resource/resource-modal';
 import { useScreenSizes } from '../../../../shared/constants/screen-width';
 import { formatDay } from '../../../../shared/utils';
 
-export const EquipmentPage = () => {
+export const ResourcePage = () => {
   const {
     resources,
     total,

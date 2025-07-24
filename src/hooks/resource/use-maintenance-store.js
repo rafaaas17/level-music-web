@@ -16,7 +16,7 @@ export const useMaintenanceStore = () => {
   const {
     maintenances,
     selected,
-    total,                                    
+    total,
     loading,
     currentPage,
     rowsPerPage,
@@ -26,26 +26,19 @@ export const useMaintenanceStore = () => {
   const [orderBy, setOrderBy] = useState("date");
   const [order, setOrder] = useState("desc");
 
+  const openSnackbar = (message) => dispatch(showSnackbar({ message }));
+
   const startCreateMaintenance = async (maintenance) => {
     dispatch(setLoadingMaintenance(true));
     try {
       const payload = createMaintenanceModel(maintenance)
       await maintenanceApi.post("/", payload);
       await startLoadingMaintenancesPaginated();
-      dispatch(
-        showSnackbar({
-          message: "El mantenimiento fue creado exitosamente.",
-          severity: "success",
-        })
-      );
+      openSnackbar("El mantenimiento fue creado exitosamente.");
       return true;
     } catch (error) {
-      dispatch(
-        showSnackbar({
-          message: "Ocurrió un error al crear el mantenimiento.",
-          severity: "error",
-        })
-      );
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al registrar el mantenimiento.");
       return false;
     } finally {
       dispatch(setLoadingMaintenance(false));
@@ -81,26 +74,18 @@ export const useMaintenanceStore = () => {
     }
   };
 
-  const startChangeManteinanceStatus = async (id, maintenance) => {
+  const startChangeMaintenanceStatus = async (id, maintenance) => {
     dispatch(setLoadingMaintenance(true));
     try {
       const payload = updateMaintenanceStatusModel(maintenance)
       await maintenanceApi.patch(`/${id}/status`, payload)
       await startLoadingMaintenancesPaginated();
-      dispatch(
-        showSnackbar({
-          message: "El mantenimiento fue creado exitosamente.",
-          severity: "success",
-        })
-      );
+      openSnackbar("El estado del mantenimiento fue modificado exitosamente.");
       return true;
     } catch (error) {
-      dispatch(
-        showSnackbar({
-          message: "Ocurrió un error al crear el mantenimiento.",
-          severity: "error",
-        })
-      );
+      console.log(error);
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al modificar el estado del mantenimiento.");
       return false;
     } finally {
       dispatch(setLoadingMaintenance(false));
@@ -141,7 +126,7 @@ export const useMaintenanceStore = () => {
     // actions
     startCreateMaintenance,
     startLoadingMaintenancesPaginated,
-    startChangeManteinanceStatus,
+    startChangeMaintenanceStatus,
     setSelectedMaintenance,
   };
 };

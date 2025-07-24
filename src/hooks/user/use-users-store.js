@@ -40,7 +40,6 @@ export const useUsersStore = () => {
     try {
       const newUser = createUserEmailPasswordModel(user, role, { needs_password_change: true });
       await userApi.post("/", newUser);
-      startLoadingUsersPaginated();
       dispatch(showSnackbar({
         message: `El usuario fue creado exitosamente.`,
         severity: 'success',

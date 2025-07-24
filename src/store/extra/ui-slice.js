@@ -4,7 +4,6 @@ const initialState = {
   snackbar: {
     open: false,
     message: '',
-    type: 'success', 
   },
 };
 
@@ -14,9 +13,8 @@ export const uiSlice = createSlice({
   reducers: {
     showSnackbar: (state, action) => {
       state.snackbar = {
-        open: true,
+        open:    true,
         message: action.payload.message,
-        type: action.payload.type,
       };
     },
     closeSnackbar: (state) => {

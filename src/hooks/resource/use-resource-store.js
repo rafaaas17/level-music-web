@@ -25,28 +25,19 @@ export const useResourceStore = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [orderBy, setOrderBy] = useState("name");
   const [order, setOrder] = useState("asc");
+  
+  const openSnackbar = (message) => dispatch(showSnackbar({ message }));
 
   const startCreateResource = async (resource) => {
     dispatch(setLoadingResource(true));
     try {
-      console.log(resource)
       const payload = createResourceModel(resource);
       await resourceApi.post("/", payload);
       await startLoadingResourcesPaginated();
-      dispatch(
-        showSnackbar({
-          message: "El recurso fue creado exitosamente.",
-          severity: "success",
-        })
-      );
+      openSnackbar("El recurso fue creado exitosamente.");
       return true;
     } catch (error) {
-      dispatch(
-        showSnackbar({
-          message: "Ocurrió un error al crear el recurso.",
-          severity: "error",
-        })
-      );
+      openSnackbar("Ocurrió un error al crear el recurso.");
       return false;
     } finally {
       dispatch(setLoadingResource(false));
@@ -88,20 +79,10 @@ export const useResourceStore = () => {
       const payload = updateResourceModel(resource)
       await resourceApi.put(`/${id}`, payload);
       await startLoadingResourcesPaginated();
-      dispatch(
-        showSnackbar({
-          message: "El recurso fue actualizado exitosamente.",
-          severity: "success",
-        })
-      );
+      openSnackbar("El recurso fue actualizado exitosamente.");
       return true;
     } catch (error) {
-      dispatch(
-        showSnackbar({
-          message: "Ocurrió un error al actualizar el recurso.",
-          severity: "error",
-        })
-      );
+      openSnackbar("Ocurrió un error al actualizar el recurso.");
       return false;
     } finally {
       dispatch(setLoadingResource(false));
@@ -115,12 +96,8 @@ export const useResourceStore = () => {
       const { data } = await resourceApi.get(`/by-serial?serial=${term}`);
       return { data, ok: true };
     } catch (error) {
-      dispatch(
-        showSnackbar({
-          message: "Ocurrió un error al buscar el recurso.",
-          severity: "error",
-        })
-      );
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al buscar el recurso.");
       return false;
     } finally {
       dispatch(setLoadingResource(false));

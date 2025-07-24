@@ -33,6 +33,8 @@ export const ResourceModal = ({
   const isEditing = !!resource?._id;
   const { startCreateResource, startUpdateResource } = useResourceStore();
 
+  console.log(resource);
+
   const {
     register,
     handleSubmit,
@@ -51,15 +53,31 @@ export const ResourceModal = ({
   useEffect(() => {
     if (open) {
       const today = new Date().toISOString().split("T")[0];
+      
+      let last = '';
+      if (resource.last_maintenance_date) {
+        last = new Date(resource.last_maintenance_date)
+          .toISOString()
+          .split('T')[0];
+      }
+
+      let next = today;
+      if (resource.next_maintenance_date) {
+        next = new Date(resource.next_maintenance_date)
+          .toISOString()
+          .split('T')[0];
+      }
 
       reset({
-        name: resource?.name ?? "",
-        description: resource?.description ?? "",
-        resource_type: resource?.resource_type ?? "Sonido",
-        maintenance_interval_days: resource?.maintenance_interval_days ?? 0,
-        next_maintenance_date: resource?.next_maintenance_date ?? today, 
-        last_maintenance_date: resource?.last_maintenance_date ?? "",
+        name: resource.name ?? '',
+        description: resource.description ?? '',
+        resource_type: resource.resource_type ?? 'Sonido',
+        maintenance_interval_days: resource.maintenance_interval_days ?? 0,
+        last_maintenance_date: last,
+        next_maintenance_date: next,
       });
+
+      setShowLastMaintenanceDate(!!last);
     }
   }, [open, reset, resource]);
 
@@ -89,6 +107,7 @@ export const ResourceModal = ({
 
   const onSubmit = async (data) => {
     try {
+      if (!showLastMaintenanceDate) delete data.last_maintenance_date;
       const success = isEditing
         ? await startUpdateResource(resource._id, data)
         : await startCreateResource(data);
@@ -150,6 +169,8 @@ export const ResourceModal = ({
           <TextField
             label="Descripción"
             fullWidth
+            multiline
+            minRows={4}
             {...register("description", {
               required: "La descripción es obligatoria",
             })}
@@ -194,33 +215,50 @@ export const ResourceModal = ({
           />
 
           {/* Última fecha de mantenimiento */}
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={showLastMaintenanceDate}
-                onChange={(e) => {
-                  setShowLastMaintenanceDate(e.target.checked);
-                  if (!e.target.checked) setValue("last_maintenance_date", "");
-                }}
-              />
-            }
-            label="¿Registrar última fecha de mantenimiento? Si no la recuerda, se usará la fecha actual."
-          />
+          { (!isEditing || resource.maintenance_count <= 1) && (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={showLastMaintenanceDate}
+                  onChange={(e) => {
+                    setShowLastMaintenanceDate(e.target.checked);
+                    if (!e.target.checked) setValue("last_maintenance_date", "");
+                  }}
+                />
+              }
+              label="¿Registrar última fecha de mantenimiento? Si no la recuerda, se usará la fecha actual."
+            />
+          )}
+
           {showLastMaintenanceDate && (
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
               <DemoContainer components={["DatePicker"]}>
                 <DatePicker
                   label="Última fecha de mantenimiento"
-                  value={watch("last_maintenance_date") ? dayjs(watch("last_maintenance_date")) : null}
-                  onChange={(date) => setValue("last_maintenance_date", date ? date.format("YYYY-MM-DD") : "")}
-                  slotProps={{ textField: { fullWidth: true } }}
+                  value={
+                    watch("last_maintenance_date") ? dayjs(watch("last_maintenance_date")) : null
+                  }
+                  onChange={(date) => {
+                    const formatted = date ? date.format("YYYY-MM-DD") : "";
+                    setValue("last_maintenance_date", formatted);
+                  }}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      ...register("last_maintenance_date", {
+                        required: "La fecha es obligatoria"
+                      }),
+                      error: !!errors.last_maintenance_date,
+                      helperText: errors.last_maintenance_date?.message ?? "",
+                    },
+                  }}
                 />
               </DemoContainer>
             </LocalizationProvider>
           )}
 
           {/* Próxima fecha de mantenimiento */}
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
             <DemoContainer components={["DatePicker"]}>
               <DatePicker
                 label="Próxima fecha de mantenimiento"
