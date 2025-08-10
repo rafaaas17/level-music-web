@@ -10,6 +10,7 @@ import {
 } from "../../store";
 import { useState } from "react";
 import { serviceTypeApi } from "../../api";
+import { getAuthConfig, getAuthConfigWithParams } from "../../shared/utils";
 
 export const useServiceTypeStore = () => {
   const dispatch = useDispatch();
@@ -21,30 +22,27 @@ export const useServiceTypeStore = () => {
     currentPage,
     rowsPerPage,  
   } = useSelector((state) => state.serviceType);
+
+  const { token } = useSelector((state) => state.auth);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [orderBy, setOrderBy] = useState('name');
   const [order, setOrder] = useState('asc');
 
+  const openSnackbar = (message) => dispatch(showSnackbar({ message }));
+
   const startCreateServiceType = async (serviceType) => {
-    if (!validateAttributes(serviceType.attributes)) {
-      return false;
-    } 
+    if (!validateAttributes(serviceType.attributes)) return false;
     dispatch(setLoadingServiceType(true));
     try {
       const payload = createServiceTypeModel(serviceType);
-      await serviceTypeApi.post('/', payload);
+      await serviceTypeApi.post('/', payload, getAuthConfig(token));
       startLoadingServiceTypePaginated();
-      dispatch(showSnackbar({
-        message: `El tipo de servicio fue creado exitosamente.`,
-        severity: 'success',
-      }));
+      openSnackbar("El tipo de servicio fue creado exitosamente.");
       return true;
     } catch (error) {
-      console.log(error);
-      dispatch(showSnackbar({
-        message: `Ocurrió un error al crear el tipo de servicio.`,
-        severity: 'error', 
-      }));
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al crear el tipo de servicio.");
       return false;
     } finally {
       dispatch(setLoadingServiceType(false));
@@ -56,15 +54,15 @@ export const useServiceTypeStore = () => {
     try {
       const limit  = rowsPerPage;
       const offset = currentPage * rowsPerPage;
-      const { data } = await serviceTypeApi.get('/paginated', {
-        params: {
+      const { data } = await serviceTypeApi.get('/paginated', 
+        getAuthConfigWithParams(token, {
           limit,
           offset,
           search: searchTerm.trim(),
           sortField: orderBy,
           sortOrder: order,
-        },
-      });
+        })
+      );
       dispatch(refreshServiceType({
         items: data.items,
         total: data.total,
@@ -72,7 +70,8 @@ export const useServiceTypeStore = () => {
       }));
       return true;
     } catch (error) {
-      console.log(error);
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al cargar los tipos de servicio.");
       return false;
     } finally {
       dispatch(setLoadingServiceType(false));
@@ -80,26 +79,17 @@ export const useServiceTypeStore = () => {
   };
 
   const startUpdateServiceType = async (id, serviceType) => {
-    if (!validateAttributes(serviceType.attributes)) {
-      return false;
-  } 
+    if (!validateAttributes(serviceType.attributes)) return false;
     dispatch(setLoadingServiceType(true));
     try {
-      console.log(serviceType);
       const payload = updateServiceTypeModel(serviceType);
-      await serviceTypeApi.put(`/${id}`, payload);
+      await serviceTypeApi.put(`/${id}`, payload, getAuthConfig(token));
       startLoadingServiceTypePaginated();
-      dispatch(showSnackbar({
-        message: `El tipo de servicio fue actualizado exitosamente.`,
-        severity: 'success',
-      }));
+      openSnackbar("El tipo de servicio fue actualizado exitosamente.");
       return true;
     } catch (error) {
-      console.log(error);
-      dispatch(showSnackbar({
-        message: `Ocurrió un error al actualizar el tipo de servicio.`,
-        severity: 'error', 
-      }));
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al actualizar el tipo de servicio.");
       return false;
     } finally {
       dispatch(setLoadingServiceType(false));
@@ -108,12 +98,9 @@ export const useServiceTypeStore = () => {
 
   const validateAttributes = (attributes) => {
     if (attributes.length === 0) {
-      dispatch(showSnackbar({
-        message: 'Debe agregar al menos un atributo al tipo de servicio.',
-        severity: 'error',
-      }));
+      openSnackbar("Debe agregar al menos un atributo al tipo de servicio.");
       return false;
-    }
+    } 
     return true;
   };
 
@@ -130,6 +117,7 @@ export const useServiceTypeStore = () => {
   };
 
   return {
+    // state
     serviceTypes,
     selected,
     total,
@@ -140,12 +128,14 @@ export const useServiceTypeStore = () => {
     orderBy,
     order,
 
+    // setters
     setSearchTerm,
     setOrderBy,
     setOrder, 
     setPageGlobal,
     setRowsPerPageGlobal,
 
+    // actions
     startCreateServiceType,
     startLoadingServiceTypePaginated,
     startUpdateServiceType,

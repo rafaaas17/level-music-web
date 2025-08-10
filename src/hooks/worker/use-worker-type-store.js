@@ -1,5 +1,4 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { workerTypeApi } from '../../api';
 import {
   refreshWorkerTypes,
   selectedWorkerType,
@@ -13,6 +12,8 @@ import {
   updateWorkerTypeModel
 } from '../../shared/models';
 import { useState } from 'react';
+import { workerTypeApi } from '../../api';
+import { getAuthConfig, getAuthConfigWithParams } from "../../shared/utils";
 
 export const useWorkerTypeStore = () => {
   const dispatch = useDispatch();
@@ -25,27 +26,25 @@ export const useWorkerTypeStore = () => {
     rowsPerPage 
   } = useSelector((state) => state.workerTypes);
 
+  const { token } = useSelector((state) => state.auth);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [orderBy, setOrderBy] = useState('name');
   const [order, setOrder] = useState('asc');
+
+  const openSnackbar = (message) => dispatch(showSnackbar({ message }));
 
   const startCreateWorkerType = async (workerType) => {
     dispatch(setLoadingWorkerType(true));
     try {
       const payload = createWorkerTypeModel(workerType);
-      await workerTypeApi.post('/', payload);
+      await workerTypeApi.post('/', payload, getAuthConfig(token));
       startLoadingWorkerTypePaginated();
-      dispatch(showSnackbar({
-        message: `El tipo de trabajador fue creado exitosamente.`,
-        severity: 'success',
-      }));
+      openSnackbar("El tipo de trabajador fue creado exitosamente.");
       return true;
     } catch (error) {
-      console.log(error);
-      dispatch(showSnackbar({
-        message: `Ocurrió un error al crear el tipo de trabajador.`,
-        severity: 'error', 
-      }));
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al crear el tipo de trabajador.");
       return false;
     } finally {
       dispatch(setLoadingWorkerType(false));
@@ -57,15 +56,15 @@ export const useWorkerTypeStore = () => {
     try {
       const limit  = rowsPerPage;
       const offset = currentPage * rowsPerPage;
-      const { data } = await workerTypeApi.get('/paginated', {
-        params: {
+      const { data } = await workerTypeApi.get('/paginated',
+        getAuthConfigWithParams(token, {
           limit,
           offset,
           search: searchTerm.trim(),
           sortField: orderBy,
           sortOrder: order,
-        },
-      });
+        })
+      );
       dispatch(refreshWorkerTypes({
         items: data.items,
         total: data.total,
@@ -73,7 +72,8 @@ export const useWorkerTypeStore = () => {
       }));
       return true;
     } catch (error) {
-      console.log(error);
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al cargar los tipos de trabajador.");
       return false;
     } finally {
       dispatch(setLoadingWorkerType(false));
@@ -84,41 +84,13 @@ export const useWorkerTypeStore = () => {
     dispatch(setLoadingWorkerType(true));
     try {
       const payload = updateWorkerTypeModel(workerType);
-      await workerTypeApi.put(`/${id}`, payload);
+      await workerTypeApi.put(`/${id}`, payload, getAuthConfig(token));
       startLoadingWorkerTypePaginated();
-      dispatch(showSnackbar({
-        message: `El tipo de trabajador fue actualizado exitosamente.`,
-        severity: 'success',
-      }));
+      openSnackbar("El tipo de trabajador fue actualizado exitosamente.");
       return true;
     } catch (error) {
-      console.log(error);
-      dispatch(showSnackbar({
-        message: `Ocurrió un error al actualizar el tipo de trabajador.`,
-        severity: 'error', 
-      }));
-      return false;
-    } finally {
-      dispatch(setLoadingWorkerType(false));
-    }
-  };
-
-  const startDeleteWorkerType = async (id) => {
-    dispatch(setLoadingWorkerType(true));
-    try {
-      await workerTypeApi.delete(`/${id}`);
-      startLoadingWorkerTypePaginated();
-      dispatch(showSnackbar({
-        message: `El tipo de trabajador fue eliminado exitosamente.`,
-        severity: 'success',
-      }));
-      return true;
-    } catch (error) {
-      console.log(error);
-      dispatch(showSnackbar({
-        message: `Ocurrió un error al eliminar el tipo de trabajador.`,
-        severity: 'error',
-      }));
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al actualizar el tipo de trabajador.");
       return false;
     } finally {
       dispatch(setLoadingWorkerType(false));
@@ -160,7 +132,6 @@ export const useWorkerTypeStore = () => {
     startCreateWorkerType,
     startLoadingWorkerTypePaginated,
     startUpdateWorkerType,
-    startDeleteWorkerType,
     setSelectedWorkerType,
   };
 };

@@ -5,5 +5,5 @@ export const updateClientModel = (client) => ({
   email: client.email,
   document_type: client.document_type,
   document_number: client.document_number,
-  status: "Activo",
+  status: client.status
 });

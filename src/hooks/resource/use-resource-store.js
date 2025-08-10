@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { resourceApi } from "../../api";
+import { createResourceModel, updateResourceModel } from "../../shared/models";
 import {
   refreshResource,
   selectedResource,
@@ -9,7 +9,8 @@ import {
   showSnackbar,
 } from "../../store";
 import { useState } from "react";
-import { createResourceModel, updateResourceModel } from "../../shared/models";
+import { resourceApi } from "../../api";
+import { getAuthConfig, getAuthConfigWithParams } from "../../shared/utils";
 
 export const useResourceStore = () => {
   const dispatch = useDispatch();
@@ -22,6 +23,8 @@ export const useResourceStore = () => {
     rowsPerPage,
   } = useSelector((state) => state.resource);
 
+  const { token } = useSelector((state) => state.auth);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [orderBy, setOrderBy] = useState("name");
   const [order, setOrder] = useState("asc");
@@ -32,12 +35,13 @@ export const useResourceStore = () => {
     dispatch(setLoadingResource(true));
     try {
       const payload = createResourceModel(resource);
-      await resourceApi.post("/", payload);
+      await resourceApi.post("/", payload, getAuthConfig(token));
       await startLoadingResourcesPaginated();
       openSnackbar("El recurso fue creado exitosamente.");
       return true;
     } catch (error) {
-      openSnackbar("Ocurrió un error al crear el recurso.");
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al registrar el recurso.");
       return false;
     } finally {
       dispatch(setLoadingResource(false));
@@ -49,15 +53,15 @@ export const useResourceStore = () => {
     try {
       const limit = rowsPerPage;
       const offset = currentPage * rowsPerPage;
-      const { data } = await resourceApi.get("/paginated", {
-        params: {
+      const { data } = await resourceApi.get("/paginated", 
+        getAuthConfigWithParams(token, {
           limit,
           offset,
           search: searchTerm.trim(),
           sortField: orderBy,
           sortOrder: order,
-        },
-      });
+        })
+      );
       dispatch(
         refreshResource({
           items: data.items,
@@ -67,6 +71,8 @@ export const useResourceStore = () => {
       );
       return true;
     } catch (error) {
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al cargar los recursos.");
       return false;
     } finally {
       dispatch(setLoadingResource(false));
@@ -77,12 +83,13 @@ export const useResourceStore = () => {
     dispatch(setLoadingResource(true));
     try {
       const payload = updateResourceModel(resource)
-      await resourceApi.put(`/${id}`, payload);
+      await resourceApi.put(`/${id}`, payload, getAuthConfig(token));
       await startLoadingResourcesPaginated();
       openSnackbar("El recurso fue actualizado exitosamente.");
       return true;
     } catch (error) {
-      openSnackbar("Ocurrió un error al actualizar el recurso.");
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al actualizar el recurso.");
       return false;
     } finally {
       dispatch(setLoadingResource(false));
@@ -93,7 +100,7 @@ export const useResourceStore = () => {
     if (term.length !== 12) return;
     dispatch(setLoadingResource(true));
     try {
-      const { data } = await resourceApi.get(`/by-serial?serial=${term}`);
+      const { data } = await resourceApi.get(`/by-serial?serial=${term}`, getAuthConfig(token));
       return { data, ok: true };
     } catch (error) {
       const message = error.response?.data?.message;

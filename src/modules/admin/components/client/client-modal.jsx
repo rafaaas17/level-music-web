@@ -46,6 +46,7 @@ export const ClientModal = ({
         phone: client?.phone ?? "",
         document_type: client?.document_type ?? "",
         document_number: client?.document_number ?? "",
+        status: client?.status ?? "Activo",
       });
     }
   }, [open, reset, client]);
@@ -98,6 +99,8 @@ export const ClientModal = ({
         </Box>
 
         <Box display="flex" gap={2} mb={2} sx={{ flexDirection: "column" }}>
+
+          {/* Nombre */}
           <TextField
             label="Nombre"
             fullWidth
@@ -107,6 +110,8 @@ export const ClientModal = ({
             error={!!errors.first_name}
             helperText={errors.first_name?.message}
           />
+
+          {/* Apellido */}
           <TextField
             label="Apellido"
             fullWidth
@@ -116,6 +121,8 @@ export const ClientModal = ({
             error={!!errors.last_name}
             helperText={errors.last_name?.message}
           />
+
+          {/* Email */}
           <TextField
             label="Correo"
             fullWidth
@@ -125,6 +132,8 @@ export const ClientModal = ({
             error={!!errors.email}
             helperText={errors.email?.message}
           />
+
+          {/* Teléfono */}
           <TextField
             label="Teléfono"
             fullWidth
@@ -138,6 +147,8 @@ export const ClientModal = ({
             error={!!errors.phone}
             helperText={errors.phone?.message}
           />
+
+          {/* Tipo de documento */}
           <FormControl fullWidth error={!!errors.document_type}>
             <InputLabel id="document-type-label">Tipo de documento</InputLabel>
             <Select
@@ -160,6 +171,8 @@ export const ClientModal = ({
             </Select>
             <FormHelperText>{errors.document_type?.message}</FormHelperText>
           </FormControl>
+
+          {/* Número de documento */}
           <TextField
             label="Número de documento"
             fullWidth
@@ -184,7 +197,25 @@ export const ClientModal = ({
             error={!!errors.document_number}
             helperText={errors.document_number?.message}
           />
-          
+
+          {/* Estado */}
+          { isEditing && (
+            <FormControl fullWidth error={!!errors.status}>
+              <InputLabel id="status-label">Estado</InputLabel>
+              <Select
+                labelId="status-label"
+                value={watch("status") || "Activo"}
+                {...register("status", {
+                  required: "Selecciona un estado",
+                })}
+                onChange={(e) => setValue("status", e.target.value)}
+              >
+                <MenuItem value="Activo">Activo</MenuItem>
+                <MenuItem value="Inactivo">Inactivo</MenuItem>
+              </Select>
+              <FormHelperText>{errors.status?.message}</FormHelperText>
+            </FormControl>
+          )}
         </Box>
 
         <Button

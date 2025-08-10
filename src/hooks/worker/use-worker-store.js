@@ -1,5 +1,4 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { workerApi } from '../../api';
 import {
   refreshWorkers,
   selectedWorker,
@@ -12,8 +11,9 @@ import {
   createWorkerModel,
   updateWorkerModel
 } from '../../shared/models';
-import { generateRandomPassword } from '../../shared/utils';
 import { useState } from 'react';
+import { workerApi } from '../../api';
+import { getAuthConfig, getAuthConfigWithParams } from '../../shared/utils';
 
 export const useWorkerStore = () => {
   const dispatch = useDispatch();
@@ -26,58 +26,54 @@ export const useWorkerStore = () => {
     rowsPerPage,
   } = useSelector((state) => state.workers);
 
+  const { token } = useSelector((state) => state.auth);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [orderBy, setOrderBy] = useState("name");
   const [order, setOrder] = useState("asc");
 
+  const openSnackbar = (message) => dispatch(showSnackbar({ message }));
+
   const startCreateWorker = async (worker) => {
-      dispatch(setLoadingWorker(true));
-      try {
-        const password = generateRandomPassword();
-        const payload = createWorkerModel(worker, password);
-        await workerApi.post('/', payload);
-        startLoadingWorkerPaginated();
-        dispatch(showSnackbar({
-          message: `El trabajador fue creado exitosamente.`,
-          severity: 'success',
-        }));
-        return true;
-      } catch (error) {
-        console.log(error);
-        dispatch(showSnackbar({
-          message: `Ocurrió un error al crear el trabajador.`,
-          severity: 'error', 
-        }));
-        return false;
-      } finally {
-        dispatch(setLoadingWorker(false));
-      }
-    };
+    dispatch(setLoadingWorker(true));
+    try {
+      const payload = createWorkerModel(worker);
+      await workerApi.post('/', payload, getAuthConfig(token));
+      startLoadingWorkerPaginated();
+      openSnackbar("El trabajador fue creado exitosamente.");
+      return true;
+    } catch (error) {
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al crear el trabajador.");
+      return false;
+    } finally {
+      dispatch(setLoadingWorker(false));
+    }
+  };
 
   const startLoadingWorkerPaginated = async () => {
     dispatch(setLoadingWorker(true));
     try {
       const limit = rowsPerPage;
       const offset = currentPage * rowsPerPage;
-      const { data } = await workerApi.get("/paginated", {
-        params: {
+      const { data } = await workerApi.get("/paginated", 
+        getAuthConfigWithParams(token, {
           limit,
           offset,
           search: searchTerm.trim(),
           sortField: orderBy,
           sortOrder: order,
-        },
-      });
-      dispatch(
-        refreshWorkers({
-          items: data.items,
-          total: data.total,
-          page: currentPage,
         })
       );
+      dispatch(refreshWorkers({
+        items: data.items,
+        total: data.total,
+        page: currentPage,
+      }));
       return true;
     } catch (error) {
-      console.log(error);
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al cargar los trabajadores.");
       return false;
     } finally {
       dispatch(setLoadingWorker(false));
@@ -88,19 +84,13 @@ export const useWorkerStore = () => {
     dispatch(setLoadingWorker(true));
     try {
       const payload = updateWorkerModel(worker);
-      await workerApi.put(`/${id}`, payload);
+      await workerApi.put(`/${id}`, payload, getAuthConfig(token));
       startLoadingWorkerPaginated();
-      dispatch(showSnackbar({
-        message: `El trabajador fue actualizado exitosamente.`,
-        severity: 'success',
-      }));
+      openSnackbar("El trabajador fue actualizado exitosamente.");
       return true;
     } catch (error) {
-      console.log(error);
-      dispatch(showSnackbar({
-        message: `Ocurrió un error al actualizar el trabajador.`,
-        severity: 'error', 
-      }));
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al actualizar el trabajador.");
       return false;
     } finally {
       dispatch(setLoadingWorker(false));

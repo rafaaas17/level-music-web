@@ -39,7 +39,6 @@ export const WorkerModal = ({
     mode: "onBlur",
   });
 
-
   useEffect(() => {
     if (open) {
       reset({
@@ -47,7 +46,7 @@ export const WorkerModal = ({
         last_name: worker?.last_name ?? '',
         email: worker?.email ?? '',
         phone: worker?.phone ?? '',
-        worker_type_id: worker?.worker_type_id ?? '',
+        worker_type_id: worker?.worker_type?._id ?? worker?.worker_type ?? '',
         role: worker?.role ?? '',
         document_type: worker?.document_type ?? '',
         document_number: worker?.document_number ?? '',
@@ -117,6 +116,7 @@ export const WorkerModal = ({
                     setValue("role", selectedType ? selectedType.name : '');
                   }}
                   inputProps={{ name: 'worker_type_id' }}
+                  disabled={isEditing}
                 >
                   {workerTypes.map((type) => (
                     <MenuItem key={type._id} value={type._id}>

@@ -24,10 +24,18 @@ googleProvider.addScope("email");
 
 export const useAuthStore = () => {
   const dispatch = useDispatch();
-  const checkingAuthentication = () => dispatch(checkingCredentials());
+  const { 
+    status, 
+    uid, 
+    email, 
+    displayName, 
+    photoURL, 
+    role 
+  } = useSelector((state) => state.auth);
 
-  const { status, uid, email, displayName, photoURL, role } = useSelector((state) => state.auth);
   const { startCreateUser, findUserByEmail } = useUsersStore();
+
+  const openSnackbar = (message) => dispatch(showSnackbar({ message }));
 
   const onGoogleSignIn = async () => {
     try {
@@ -75,17 +83,10 @@ export const useAuthStore = () => {
       }
     } catch (error) {
       dispatch(logout());
-      console.log(error)
       if (error.code === "auth/error-code:-47") {
-        dispatch(showSnackbar({
-          message: 'Este correo ya está registrado con otro método de autenticación.',
-          severity: 'error',
-        }));
+        openSnackbar("Este correo ya está registrado con otro método de autenticación.");
       } else {
-        dispatch(showSnackbar({
-          message: 'Error al iniciar sesión.',
-          severity: 'error',
-        }));
+        openSnackbar("Error al iniciar sesión.");
       }
       return false;
     }
@@ -101,6 +102,7 @@ export const useAuthStore = () => {
         dispatch(logout());
         return false;
       }
+      
       const needsPassword = !!data.needs_password_change;
       dispatch(login({
         uid: data.auth_id,
@@ -120,15 +122,9 @@ export const useAuthStore = () => {
     } catch (error) {
       dispatch(logout());
       if (error.code === "auth/invalid-credential") {
-        dispatch(showSnackbar({
-          message: 'Credenciales incorrectas',
-          severity: 'success',
-        }));
+        openSnackbar("Credenciales incorrectas.");
       } else {
-        dispatch(showSnackbar({
-          message: 'Error al iniciar sesión.',
-          severity: 'success',
-        }));
+        openSnackbar("Error al iniciar sesión.");
       }
       return false;
     }
@@ -141,10 +137,7 @@ export const useAuthStore = () => {
 
       if (ok) {
         dispatch(logout());
-        dispatch(showSnackbar({
-          message: 'Este correo ya está registrado.',
-          severity: 'success',
-        }));
+        openSnackbar("Este correo ya está registrado.");
         return false;
       } else {
         const { user } = await createUserWithEmailAndPassword(FirebaseAuth, email, password);
@@ -166,15 +159,9 @@ export const useAuthStore = () => {
     } catch (error) {
       dispatch(logout());
       if (error.code === "auth/email-already-in-use") {
-        dispatch(showSnackbar({
-          message: 'Este correo ya está en uso.',
-          severity: 'success',
-        }));
+        openSnackbar("Este correo ya está en uso.");
       } else {
-        dispatch(showSnackbar({
-          message: 'Error al crear usuario.',
-          severity: 'success',
-        }));
+        openSnackbar("Error al crear usuario.");
       }
       return false;
     }
@@ -187,10 +174,7 @@ export const useAuthStore = () => {
 
   const startChangePassword = async ({ password, confirmPassword }) => {
     if (password !== confirmPassword) {
-      dispatch(showSnackbar({
-        message: 'Las contraseñas no coinciden.',
-        severity: 'error',
-      }));
+      openSnackbar("Las contraseñas no coinciden.");
       return false;
     }
 
@@ -199,28 +183,20 @@ export const useAuthStore = () => {
       await updatePassword(user, password);
       await userApi.patch(`/reset-password-flag/${uid}`);
       dispatch(authenticated());
-      dispatch(showSnackbar({
-        message: 'Contraseña actualizada exitosamente.',
-        severity: 'success',
-      }));
+      openSnackbar("Contraseña actualizada exitosamente.");
       return true;
     } catch (error) {
       if (error.code === "auth/requires-recent-login") {
-        dispatch(showSnackbar({
-          message: 'Por seguridad, vuelve a iniciar sesión para cambiar tu contraseña.',
-          severity: 'error',
-        }));
+        openSnackbar("Por seguridad, vuelve a iniciar sesión para cambiar tu contraseña.");
       } else {
-        dispatch(showSnackbar({
-          message: 'Error al cambiar la contraseña.',
-          severity: 'error',
-        }));
+        openSnackbar("Error al cambiar la contraseña.");
       }
       return false;
     }
   }
 
   return { 
+    // state
     status, 
     uid, 
     email, 
@@ -228,7 +204,7 @@ export const useAuthStore = () => {
     photoURL, 
     role,
     
-    checkingAuthentication, 
+    // actions
     onGoogleSignIn, 
     startLogin, 
     startRegisterUser,

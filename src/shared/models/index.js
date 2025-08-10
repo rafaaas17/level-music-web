@@ -1,7 +1,5 @@
 export * from './client';
 export * from './event';
-export * from './firebase';
-export * from './mail';
 export * from './provider';
 export * from './resource';
 export * from './service';

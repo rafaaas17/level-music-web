@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { firebaseAuthApi, mailApi, userApi } from "../../api";
+import { userApi } from "../../api";
 import {
   refreshClients,
   selectedClient,
@@ -10,13 +10,10 @@ import {
 } from "../../store";
 import { 
   createClientModel, 
-  createFirebaseUserModel, 
-  createTemporalCredentialsMailModel, 
   updateClientModel, 
-  updateFirebaseUserModel
 } from "../../shared/models";
+import { getAuthConfig, getAuthConfigWithParams } from "../../shared/utils";
 import { useState } from "react";
-import { generateRandomPassword } from '../../shared/utils';
 
 export const useClientStore = () => {
   const dispatch = useDispatch();
@@ -28,33 +25,26 @@ export const useClientStore = () => {
     currentPage,
     rowsPerPage,
   } = useSelector((state) => state.client);
+  
+  const { token } = useSelector((state) => state.auth);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [orderBy, setOrderBy] = useState('name');
   const [order, setOrder] = useState('asc');
 
+  const openSnackbar = (message) => dispatch(showSnackbar({ message }));
+
   const startCreateClient = async (client) => {
     dispatch(setLoadingClient(true));
     try {
-      const password = generateRandomPassword();
-      const newFirebaseUser = createFirebaseUserModel(client, password);
-      const { data } = await firebaseAuthApi.post("/", newFirebaseUser);
-      const newClient = createClientModel(data.uid, client);
-      await userApi.post("/", newClient);
-      const credentialsMail = createTemporalCredentialsMailModel(client, password);
-      await mailApi.post("send-temporal-credentials", credentialsMail);
+      const payload = createClientModel(client);
+      await userApi.post("/client-admin", payload, getAuthConfig(token));
       await startLoadingClientsPaginated();
-      dispatch(showSnackbar({
-        message: `El cliente fue creado exitosamente.`,
-        severity: 'success',
-      }));
+      openSnackbar("El cliente fue creado exitosamente.");
       return true;
     } catch (error) {
-      let errorMessage = 'Ocurrió un error al crear el cliente.';
-      if (error?.response?.data?.message?.includes('duplicate key error')) {
-        errorMessage = 'El correo electrónico ya está registrado.';
-      }
-      dispatch(showSnackbar({ message: errorMessage, severity: 'error' }));
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al registrar el cliente.");
       return false;
     } finally {
       dispatch(setLoadingClient(false));
@@ -62,52 +52,45 @@ export const useClientStore = () => {
   };
 
   const startLoadingClientsPaginated = async () => {
-      dispatch(setLoadingClient(true));
-      try {
-        const limit  = rowsPerPage;
-        const offset = currentPage * rowsPerPage;
-        const { data } = await userApi.get('/customers-paginated', {
-          params: {
-            limit,
-            offset,
-            search: searchTerm.trim(),
-            sortField: orderBy,
-            sortOrder: order,
-          },
-        });
-        dispatch(refreshClients({
-          items: data.items,
-          total: data.total,
-          page:  currentPage,
-        }));
-        return true;
-      } catch (error) {
-        console.log(error);
-        return false;
-      } finally {
-        dispatch(setLoadingClient(false));
-      }
-    };
+    dispatch(setLoadingClient(true));
+    try {
+      const limit = rowsPerPage;
+      const offset = currentPage * rowsPerPage;
+      const { data } = await userApi.get("/customers-paginated", 
+        getAuthConfigWithParams(token, {
+          limit,
+          offset,
+          search: searchTerm.trim(),
+          sortField: orderBy,
+          sortOrder: order,
+        })
+      );
+      dispatch(refreshClients({
+        items: data.items,
+        total: data.total,
+        page: currentPage,
+      }));
+      return true;
+    } catch (error) {
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al cargar los clientes.");
+      return false;
+    } finally {
+      dispatch(setLoadingClient(false));
+    }
+  };
 
   const startUpdateClient = async (id, client) => {
     dispatch(setLoadingClient(true));
     try {
       const payload = updateClientModel(client);
-      await userApi.put(`/${id}`, payload);
-      const updatedClient = updateFirebaseUserModel(client);
-      await firebaseAuthApi.patch(`/${client.auth_id}`, updatedClient);
+      await userApi.put(`/${id}`, payload, getAuthConfig(token));
       await startLoadingClientsPaginated();
-      dispatch(showSnackbar({
-        message: `El cliente fue actualizado exitosamente.`,
-        severity: 'success',
-      }));
+      openSnackbar("El cliente fue actualizado exitosamente.");
       return true;
     } catch (error) {
-      let errorMessage = 'Ocurrió un error al actualizar el cliente.';
-      if (error?.response?.data?.message?.includes('duplicate key error')) {
-        errorMessage = 'El correo electrónico ya está registrado.';
-      }
-      dispatch(showSnackbar({ message: errorMessage, severity: 'error' }));
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al actualizar el cliente.");
       return false;
     } finally {
       dispatch(setLoadingClient(false));

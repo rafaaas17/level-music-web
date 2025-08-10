@@ -13,6 +13,8 @@ export const useUsersStore = () => {
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.users);
 
+  const openSnackbar = (message) => dispatch(showSnackbar({ message }));
+
   const startCreateUser = async (user, role, model) => {
     dispatch(setLoadingUser(true));
     try {
@@ -24,38 +26,13 @@ export const useUsersStore = () => {
       const { data } = await userApi.post("/", newUser);
       return { ok: true, data };
     } catch (error) {
-      console.log(error);
-      dispatch(showSnackbar({
-        message: `Ocurrió un error al crear el usuario.`,
-        severity: 'error', 
-      }));
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al registrar el cliente.");
       return false;
     } finally {
       dispatch(setLoadingUser(false));
     }
   };
-
-  const startCreateUserFromAdmin = async (user, role) => {
-    dispatch(setLoadingUser(true));
-    try {
-      const newUser = createUserEmailPasswordModel(user, role, { needs_password_change: true });
-      await userApi.post("/", newUser);
-      dispatch(showSnackbar({
-        message: `El usuario fue creado exitosamente.`,
-        severity: 'success',
-      }));
-      return true;
-    } catch (error) {
-      console.log(error);
-      dispatch(showSnackbar({
-        message: `Ocurrió un error al crear el usuario.`,
-        severity: 'error', 
-      }));
-      return false;
-    } finally {
-      dispatch(setLoadingUser(false));
-    }
-  }
 
   const findUserByEmail = async (email) => {
     try {
@@ -75,7 +52,6 @@ export const useUsersStore = () => {
 
     // actions
     startCreateUser,
-    startCreateUserFromAdmin,
     findUserByEmail
   };
 };

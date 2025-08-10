@@ -10,6 +10,7 @@ import {
 import { createProviderModel, updateProviderModel } from "../../shared/models";
 import { useState } from "react";
 import { providerApi } from "../../api";
+import { getAuthConfig, getAuthConfigWithParams } from "../../shared/utils";
 
 export const useProviderStore = () => {
   const dispatch = useDispatch();
@@ -22,32 +23,25 @@ export const useProviderStore = () => {
     rowsPerPage,
   } = useSelector((state) => state.provider);
 
+  const { token } = useSelector((state) => state.auth);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [orderBy, setOrderBy] = useState("name");
   const [order, setOrder] = useState("asc");
+
+  const openSnackbar = (message) => dispatch(showSnackbar({ message }));
 
   const startCreateProvider = async (provider) => {
     dispatch(setLoadingProvider(true));
     try {
       const payload = createProviderModel(provider);
-      console.log(payload);
-      await providerApi.post("/", payload);
+      await providerApi.post("/", payload, getAuthConfig(token));
       startLoadingProviderPaginated();
-      dispatch(
-        showSnackbar({
-          message: `El proveedor fue creado exitosamente.`,
-          severity: "success",
-        })
-      );
+      openSnackbar("El proveedor fue creado exitosamente.");
       return true;
     } catch (error) {
-      console.log(error);
-      dispatch(
-        showSnackbar({
-          message: `Ocurrió un error al crear el proveedor.`,
-          severity: "error",
-        })
-      );
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al crear el proveedor.");
       return false;
     } finally {
       dispatch(setLoadingProvider(false));
@@ -59,15 +53,15 @@ export const useProviderStore = () => {
     try {
       const limit = rowsPerPage;
       const offset = currentPage * rowsPerPage;
-      const { data } = await providerApi.get("/paginated", {
-        params: { 
-          limit, 
+      const { data } = await providerApi.get("/paginated", 
+        getAuthConfigWithParams(token, {
+          limit,
           offset,
-          search: searchTerm.trim(), 
-          sortField: orderBy, 
-          sortOrder: order,  
-        },
-      });
+          search: searchTerm.trim(),
+          sortField: orderBy,
+          sortOrder: order,
+        })
+      );
       dispatch(refreshProvider({
         items: data.items,
         total: data.total,
@@ -75,7 +69,8 @@ export const useProviderStore = () => {
       }));
       return true;
     } catch (error) {
-      console.log(error);
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al cargar los tipos de servicio.");
       return false;
     } finally {
       dispatch(setLoadingProvider(false));
@@ -86,23 +81,13 @@ export const useProviderStore = () => {
     dispatch(setLoadingProvider(true));
     try {
       const payload = updateProviderModel(provider);
-      await providerApi.put(`/${id}`, payload);
+      await providerApi.put(`/${id}`, payload, getAuthConfig(token));
       startLoadingProviderPaginated();
-      dispatch(
-        showSnackbar({
-          message: `El proveedor fue actualizado exitosamente.`,
-          severity: "success",
-        })
-      );
+      openSnackbar("El proveedor fue actualizado exitosamente.");
       return true;
     } catch (error) {
-      console.log(error);
-      dispatch(
-        showSnackbar({
-          message: `Ocurrió un error al actualizar el proveedor.`,
-          severity: "error",
-        })
-      );
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al actualizar el tipo de servicio.");
       return false;
     } finally {
       dispatch(setLoadingProvider(false));
@@ -122,7 +107,7 @@ export const useProviderStore = () => {
   };
 
 return {
-
+    // state
     provider,
     selected,
     total,
@@ -133,16 +118,17 @@ return {
     orderBy,
     order,
 
+    // setters
     setSearchTerm,
     setOrderBy,
     setOrder,
     setPageGlobal,
     setRowsPerPageGlobal,
     
+    // actions
     startCreateProvider,
     startLoadingProviderPaginated,
     startUpdateProvider,
     setSelectedProvider,
-    
   };
 }

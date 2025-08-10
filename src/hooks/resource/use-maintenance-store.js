@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { maintenanceApi } from "../../api";
+import { createMaintenanceModel, updateMaintenanceStatusModel } from "../../shared/models";
 import {
   refreshMaintenance,
   selectedMaintenance,
@@ -9,7 +9,8 @@ import {
   showSnackbar,
 } from "../../store";
 import { useState } from "react";
-import { createMaintenanceModel, updateMaintenanceStatusModel } from "../../shared/models";
+import { maintenanceApi } from "../../api";
+import { getAuthConfig, getAuthConfigWithParams } from "../../shared/utils";
 
 export const useMaintenanceStore = () => {
   const dispatch = useDispatch();
@@ -22,9 +23,11 @@ export const useMaintenanceStore = () => {
     rowsPerPage,
   } = useSelector((state) => state.maintenance);
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [orderBy, setOrderBy] = useState("date");
-  const [order, setOrder] = useState("desc");
+  const { token } = useSelector((state) => state.auth);
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [orderBy, setOrderBy] = useState('date');
+  const [order, setOrder] = useState('desc');
 
   const openSnackbar = (message) => dispatch(showSnackbar({ message }));
 
@@ -32,7 +35,7 @@ export const useMaintenanceStore = () => {
     dispatch(setLoadingMaintenance(true));
     try {
       const payload = createMaintenanceModel(maintenance)
-      await maintenanceApi.post("/", payload);
+      await maintenanceApi.post("/", payload, getAuthConfig(token));
       await startLoadingMaintenancesPaginated();
       openSnackbar("El mantenimiento fue creado exitosamente.");
       return true;
@@ -50,15 +53,15 @@ export const useMaintenanceStore = () => {
     try {
       const limit = rowsPerPage;
       const offset = currentPage * rowsPerPage;
-      const { data } = await maintenanceApi.get("/paginated", {
-        params: {
+      const { data } = await maintenanceApi.get("/paginated", 
+        getAuthConfigWithParams(token, {
           limit,
           offset,
           search: searchTerm.trim(),
           sortField: orderBy,
           sortOrder: order,
-        },
-      });
+        })
+      );
       dispatch(
         refreshMaintenance({
           items: data.items,
@@ -68,6 +71,8 @@ export const useMaintenanceStore = () => {
       );
       return true;
     } catch (error) {
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al cargar los mantenimientos.");
       return false;
     } finally {
       dispatch(setLoadingMaintenance(false));
@@ -78,12 +83,11 @@ export const useMaintenanceStore = () => {
     dispatch(setLoadingMaintenance(true));
     try {
       const payload = updateMaintenanceStatusModel(maintenance)
-      await maintenanceApi.patch(`/${id}/status`, payload)
+      await maintenanceApi.patch(`/${id}/status`, payload, getAuthConfig(token))
       await startLoadingMaintenancesPaginated();
       openSnackbar("El estado del mantenimiento fue modificado exitosamente.");
       return true;
     } catch (error) {
-      console.log(error);
       const message = error.response?.data?.message;
       openSnackbar(message ?? "Ocurrió un error al modificar el estado del mantenimiento.");
       return false;
