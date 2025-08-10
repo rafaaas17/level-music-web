@@ -3,4 +3,8 @@ export const updateEventTypeModel = (eventType) => ({
   type: eventType.type,
   category: eventType.category,
   status: eventType.status,
+  attributes: eventType.attributes.map(attr => ({
+    name: attr.name,
+    description: attr.description,
+  })),
 });

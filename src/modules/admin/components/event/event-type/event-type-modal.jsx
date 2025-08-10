@@ -1,32 +1,30 @@
-import { useEffect, useMemo, useState } from "react";
 import {
+  Modal,
   Box,
+  Typography,
+  TextField,
   Button,
   IconButton,
-  Modal,
-  TextField,
-  Typography,
+  MenuItem,
+  Select,
   FormControl,
   InputLabel,
-  Select,
-  MenuItem,
-  FormHelperText,
-  Checkbox,
 } from "@mui/material";
 import { Close, Delete, Edit } from "@mui/icons-material";
-import {  useFieldArray, useForm } from "react-hook-form";
-import { useServiceTypeStore } from "../../../../../hooks";
-import { ServiceTypeFieldModal } from "./service-type-field-modal";
+import { useEventTypeStore } from "../../../../../hooks";
+import { useMemo, useEffect, useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
+import { EventTypeFieldModal } from "./event-type-field-modal";
 
-export const ServiceTypeModal = ({
+export const EventTypeModal = ({
   open,
   onClose,
-  serviceType = {},
-  setServiceType,
+  eventType = {},
+  setEventType,
   loading,
 }) => {
-  const isEditing = !!serviceType?._id;
-  const { startCreateServiceType, startUpdateServiceType } = useServiceTypeStore();
+  const isEditing = !!eventType?._id;
+  const { startCreateEventType, startUpdateEventType } = useEventTypeStore();
 
   const {
     register,
@@ -39,8 +37,9 @@ export const ServiceTypeModal = ({
   } = useForm({
     mode: "onBlur",
     defaultValues: {
-      name: "",
+      type: "",
       description: "",
+      category: "",
       status: "Activo",
       attributes: [],
     },
@@ -54,25 +53,26 @@ export const ServiceTypeModal = ({
   useEffect(() => {
     if (open) {
       reset({
-        name: serviceType?.name ?? "",
-        description: serviceType?.description ?? "",
-        status: serviceType?.status ?? "Activo",
-        attributes: serviceType?.attributes ?? [],
+        type: eventType?.type ?? "",
+        description: eventType?.description ?? "",
+        category: eventType?.category ?? "",
+        status: eventType?.status ?? "Activo",
+        attributes: eventType?.attributes ?? [],
       });
     }
-  }, [open, reset, serviceType]);
+  }, [open, reset, eventType]);
 
   const onSubmit = async (data) => {
     try {
       const success = isEditing
-        ? await startUpdateServiceType(serviceType._id, data)
-        : await startCreateServiceType(data);
+        ? await startUpdateEventType(eventType._id, data)
+        : await startCreateEventType(data);
       if (success) {
-        setServiceType(data);
+        setEventType(data);
         onClose();
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
 
@@ -105,14 +105,13 @@ export const ServiceTypeModal = ({
 
   return (
     <>
-      <ServiceTypeFieldModal
+      <EventTypeFieldModal
         open={fieldModalOpen}
         onClose={() => setFieldModalOpen(false)}
         onSubmit={handleFieldSubmit}
         field={selectedField}
         index={editingIndex}
       />
-
       <Modal open={open} onClose={onClose}>
         <Box
           component="form"
@@ -129,49 +128,82 @@ export const ServiceTypeModal = ({
             p: 4,
           }}
         >
-          {/* Encabezado */}
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={3}
+          >
             <Typography variant="h6" fontWeight={600}>
-              {isEditing ? "Editar Tipo de Servicio" : "Agregar Tipo de Servicio"}
+              {isEditing ? "Editar evento" : "Agregar evento"}
             </Typography>
             <IconButton onClick={onClose}>
               <Close />
             </IconButton>
           </Box>
 
-          {/* Campos básicos */}
-          <Box display="flex" flexDirection="column" gap={2} mb={2}>
+          <Box display="flex" gap={2} mb={2} sx={{ flexDirection: "column" }}>
+            {/* Nombre */}
             <TextField
               label="Nombre"
               fullWidth
-              {...register("name", { required: "El nombre es obligatorio" })}
-              error={Boolean(errors.name)}
-              helperText={errors.name?.message}
+              value={eventType?.type || ""}
+              onChange={(e) =>
+                setEventType({ ...eventType, type: e.target.value })
+              }
             />
+
+            {/* Descripcion */}
             <TextField
               label="Descripción"
               fullWidth
-              {...register("description", { required: "La descripción es obligatoria" })}
-              error={Boolean(errors.description)}
-              helperText={errors.description?.message}
+              value={eventType?.description || ""}
+              onChange={(e) =>
+                setEventType({ ...eventType, description: e.target.value })
+              }
             />
-            <FormControl fullWidth error={Boolean(errors.status)}>
+
+            {/* Categoria */}
+            <FormControl fullWidth>
+              <InputLabel id="category-label">Categoria</InputLabel>
+              <Select
+                labelId="category-label"
+                id="category"
+                value={eventType?.category || "Social"}
+                onChange={(e) =>
+                  setEventType({ ...eventType, category: e.target.value })
+                }
+              >
+                <MenuItem value="Social">Social</MenuItem>
+                <MenuItem value="Corporativo">Corporativo</MenuItem>
+              </Select>
+            </FormControl>
+
+            {/* Estado */}
+            <FormControl fullWidth>
               <InputLabel id="status-label">Estado</InputLabel>
               <Select
                 labelId="status-label"
-                value={watch("status") || "Activo"}
-                {...register("status", { required: "Selecciona un estado" })}
-                onChange={(e) => setValue("status", e.target.value)}
+                id="status"
+                value={eventType?.status || "Activo"}
+                onChange={(e) =>
+                  setEventType({ ...eventType, status: e.target.value })
+                }
               >
                 <MenuItem value="Activo">Activo</MenuItem>
                 <MenuItem value="Inactivo">Inactivo</MenuItem>
               </Select>
-              <FormHelperText>{errors.status?.message}</FormHelperText>
             </FormControl>
           </Box>
 
           {/* Sección de atributos */}
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} mt={1}>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={2}
+            mt={1}
+          >
             <Typography fontSize={18} fontWeight={500}>
               Estructura de campos
             </Typography>
@@ -190,7 +222,7 @@ export const ServiceTypeModal = ({
                 fontWeight: 600,
               }}
             >
-              + Agregar campo
+              + Agregar tarea
             </Button>
           </Box>
 
@@ -206,7 +238,12 @@ export const ServiceTypeModal = ({
             }}
           >
             {fields.length === 0 ? (
-              <Typography textAlign="center" color="text.secondary" fontSize={14} my={3}>
+              <Typography
+                textAlign="center"
+                color="text.secondary"
+                fontSize={14}
+                my={3}
+              >
                 No hay campos disponibles. Agrega un nuevo campo.
               </Typography>
             ) : (
@@ -215,7 +252,9 @@ export const ServiceTypeModal = ({
                   key={field.id}
                   sx={{
                     border: (theme) =>
-                      `1px solid ${theme.palette.mode === "dark" ? "#494949" : "#C4C4C4"}`,
+                      `1px solid ${
+                        theme.palette.mode === "dark" ? "#494949" : "#C4C4C4"
+                      }`,
                     display: "flex",
                     justifyContent: "space-between",
                     borderRadius: 3,
@@ -225,28 +264,25 @@ export const ServiceTypeModal = ({
                 >
                   <Box display="flex" flexDirection="column" gap={1}>
                     <Typography fontWeight={600} fontSize={14}>
-                      Campo
+                      Tarea
                     </Typography>
                     <Typography>{field.name}</Typography>
-                    <Typography fontWeight={600} fontSize={14}>
-                      Tipo de dato
-                    </Typography>
-                    <Typography>{field.type}</Typography>
                   </Box>
-                  <Box display="flex" flexDirection="column" justifyContent="space-between">
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    justifyContent="space-between"
+                  >
                     <Box display="flex" gap={1} justifyContent="flex-end">
-                      <IconButton onClick={() => handleEditField(field, index)} size="small">
+                      <IconButton
+                        onClick={() => handleEditField(field, index)}
+                        size="small"
+                      >
                         <Edit fontSize="small" />
                       </IconButton>
                       <IconButton onClick={() => remove(index)} size="small">
                         <Delete fontSize="small" />
                       </IconButton>
-                    </Box>
-                    <Box display="flex" gap={1} alignItems="center">
-                      <Typography fontWeight={600} fontSize={14}>
-                        Requerido:
-                      </Typography>
-                      <Checkbox checked={field.required} disabled size="small" />
                     </Box>
                   </Box>
                 </Box>
@@ -254,7 +290,6 @@ export const ServiceTypeModal = ({
             )}
           </Box>
 
-          {/* Botón enviar */}
           <Button
             type="submit"
             variant="contained"

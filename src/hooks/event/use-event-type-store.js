@@ -13,6 +13,7 @@ import {
   updateEventTypeModel
 } from '../../shared/models';
 import { useState } from 'react';
+import { getAuthConfig } from '../../shared/utils';
 
 export const useEventTypeStore = () => {
   const dispatch = useDispatch();
@@ -25,27 +26,25 @@ export const useEventTypeStore = () => {
     rowsPerPage 
   } = useSelector((state) => state.eventType);
 
+  const { token } = useSelector((state) => state.auth);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [orderBy, setOrderBy] = useState('description');
   const [order, setOrder] = useState('asc');
+
+  const openSnackbar = (message) => dispatch(showSnackbar({ message }));
 
   const startCreateEventType = async (eventType) => {
     dispatch(setLoadingEventType(true));
     try {
       const payload = createEventTypeModel(eventType);
-      await eventTypeApi.post('/', payload);
+      await eventTypeApi.post('/', payload, getAuthConfig(token));
       startLoadingEventTypePaginated();
-      dispatch(showSnackbar({
-        message: `El tipo de evento fue creado exitosamente.`,
-        severity: 'success',
-      }));
+      openSnackbar("El tipo de evento fue creado exitosamente.");
       return true;
     } catch (error) {
-      console.log(error);
-      dispatch(showSnackbar({
-        message: `Ocurrió un error al crear el tipo de evento.`,
-        severity: 'error', 
-      }));
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al crear los tipos de evento.");
       return false;
     } finally {
       dispatch(setLoadingEventType(false));
@@ -57,15 +56,16 @@ export const useEventTypeStore = () => {
     try {
       const limit  = rowsPerPage;
       const offset = currentPage * rowsPerPage;
-      const { data } = await eventTypeApi.get('/paginated', {
-        params: {
+      const { data } = await eventTypeApi.get('/paginated',
+        getAuthConfig(token, {
+        
           limit,
           offset,
           search: searchTerm.trim(),
           sortField: orderBy,
           sortOrder: order,
-        },
-      });
+        })
+      );
       dispatch(refreshEventType({
         items: data.items,
         total: data.total,
@@ -73,7 +73,8 @@ export const useEventTypeStore = () => {
       }));
       return true;
     } catch (error) {
-      console.log(error);
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al cargar los tipos de evento.");
       return false;
     } finally {
       dispatch(setLoadingEventType(false));
@@ -84,32 +85,29 @@ export const useEventTypeStore = () => {
     dispatch(setLoadingEventType(true));
     try {
       const payload = updateEventTypeModel(eventType);
-      await eventTypeApi.put(`/${id}`, payload);
+      await eventTypeApi.put(`/${id}`, payload, getAuthConfig(token));
       startLoadingEventTypePaginated();
-      dispatch(showSnackbar({
-        message: `El tipo de evento fue actualizado exitosamente.`,
-        severity: 'success',
-      }));
+      openSnackbar("El tipo de evento fue actualizado exitosamente.");
       return true;
     } catch (error) {
-      console.log(error);
-      dispatch(showSnackbar({
-        message: `Ocurrió un error al actualizar el tipo de evento.`,
-        severity: 'error', 
-      }));
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al actualizar los tipos de evento.");
       return false;
     } finally {
       dispatch(setLoadingEventType(false));
     }
   };
 
+  const validateAttributes = (attributes) => {
+    if (attributes.length === 0) {
+      openSnackbar("Debe agregar al menos un atributo al tipo de servicio.");
+      return false;
+    } 
+    return true;
+  };
+
   const setSelectedEventType = (eventType) => {
-    // Si no hay eventType, limpiar el seleccionado
-    if (!eventType) {
-      dispatch(selectedEventType(null));
-    } else {
-      dispatch(selectedEventType({ ...eventType }));
-    }
+    dispatch(selectedEventType({ ...eventType }));
   };
 
   const setPageGlobal = (page) => {
@@ -144,5 +142,6 @@ export const useEventTypeStore = () => {
     startLoadingEventTypePaginated,
     startUpdateEventType,
     setSelectedEventType,
+    validateAttributes
   };
 };
