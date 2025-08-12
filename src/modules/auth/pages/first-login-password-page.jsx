@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { Button, useTheme, CircularProgress } from "@mui/material";
+import { Button, useTheme } from "@mui/material";
 import { AuthLayout } from "../layout/auth-layout";
 import { FormInputText } from "../../../shared/ui/components";
 import { useAuthStore } from "../../../hooks";
 
-export const ChangePasswordPage = () => {
+export const FirstLoginPassword = () => {
   const theme = useTheme();
   const { status, startChangePassword } = useAuthStore();
   

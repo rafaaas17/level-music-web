@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 export const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    status: 'not-authenticated', // 'authenticated' | 'not-authenticated' | 'checking' | 'change-password'
+    status: 'not-authenticated', // 'authenticated' | 'not-authenticated' | 'checking' | 'first-login-password'
     uid: null, 
     email: null,
     firstName: null,
@@ -36,7 +36,7 @@ export const authSlice = createSlice({
       state.userStatus = payload.userStatus;
       state.photoURL = payload.photoURL; 
       state.token = payload.token;
-      state.status = payload.needs_password_change ? "change-password" : "authenticated";
+      state.status = payload.needs_password_change ? "fisrt-login-password" : "authenticated";
     },
     logout: (state) => {
       state.status = 'not-authenticated';

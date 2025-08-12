@@ -1,10 +1,21 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { Drawer, Box, List, ListItem, ListItemButton, ListItemText, useTheme, Divider, ListItemIcon, Switch } from '@mui/material';
+import {
+  Drawer,
+  Box,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  useTheme,
+  Divider,
+  ListItemIcon,
+  Switch,
+} from "@mui/material";
 import { sections } from '../../../constants/custom/nav-sections';
 import { Link, useNavigate } from 'react-router-dom';
 import { Login, Logout, Brightness7, Brightness4 } from '@mui/icons-material'; 
 import { toggleTheme } from '../../../../store';
-import { useAuthStore } from '../../../../hooks'; // Importa el hook para manejar la autenticación
+import { useAuthStore } from '../../../../hooks';
 
 export const LandingDrawer = ({ drawerOpen, handleDrawerToggle }) => {
   const theme = useTheme();
@@ -19,7 +30,7 @@ export const LandingDrawer = ({ drawerOpen, handleDrawerToggle }) => {
     handleDrawerToggle(); 
   };
 
-  const isLoggedIn = status === 'authenticated' || status === 'change-password';
+  const isLoggedIn = status === 'authenticated' || status === 'first-login-password';
 
   return (
     <Drawer
