@@ -6,6 +6,7 @@ import {
   GoogleAuthProvider,
   signOut,
   updatePassword,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { FirebaseAuth } from '../../modules/auth/firebase/config';
 import { 
@@ -195,6 +196,33 @@ export const useAuthStore = () => {
     }
   }
 
+  const startPasswordReset = async (data) => {
+    try {
+      console.log("startPasswordReset", data);
+      dispatch(checkingCredentials());
+
+      // Toma la URL base desde variables de entorno
+      const appUrl = import.meta.env.VITE_APP_URL;
+
+      await sendPasswordResetEmail(FirebaseAuth, data.email, {
+        url: appUrl, // Firebase redirige aquí después del clic en el correo
+      });
+
+      openSnackbar("Se envió un enlace para restablecer tu contraseña a tu correo.");
+      return true;
+    } catch (error) {
+      console.error(error);
+      if (error.code === "auth/user-not-found") {
+        openSnackbar("No existe una cuenta con ese correo.");
+      } else if (error.code === "auth/invalid-email") {
+        openSnackbar("El email no es válido.");
+      } else {
+        openSnackbar("Error al enviar el correo de restablecimiento.");
+      }
+      return false;
+    }
+  };
+
   return { 
     // state
     status, 
@@ -209,6 +237,7 @@ export const useAuthStore = () => {
     startLogin, 
     startRegisterUser,
     onLogout,
-    startChangePassword
+    startChangePassword,
+    startPasswordReset
   };
 };

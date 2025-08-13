@@ -12,7 +12,7 @@ export const AuthButtons = () => {
 
   const handleLogout = () => onLogout() && navigate('/auth/login');
 
-  const isLoggedIn = status === 'authenticated' || status === 'change-password';
+  const isLoggedIn = status === 'authenticated' || status === 'first-login-password';
 
   if (isLoggedIn) {
     return (

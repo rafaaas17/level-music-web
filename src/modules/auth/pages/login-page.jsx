@@ -64,7 +64,7 @@ export const LoginPage = () => {
 
         <Box sx={{ display: "flex", justifyContent: "flex-end", my: 2 }}>
           <Link 
-            to="/forgot-password" 
+            to="/auth/forgot-password" 
             style={{ 
               color: theme.palette.text.primary, 
               textDecoration: "underline",
