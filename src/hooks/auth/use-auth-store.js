@@ -199,19 +199,17 @@ export const useAuthStore = () => {
   const startPasswordReset = async (data) => {
     try {
       console.log("startPasswordReset", data);
-      dispatch(checkingCredentials());
 
-      // Toma la URL base desde variables de entorno
       const appUrl = import.meta.env.VITE_APP_URL;
 
       await sendPasswordResetEmail(FirebaseAuth, data.email, {
-        url: appUrl, // Firebase redirige aquí después del clic en el correo
+        url: appUrl, 
       });
 
       openSnackbar("Se envió un enlace para restablecer tu contraseña a tu correo.");
       return true;
     } catch (error) {
-      console.error(error);
+      console.log(error);
       if (error.code === "auth/user-not-found") {
         openSnackbar("No existe una cuenta con ese correo.");
       } else if (error.code === "auth/invalid-email") {
