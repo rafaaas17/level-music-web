@@ -9,5 +9,6 @@ export const usePersistRoute = () => {
     if (!location.pathname.startsWith('/auth') || location.pathname.startsWith('/auth/first-login-password')) {
       sessionStorage.setItem('lastRoute', location.pathname);
     }
+    console.log(location)
   }, [location.pathname]);
 };

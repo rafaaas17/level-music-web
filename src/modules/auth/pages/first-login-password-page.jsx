@@ -7,7 +7,7 @@ import { useAuthStore } from "../../../hooks";
 
 export const FirstLoginPassword = () => {
   const theme = useTheme();
-  const { status, startChangePassword } = useAuthStore();
+  const { status, startChangePasswordFirstLogin } = useAuthStore();
   
   const {
     handleSubmit,
@@ -20,13 +20,13 @@ export const FirstLoginPassword = () => {
   const isAuthenticated = useMemo(() => status === "checking", [status]);
 
   const onSubmit = async (data) => {
-    await startChangePassword(data);
+    await startChangePasswordFirstLogin(data);
   };
 
   return (
     <AuthLayout
       title="Cambiar contraseña"
-      subtitle="Por seguridad, debes cambiar tu contraseña antes de continuar."
+      subtitle="La contraseña debe tener entre 6 y 12 caracteres, incluir letras, números y al menos un caracter especial (!$@%)."
     >
       <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
         {/* Nueva contraseña */}
@@ -39,7 +39,11 @@ export const FirstLoginPassword = () => {
           rules={{ 
             required: "La contraseña es obligatoria",
             minLength: { value: 6, message: "Mínimo 6 caracteres" },
-            maxLength: { value: 12, message: "Máximo 12 caracteres" }
+            maxLength: { value: 12, message: "Máximo 12 caracteres" },
+            pattern: {
+              value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!$@%])[A-Za-z\d!$@%]{6,12}$/,
+              message: "Debe incluir letras, números y al menos un caracter especial (!$@%)"
+            }
           }}
         />
 
@@ -53,10 +57,15 @@ export const FirstLoginPassword = () => {
           rules={{ 
             required: "La contraseña es obligatoria",
             minLength: { value: 6, message: "Mínimo 6 caracteres" },
-            maxLength: { value: 12, message: "Máximo 12 caracteres" }
+            maxLength: { value: 12, message: "Máximo 12 caracteres" },
+            pattern: {
+              value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!$@%])[A-Za-z\d!$@%]{6,12}$/,
+              message: "Debe incluir letras, números y al menos un caracter especial (!$@%)"
+            }
           }}
         />
 
+        {/* Botón de actualizar contraseña */}
         <Button
           type="submit"
           fullWidth

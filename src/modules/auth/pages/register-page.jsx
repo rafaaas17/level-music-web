@@ -62,7 +62,11 @@ export const RegisterPage = () => {
           rules={{ 
             required: "La contraseña es obligatoria",
             minLength: { value: 6, message: "Mínimo 6 caracteres" },
-            maxLength: { value: 12, message: "Máximo 12 caracteres" }
+            maxLength: { value: 12, message: "Máximo 12 caracteres" },
+            pattern: {
+              value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!$@%])[A-Za-z\d!$@%]{6,12}$/,
+              message: "Debe incluir letras, números y al menos un caracter especial (!$@%)"
+            }
           }}
           isPasswordInput
         />
@@ -84,7 +88,9 @@ export const RegisterPage = () => {
         >
           Registrarse
         </Button>
+
         <Typography sx={{ my: 3, textAlign: 'center' }}>O crea una cuenta con</Typography>
+        
         <Button
           fullWidth
           variant="text"
@@ -103,6 +109,7 @@ export const RegisterPage = () => {
           <Box component="img" src={googleLogo} alt="Google Logo" sx={{ width: 24, height: 24, mr: 1 }} />
           <Typography sx={{ ml: 1 }}>Continuar con Gmail</Typography>
         </Button>
+        
         <Typography sx={{ mt: 1, textAlign: 'center' }}>
           ¿Ya tienes cuenta?{' '}
           <Link 

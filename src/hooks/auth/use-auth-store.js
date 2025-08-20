@@ -6,7 +6,9 @@ import {
   GoogleAuthProvider,
   signOut,
   updatePassword,
-  sendPasswordResetEmail
+  getAuth,
+  verifyPasswordResetCode,
+  confirmPasswordReset,
 } from 'firebase/auth';
 import { FirebaseAuth } from '../../modules/auth/firebase/config';
 import { 
@@ -14,10 +16,14 @@ import {
   login, 
   logout,
   showSnackbar,
-  authenticated
+  authenticated,
+  sendingResetEmail,
+  resetEmailSent,
+  changingPassword
 } from '../../store';
 import { useUsersStore } from '../../hooks';
 import { userApi } from '../../api';
+import { createRequestPasswordResetModel } from '../../shared/models'
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });
@@ -173,7 +179,7 @@ export const useAuthStore = () => {
     dispatch(logout());
   };
 
-  const startChangePassword = async ({ password, confirmPassword }) => {
+  const startChangePasswordFirstLogin = async ({ password, confirmPassword }) => {
     if (password !== confirmPassword) {
       openSnackbar("Las contraseñas no coinciden.");
       return false;
@@ -198,25 +204,57 @@ export const useAuthStore = () => {
 
   const startPasswordReset = async (data) => {
     try {
-      console.log("startPasswordReset", data);
-
-      const appUrl = import.meta.env.VITE_APP_URL;
-
-      await sendPasswordResetEmail(FirebaseAuth, data.email, {
-        url: appUrl, 
-      });
-
+      dispatch(sendingResetEmail());
+      const payload = createRequestPasswordResetModel(data);
+      await userApi.post('/forgot-password', payload);
       openSnackbar("Se envió un enlace para restablecer tu contraseña a tu correo.");
       return true;
     } catch (error) {
-      console.log(error);
-      if (error.code === "auth/user-not-found") {
-        openSnackbar("No existe una cuenta con ese correo.");
-      } else if (error.code === "auth/invalid-email") {
-        openSnackbar("El email no es válido.");
-      } else {
-        openSnackbar("Error al enviar el correo de restablecimiento.");
+      console.log(error)
+      const message = error.response?.data?.message;
+      openSnackbar(message ?? "Ocurrió un error al restablecer la contraseña.");
+      return false;
+    } finally {
+      dispatch(resetEmailSent());
+    }
+  };
+
+  const startChangePasswordForgot = async ({ password, confirmPassword }) => {
+    if (password !== confirmPassword) {
+      openSnackbar("Las contraseñas no coinciden.");
+      return false;
+    }
+
+    try {
+      dispatch(changingPassword());
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("oobCode");
+      if (!code) {
+        openSnackbar("El enlace de recuperación no es válido.");
+        return false;
       }
+
+      const auth = getAuth();
+
+      const email = await verifyPasswordResetCode(auth, code);
+
+      await confirmPasswordReset(auth, code, password);
+
+      await signInWithEmailAndPassword(auth, email, password);
+
+      await startLogin({ email, password });
+      
+      openSnackbar(`La contraseña de ${email} se ha restablecido exitosamente.`);
+      return true;
+    } catch (error) {
+      if (error.code === "auth/invalid-action-code") {
+        openSnackbar("El enlace de restablecimiento es inválido o ha expirado.");
+      } else if (error.code === "auth/requires-recent-login") {
+        openSnackbar("Por seguridad, vuelve a iniciar sesión para cambiar tu contraseña.");
+      } else {
+        openSnackbar("Error al cambiar la contraseña.");
+      }
+      dispatch(logout());
       return false;
     }
   };
@@ -235,7 +273,8 @@ export const useAuthStore = () => {
     startLogin, 
     startRegisterUser,
     onLogout,
-    startChangePassword,
-    startPasswordReset
+    startChangePasswordFirstLogin,
+    startPasswordReset,
+    startChangePasswordForgot
   };
 };

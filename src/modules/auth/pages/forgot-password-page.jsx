@@ -1,13 +1,15 @@
 import { useForm } from "react-hook-form";
 import { AuthLayout } from "../layout/auth-layout";
 import { FormInputText } from "../../../shared/ui/components";
-import { Typography, Button, Link, useTheme } from "@mui/material";
+import { Typography, Button, useTheme } from "@mui/material";
+import { Link } from "react-router-dom";
 import { useMemo } from "react";
 import { useAuthStore } from "../../../hooks";
 
 export const ForgotPasswordPage = () => {
   const theme = useTheme();
   const { status, startPasswordReset } = useAuthStore();
+
   const {
     handleSubmit,
     formState: { errors, isSubmitting },
@@ -15,15 +17,17 @@ export const ForgotPasswordPage = () => {
   } = useForm({
     mode: "onBlur",
   });
-  const isAuthenticated = useMemo(() => status === "checking", [status]);
+
+  const isAuthenticated = useMemo(() => status === "sending-reset-email", [status]);
+
   const onSubmit = (data) => {
     startPasswordReset(data);
   };
+
   return (
     <AuthLayout
       title="Restablecer contraseña"
       subtitle="Ingresa tu correo para enviarte un enlace de recuperación."
-      isLogin
     >
       <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
         {/* Email */}
@@ -41,6 +45,8 @@ export const ForgotPasswordPage = () => {
             },
           }}
         />
+
+        {/* Botón de restablecer contraseña */}
         <Button
           type="submit"
           fullWidth
@@ -59,10 +65,10 @@ export const ForgotPasswordPage = () => {
           }}
           disabled={isSubmitting || isAuthenticated}
         >
-          Ingresar
+          Restablecer Contraseña
         </Button>
 
-        <Typography sx={{ my: 3, fontSize: 16 }}>
+        <Typography sx={{ my: 4, fontSize: 16 }}>
           ¿Aún no tienes una cuenta?{" "}
           <Link
             to="/auth/register"
@@ -73,6 +79,20 @@ export const ForgotPasswordPage = () => {
             }}
           >
             Crear Cuenta
+          </Link>
+        </Typography>
+
+        <Typography sx={{ fontSize: 16, textAlign: 'center' }}>
+          <Link
+            to="/auth/login"
+            style={{
+              color: theme.palette.text.primary,
+              textDecoration: "underline",
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            Volver al inicio de sesión
           </Link>
         </Typography>
       </form>

@@ -3,7 +3,10 @@ import { createSlice } from '@reduxjs/toolkit';
 export const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    status: 'not-authenticated', // 'authenticated' | 'not-authenticated' | 'checking' | 'first-login-password'
+    status: 'not-authenticated',  // 'authenticated' | 'not-authenticated' | 
+                                  // 'checking' | 'first-login-password' | 
+                                  // 'sending-reset-email' | 'reset-email-sent' | 
+                                  // 'changing-password'
     uid: null, 
     email: null,
     firstName: null,
@@ -60,6 +63,15 @@ export const authSlice = createSlice({
       state.status = 'authenticated';
       state.needs_password_change = false;
     },
+    sendingResetEmail: (state) => {
+      state.status = 'sending-reset-email';
+    },
+    resetEmailSent: (state) => {
+      state.status = 'reset-email-sent';
+    },
+    changingPassword: (state) => {
+      state.status = 'changing-password';
+    },
   }
 });
 
@@ -68,4 +80,7 @@ export const {
   logout, 
   checkingCredentials, 
   authenticated,
+  sendingResetEmail,
+  resetEmailSent,
+  changingPassword,
 } = authSlice.actions;
