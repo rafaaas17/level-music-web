@@ -1,9 +1,13 @@
-import React from 'react';
+import {EventsView01, EventsView02, EventsView03, EventsView04, EventsView05} from "../views/events";
 
 export const EventsPage = () => {
   return (
-    <div>
-      <p>EventsPage</p>
-    </div>
+    <>
+      <EventsView01/>
+      <EventsView02/>
+      <EventsView03/>
+      <EventsView04/>
+      <EventsView05/>
+    </>
   );
 };
