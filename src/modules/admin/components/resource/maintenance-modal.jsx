@@ -10,9 +10,11 @@ import {
   Select,
   MenuItem,
   FormHelperText,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMaintenanceStore, useResourceStore } from "../../../../hooks";
 import { useForm } from "react-hook-form";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -32,6 +34,10 @@ export const MaintenanceModal = ({
   const isChangingStatus = !!maintenance?._id; 
   const { startSearchingResource } = useResourceStore();
   const { startCreateMaintenance, startChangeMaintenanceStatus } = useMaintenanceStore();
+  
+  // Estados para el manejo de la funcionalidad de reagendado
+  const [showRescheduleOptions, setShowRescheduleOptions] = useState(false);
+  const [isRealReschedule, setIsRealReschedule] = useState(false);
 
   const {
     register,
@@ -52,6 +58,9 @@ export const MaintenanceModal = ({
         resourceName: maintenance.resource_name ?? "",
         description: maintenance.description ?? "",
       });
+      // Resetear estados locales
+      setShowRescheduleOptions(false);
+      setIsRealReschedule(false);
     }
     if (isChangingStatus) {
       unregister('serialNumber');
@@ -81,8 +90,8 @@ export const MaintenanceModal = ({
   };
 
   const getStatusOptions = (current) => {
-    if (current === 'Programado') return ['En Progreso', 'Cancelado'];
-    if (current === 'En Progreso') return ['Finalizado', 'Cancelado'];
+    if (current === 'Programado') return ['En Progreso', 'Reagendado'];
+    if (current === 'En Progreso') return ['Finalizado', 'Reagendado'];
     return [];
   };
 
@@ -124,17 +133,19 @@ export const MaintenanceModal = ({
           display="flex"
           justifyContent="space-between"
           alignItems="center"
-          mb={ isChangingStatus ? 2 : 1 }
+          mb={isChangingStatus ? 2 : 1}
         >
           <Typography variant="h6" fontWeight={600}>
-            {isChangingStatus ? "Cambiar estado de mantenimiento" : "Registrar mantenimiento"}
+            {isChangingStatus
+              ? "Cambiar estado de mantenimiento"
+              : "Registrar mantenimiento"}
           </Typography>
           <IconButton onClick={onClose}>
             <Close />
           </IconButton>
         </Box>
 
-        {!isChangingStatus &&
+        {!isChangingStatus && (
           <Box
             display="flex"
             justifyContent="space-between"
@@ -142,11 +153,11 @@ export const MaintenanceModal = ({
             mb={2}
           >
             <Typography sx={{ fontWeight: 300, fontSize: 16 }}>
-              Los mantenimientos registrados en el sistema son exclusivamente de tipo{" "}
-              <span style={{ fontWeight: 600 }}>Correctivo</span>.
+              Los mantenimientos registrados en el sistema son exclusivamente de
+              tipo <span style={{ fontWeight: 600 }}>Correctivo</span>.
             </Typography>
           </Box>
-        }
+        )}
 
         <Box display="flex" gap={2} mb={2} sx={{ flexDirection: "column" }}>
           {!isChangingStatus && (
@@ -177,11 +188,19 @@ export const MaintenanceModal = ({
                   style: { textTransform: "uppercase" },
                 }}
                 onChange={(e) => handleSerialChange(e.target.value)}
-                helperText={ errors.serialNumber?.message ?? "Debe tener 12 caracteres alfanuméricos en mayúsculas." }
-                error={!!errors.serialNumber || (!!watch("serialNumber") && watch("serialNumber") !== "" && !/^[A-Z0-9]{12}$/.test(watch("serialNumber")))}
+                helperText={
+                  errors.serialNumber?.message ??
+                  "Debe tener 12 caracteres alfanuméricos en mayúsculas."
+                }
+                error={
+                  !!errors.serialNumber ||
+                  (!!watch("serialNumber") &&
+                    watch("serialNumber") !== "" &&
+                    !/^[A-Z0-9]{12}$/.test(watch("serialNumber")))
+                }
                 disabled={isChangingStatus}
               />
-            
+
               {/* Nombre del recurso ingresado */}
               <TextField
                 label="Nombre del Recurso"
@@ -189,7 +208,11 @@ export const MaintenanceModal = ({
                 value={watch("resourceName") || ""}
                 InputProps={{
                   readOnly: true,
-                  style: { whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" },
+                  style: {
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  },
                 }}
                 disabled
               />
@@ -201,24 +224,30 @@ export const MaintenanceModal = ({
                 value={watch("resourceType") || ""}
                 InputProps={{
                   readOnly: true,
-                  style: { whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" },
+                  style: {
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  },
                 }}
                 disabled
               />
-              
+
               {/* Fecha del mantenimiento */}
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DemoContainer components={["DatePicker"]}>
                   <DatePicker
                     label="Fecha del mantenimiento"
                     value={watch("date") ? dayjs(watch("date")) : null}
-                    onChange={(date) => setValue("date", date ? date.format("YYYY-MM-DD") : "")}
+                    onChange={(date) =>
+                      setValue("date", date ? date.format("YYYY-MM-DD") : "")
+                    }
                     disabled={isChangingStatus}
                     slotProps={{
                       textField: {
                         fullWidth: true,
                         ...register("date", {
-                          required: "La fecha es obligatoria"
+                          required: "La fecha es obligatoria",
                         }),
                         error: !!errors.date,
                         helperText: errors.date?.message ?? "",
@@ -234,13 +263,21 @@ export const MaintenanceModal = ({
           {isChangingStatus && (
             <>
               <Box mb={1}>
-                <Typography mb={1} variant="body2"><strong>Descripción:</strong> {maintenance.description}</Typography>
-                <Typography mb={1} variant="body2"><strong>Fecha:</strong> {formatDay(maintenance.date)}</Typography>
-                <Typography mb={1} variant="body2"><strong>Recurso:</strong> {maintenance.resource_name}</Typography>
+                <Typography mb={1} variant="body2">
+                  <strong>Descripción:</strong> {maintenance.description}
+                </Typography>
+                <Typography mb={1} variant="body2">
+                  <strong>Fecha:</strong> {formatDay(maintenance.date)}
+                </Typography>
+                <Typography mb={1} variant="body2">
+                  <strong>Recurso:</strong> {maintenance.resource_name}
+                </Typography>
               </Box>
               <Box>
                 <FormControl fullWidth error={!!errors.status}>
-                  <InputLabel id="status-label">Estado del mantenimiento</InputLabel>
+                  <InputLabel id="status-label">
+                    Estado del mantenimiento
+                  </InputLabel>
                   <Select
                     labelId="status-label"
                     value={watch("status") || ""}
@@ -248,15 +285,97 @@ export const MaintenanceModal = ({
                     {...register("status", {
                       required: "Selecciona un estado de mantenimiento",
                     })}
-                    onChange={(e) => setValue("status", e.target.value)}
+                    onChange={(e) => {
+                      setValue("status", e.target.value);
+                      setShowRescheduleOptions(e.target.value === "Reagendado");
+                      if (e.target.value !== "Reagendado") {
+                        setIsRealReschedule(false);
+                        setValue("reagendation_reason", "");
+                        setValue("return_to_available", "");
+                        setValue("rescheduled_date", "");
+                      }
+                    }}
                     renderValue={(selected) => selected}
                   >
                     {getStatusOptions(maintenance?.status).map((status) => (
-                      <MenuItem key={status} value={status}>{status}</MenuItem>
+                      <MenuItem key={status} value={status}>
+                        {status}
+                      </MenuItem>
                     ))}
                   </Select>
                   <FormHelperText>{errors.status?.message}</FormHelperText>
                 </FormControl>
+                
+
+                {/* Opciones que aparecen cuando se selecciona "Reagendado" */}
+                {showRescheduleOptions && (
+                  <Box mt={2}>
+                      {/* Campo de motivo de reagendamiento - siempre visible cuando se reagenda */}
+                    <TextField
+                      label="Motivo de reagendamiento"
+                      fullWidth
+                      multiline
+                      minRows={2}
+                      {...register("reagendation_reason", {
+                        required: showRescheduleOptions ? "El motivo de reagendamiento es obligatorio" : false,
+                      })}
+                      error={!!errors.reagendation_reason}
+                      helperText={errors.reagendation_reason?.message}
+                      sx={{ mb: 2 }}
+                    />
+                    {/* Checkbox para reagendamiento real */}
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={isRealReschedule}
+                          onChange={(e) => {
+                            setIsRealReschedule(e.target.checked);
+                            setValue("return_to_available", !e.target.checked);
+                          }}
+                        />
+                      }
+                      label="¿El recurso estaba dañado? (El recurso sigue dañado)"
+                    />
+                    
+                    
+                    {/* Mensaje condicional cuando el reagendamiento es real */}
+                    {isRealReschedule && (
+                      <Box my={2} p={2} sx={{ backgroundColor: '#fff3cd', borderRadius: 1, border: '1px solid #ffeaa7' }}>
+                        <Typography variant="body2" color="text.secondary">
+                          <strong>Nota:</strong> Al confirmar un reagendamiento real, el recurso permanecerá en estado "Dañado" 
+                          y será necesario programar un nuevo mantenimiento. Deberás proporcionar una fecha de reagendamiento.
+                        </Typography>
+                      </Box>
+                    )}
+                    
+                    {/* Campo de fecha de reagendamiento - solo visible cuando es reagendamiento real */}
+                    {isRealReschedule && (
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DemoContainer components={["DatePicker"]}>
+                          <DatePicker
+                            label="Fecha de reagendamiento"
+                            value={watch("rescheduled_date") ? dayjs(watch("rescheduled_date")) : null}
+                            onChange={(date) =>
+                              setValue("rescheduled_date", date ? date.format("YYYY-MM-DD") : "")
+                            }
+                            minDate={dayjs().add(1, 'day')}
+                            maxDate={dayjs().add(7, 'day')}
+                            slotProps={{
+                              textField: {
+                                fullWidth: true,
+                                ...register("rescheduled_date", {
+                                  required: isRealReschedule ? "La fecha de reagendamiento es obligatoria" : false,
+                                }),
+                                error: !!errors.rescheduled_date,
+                                helperText: errors.rescheduled_date?.message ?? "Selecciona una fecha entre mañana y los próximos 7 días",
+                              },
+                            }}
+                          />
+                        </DemoContainer>
+                      </LocalizationProvider>
+                    )}
+                  </Box>
+                )}
               </Box>
             </>
           )}
@@ -277,7 +396,7 @@ export const MaintenanceModal = ({
             fontWeight: 600,
           }}
         >
-          { isChangingStatus ? "Cambiar estado" : "Registrar mantenimiento" }
+          {isChangingStatus ? "Cambiar estado" : "Registrar mantenimiento"}
         </Button>
       </Box>
     </Modal>
