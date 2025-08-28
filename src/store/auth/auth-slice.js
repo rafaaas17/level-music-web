@@ -19,6 +19,7 @@ export const authSlice = createSlice({
     userStatus: null, // Activo, Inactivo
     photoURL: null, 
     token: null,
+    extra_data:false,
   },
   reducers: {
     login: (state, { payload }) => {

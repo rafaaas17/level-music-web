@@ -46,10 +46,22 @@ export const useUsersStore = () => {
     }
   }
 
+  const updateUserExtraData = async (id, extraData) => {
+  try {
+    const { data } = await userApi.patch(`extra-data/${id}`, { extraData });
+    if (!data) {
+      return { ok: false, data: null };
+    }
+    return { ok: true, data };
+  } catch (error) {
+    return false;
+  }
+};
+
   return {
     // state
     loading,
-
+    updateUserExtraData,
     // actions
     startCreateUser,
     findUserByEmail

@@ -49,7 +49,7 @@ export const useAuthStore = () => {
       dispatch(checkingCredentials());
       const { user } = await signInWithPopup(FirebaseAuth, googleProvider);
       const { data, ok } = await findUserByEmail(user.providerData[0].email); 
-
+      
       if (!ok) {
         const { data: newUser } = await startCreateUser(user, "Cliente", "google");
         dispatch(login({ 
