@@ -25,7 +25,7 @@ export const WorkerModal = ({
   loading,
 }) => {
   const isEditing = !!worker?._id;
-const { workerTypes } = useWorkerTypeList();
+ const { workerTypes } = useWorkerTypeList();
   const { startCreateWorker, startUpdateWorker } = useWorkerStore();
 
   const {
@@ -113,12 +113,12 @@ const { workerTypes } = useWorkerTypeList();
             const selectedId = e.target.value;
             setValue("worker_type_id", selectedId, { shouldValidate: true });
 
-            // 👇 Buscar el objeto del tipo seleccionado
+            //  Buscar el objeto del tipo seleccionado
             const selectedType = workerTypes.find((wt) => wt._id === selectedId);
             setValue("role", selectedType ? selectedType.name : "");
           }}
           inputProps={{ name: "worker_type_id" }}
-          disabled={isEditing || loading} // 👈 deshabilita mientras carga
+          disabled={isEditing || loading} //  deshabilita mientras carga
         >
           {loading ? (
             <MenuItem disabled>Cargando...</MenuItem>
