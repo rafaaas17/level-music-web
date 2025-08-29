@@ -34,14 +34,23 @@ export const ExtraInformationModal = ({ open, onClose }) => {
   };
 
   return (
-    <Modal open={open} onClose={onClose} 
-    sx={{
+    <Modal 
+    open={open} 
+    onClose={onClose} 
+    hideBackdrop={false} 
+    disableEscapeKeyDown
+   >
+      <Box
+       component="form"
+        onSubmit={handleSubmit(onSubmit)}
+      sx={{
+
         position: 'absolute',
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        width: 700,
-        height: 600,
+        width: 600,
+        height: 500,
         paddingTop: 2,
         padding: 20,
         bgcolor: "background.paper",
@@ -49,40 +58,36 @@ export const ExtraInformationModal = ({ open, onClose }) => {
         boxShadow: 24,
         p: 3,  
       }}>
-      <Box>
-        
         <Typography variant="h6">Información Adicional</Typography>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <TextField
-            label="Nombre Completo"
-            name="fullName"
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Número de Teléfono"
-            name="phoneNumber"
-            fullWidth
-            margin="normal"
-          />
-          <FormControl fullWidth margin="normal">
-            <InputLabel id="role-label">Rol</InputLabel>
-            <Select
-              labelId="role-label"
-              name="role"
-              label="Rol"
-              defaultValue=""
-            >
-              <MenuItem value="student">Estudiante</MenuItem>
-              <MenuItem value="teacher">Profesor</MenuItem>
-              <MenuItem value="admin">Administrador</MenuItem>
-            </Select>
-            <FormHelperText>Selecciona tu rol en la plataforma</FormHelperText>
-          </FormControl>
-          <Button type="submit" variant="contained" color="primary" fullWidth>
-            Guardar Información
-          </Button>
-        </form>
+       <TextField
+          label="Nombre Completo"
+          fullWidth
+          margin="normal"
+          {...register("fullName")}
+        />
+        <TextField
+          label="Número de Teléfono"
+          fullWidth
+          margin="normal"
+          {...register("phoneNumber")}
+        />
+        <FormControl fullWidth margin="normal">
+          <InputLabel id="role-label">Rol</InputLabel>
+          <Select
+            labelId="role-label"
+            label="Rol"
+            defaultValue=""
+            {...register("role")}
+          >
+            <MenuItem value="student">Estudiante</MenuItem>
+            <MenuItem value="teacher">Profesor</MenuItem>
+            <MenuItem value="admin">Administrador</MenuItem>
+          </Select>
+          <FormHelperText>Selecciona tu rol en la plataforma</FormHelperText>
+        </FormControl>
+        <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+          Guardar Información
+        </Button>
       </Box>
     </Modal>
   )

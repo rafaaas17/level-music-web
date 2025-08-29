@@ -37,7 +37,8 @@ export const useAuthStore = () => {
     email, 
     displayName, 
     photoURL, 
-    role 
+    role,
+    extra_data,
   } = useSelector((state) => state.auth);
 
   const { startCreateUser, findUserByEmail } = useUsersStore();
@@ -63,7 +64,8 @@ export const useAuthStore = () => {
           role: newUser.role,
           userStatus: newUser.status, // Activo, Inactivo
           photoURL: newUser.profile_picture,
-          token: user.accessToken
+          token: user.accessToken,
+          extra_data: newUser.extra_data,
         }));
         return true;
       } else {
