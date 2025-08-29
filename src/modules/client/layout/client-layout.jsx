@@ -1,7 +1,7 @@
 import { Box, Toolbar, useTheme } from '@mui/material';
 import { Breadcrumbs, SidebarMenu } from '../../../shared/ui/components/common';
 import { Outlet } from 'react-router-dom';
-import { menuItems } from '../constants/menu-items';
+import { menuItems } from '../constants/menu-items-client';
 import { useScreenSizes } from '../../../shared/constants/screen-width';
 
 export const ClientLayout = () => {

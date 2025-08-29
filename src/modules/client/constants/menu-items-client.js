@@ -33,6 +33,6 @@ export const menuItems = [
     breadcrumb: 'Gestionar Perfil',
     icon: Person,
     href: '/cliente/edit-profile' 
-  },
+  }
  
 ];

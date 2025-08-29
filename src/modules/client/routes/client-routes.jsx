@@ -11,16 +11,14 @@ export const ClientRoutes = () => {
     <Routes>
       <Route element={<ClientLayout />}>
       {/* Dashboard */}
-      <Route path="/" element={<DashboardPage />} />
+        <Route path="/" element={<DashboardPage />} />
        {/* Eventos */}
-              <Route path="event-made" element={<EventMadePage />} />
-              <Route path="event-to-do" element={<EventToDoPage />} />
+        <Route path="event-made" element={<EventMadePage />} />
+        <Route path="event-to-do" element={<EventToDoPage />} />
        {/* Clientes */}
-                 <Route path="edit-profile" element={<ProfilePage />} />
+        <Route path="edit-profile" element={<ProfilePage />} />
             
-      {/* <Route path="events" element={<EventsPage />} />
-      <Route path="quotations" element={<QuotationsPage />} /> */}
-      <Route path="*" element={<Navigate to="/not-found" replace />} />
+       <Route path="*" element={<Navigate to="/not-found" replace />} />
       </Route>
     </Routes>
   );
