@@ -16,6 +16,7 @@ export const useCheckAuth = () => {
     const unsubscribe = onAuthStateChanged(FirebaseAuth, async (user) => {
       if (!user) return dispatch(logout());
       const { data } = await findUserByEmail(user.providerData[0].email);
+      console.log("User data:", data);
       if (data?.status === "Inactivo") {
         dispatch(logout());
         return;
@@ -35,7 +36,7 @@ export const useCheckAuth = () => {
         photoURL: data.profile_picture || null,
         token: user.accessToken,
         //nuevo campo  de redux para almacenar la inforamcion sera un booleano
-        extra_data: data.extraData
+        extra_data: data.extra_data, 
       }));
     });
     

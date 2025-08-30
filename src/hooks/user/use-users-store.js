@@ -12,7 +12,7 @@ import {
 export const useUsersStore = () => {
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.users);
-
+  const { token } = useSelector((state) => state.auth);
   const openSnackbar = (message) => dispatch(showSnackbar({ message }));
 
   const startCreateUser = async (user, role, model) => {
@@ -46,13 +46,16 @@ export const useUsersStore = () => {
     }
   }
 
-  const updateUserExtraData = async (id, extraData) => {
+  const updateUserExtraData = async (id, data) => {
+    console.log("iD", id)
   try {
-    const { data } = await userApi.patch(`extra-data/${id}`, { extraData });
-    if (!data) {
+    const { data: response } = await userApi.patch(`extra-data/${id}`, data,
+    { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (!response) {
       return { ok: false, data: null };
     }
-    return { ok: true, data };
+    return { ok: true, data: response };
   } catch (error) {
     return false;
   }
