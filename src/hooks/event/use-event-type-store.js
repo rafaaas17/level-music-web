@@ -14,7 +14,6 @@ import {
 } from '../../shared/models';
 import { useState } from 'react';
 import { getAuthConfig } from '../../shared/utils';
-
 export const useEventTypeStore = () => {
   const dispatch = useDispatch();
   const { 
@@ -117,6 +116,7 @@ export const useEventTypeStore = () => {
   const setRowsPerPageGlobal = (rows) => {
     dispatch(setRowsPerPageEventType(rows));
   };
+  
 
   return {
     // state

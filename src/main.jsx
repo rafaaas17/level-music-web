@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { store } from './store';
 import { App } from './App.jsx';
 import { GlobalSnackbar } from './shared/ui/components/';
+
 import '@fontsource/mulish';
 
 createRoot(document.getElementById('root')).render(
@@ -12,6 +13,7 @@ createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       <BrowserRouter>
         <App />
+        
         <GlobalSnackbar /> 
       </BrowserRouter>
     </Provider>

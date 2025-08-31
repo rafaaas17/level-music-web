@@ -37,7 +37,8 @@ export const useAuthStore = () => {
     email, 
     displayName, 
     photoURL, 
-    role 
+    role,
+    extra_data,
   } = useSelector((state) => state.auth);
 
   const { startCreateUser, findUserByEmail } = useUsersStore();
@@ -49,7 +50,7 @@ export const useAuthStore = () => {
       dispatch(checkingCredentials());
       const { user } = await signInWithPopup(FirebaseAuth, googleProvider);
       const { data, ok } = await findUserByEmail(user.providerData[0].email); 
-
+      
       if (!ok) {
         const { data: newUser } = await startCreateUser(user, "Cliente", "google");
         dispatch(login({ 
@@ -63,7 +64,8 @@ export const useAuthStore = () => {
           role: newUser.role,
           userStatus: newUser.status, // Activo, Inactivo
           photoURL: newUser.profile_picture,
-          token: user.accessToken
+          token: user.accessToken,
+          extra_data: newUser.extra_data,
         }));
         return true;
       } else {
@@ -84,7 +86,9 @@ export const useAuthStore = () => {
           needs_password_change: needsPassword,
           userStatus: data.status,
           photoURL: data.profile_picture,
-          token: user.accessToken
+          token: user.accessToken,
+          extra_data: data.extra_data
+
         }));
         return !needsPassword;
       }
@@ -123,7 +127,8 @@ export const useAuthStore = () => {
         needs_password_change: needsPassword,
         userStatus: data.status,
         photoURL: data.profile_picture,
-        token: user.accessToken
+        token: user.accessToken,
+        extra_data: data.extra_data
       }));
       return !needsPassword;
     } catch (error) {
@@ -159,7 +164,8 @@ export const useAuthStore = () => {
           role: newUser.role,
           userStatus: newUser.status, // Activo, Inactivo
           photoURL: null,
-          token: user.accessToken
+          token: user.accessToken,
+          extra_data: newUser.extra_data
         }));
         return true;
       }
@@ -267,7 +273,7 @@ export const useAuthStore = () => {
     displayName, 
     photoURL, 
     role,
-    
+    extra_data,
     // actions
     onGoogleSignIn, 
     startLogin, 

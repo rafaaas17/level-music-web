@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { set } from 'react-hook-form';
 
 export const authSlice = createSlice({
   name: 'auth',
@@ -19,6 +20,7 @@ export const authSlice = createSlice({
     userStatus: null, // Activo, Inactivo
     photoURL: null, 
     token: null,
+    extra_data:null,
   },
   reducers: {
     login: (state, { payload }) => {
@@ -40,6 +42,7 @@ export const authSlice = createSlice({
       state.photoURL = payload.photoURL; 
       state.token = payload.token;
       state.status = payload.needs_password_change ? "fisrt-login-password" : "authenticated";
+      state.extra_data = payload.extra_data;
     },
     logout: (state) => {
       state.status = 'not-authenticated';
@@ -72,9 +75,13 @@ export const authSlice = createSlice({
     changingPassword: (state) => {
       state.status = 'changing-password';
     },
+    setExtraData: (state,  action ) => {
+      state.extra_data = action.payload;
+    }
   }
 });
 
+export const { setExtraData } = authSlice.actions;
 export const { 
   login, 
   logout, 
