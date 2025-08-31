@@ -18,19 +18,19 @@ export const menuItems = [
     subItems: [
       { 
         text: 'Realizados', 
-        breadcrumb: 'Realizados',
+        breadcrumb: 'Eventos Realizados',
         href: '/cliente/event-made' 
       },
       { 
         text: 'Por Realizar', 
-        breadcrumb: 'Por Realizar',
+        breadcrumb: 'Eventos Por Realizar',
         href: '/cliente/event-to-do' 
       }
     ]
   },
   { 
     text: 'Gestionar Perfil', 
-    breadcrumb: 'Gestionar Perfil',
+    breadcrumb: 'Perfil',
     icon: Person,
     href: '/cliente/edit-profile' 
   }
