@@ -35,9 +35,9 @@ export const MaintenanceModal = ({
   const { startSearchingResource } = useResourceStore();
   const { startCreateMaintenance, startChangeMaintenanceStatus } = useMaintenanceStore();
   
-  // Estados para el manejo de la funcionalidad de reagendado
+  // Estados para el manejo de la funcionalidad de reagendado y cancelado
   const [showRescheduleOptions, setShowRescheduleOptions] = useState(false);
-  const [isRealReschedule, setIsRealReschedule] = useState(false);
+  const [showCancelOptions, setShowCancelOptions] = useState(false);
 
   const {
     register,
@@ -54,13 +54,13 @@ export const MaintenanceModal = ({
   useEffect(() => {
     if (open) {
       reset({
-        type: "Correctivo",
+        type: maintenance.type ?? "Correctivo",
         resourceName: maintenance.resource_name ?? "",
         description: maintenance.description ?? "",
       });
       // Resetear estados locales
       setShowRescheduleOptions(false);
-      setIsRealReschedule(false);
+      setShowCancelOptions(false);
     }
     if (isChangingStatus) {
       unregister('serialNumber');
@@ -89,23 +89,57 @@ export const MaintenanceModal = ({
     }
   };
 
-  const getStatusOptions = (current) => {
-    if (current === 'Programado') return ['En Progreso', 'Reagendado'];
-    if (current === 'En Progreso') return ['Finalizado', 'Reagendado'];
+  const getStatusOptions = (currentStatus, maintenanceType) => {
+    // Opciones base según el estado actual
+    if (currentStatus === 'Programado') {
+      // Para mantenimiento Correctivo: En Progreso, Reagendar, Cancelar
+      if (maintenanceType === 'Correctivo') {
+        return ['En Progreso', 'Reagendar', 'Cancelar'];
+      }
+      // Para mantenimiento Preventivo: En Progreso, Reagendar
+      if (maintenanceType === 'Preventivo') {
+        return ['En Progreso', 'Reagendar'];
+      }
+    }
+    
+    if (currentStatus === 'En Progreso') {
+      return ['Finalizado'];
+    }
+
+    if (currentStatus === 'Reagendado') {
+      // Desde Reagendado solo se puede regresar a En Progreso
+      return ['En Progreso'];
+    }
+    
     return [];
   };
 
+  // Función para mapear los valores mostrados en UI a los valores del backend
+  const mapStatusToBackend = (uiStatus) => {
+    const statusMap = {
+      'Reagendar': 'Reagendado',
+      'Cancelar': 'Cancelado'
+    };
+    return statusMap[uiStatus] || uiStatus;
+  };
+
   const onSubmit = async (data) => {
+    // Mapear el status a los valores que espera el backend
+    const mappedData = {
+      ...data,
+      status: mapStatusToBackend(data.status)
+    };
+
     try {
       const success = isChangingStatus
-        ? await startChangeMaintenanceStatus(maintenance._id, data)
-        : await startCreateMaintenance(data)
+        ? await startChangeMaintenanceStatus(maintenance._id, mappedData)
+        : await startCreateMaintenance(mappedData)
       if (success) {
         setMaintenance(data);
         onClose();
       }
     } catch (error) {
-      console.log("Error creating maintenance:", error);
+      console.error("Error in form submission:", error);
     }
   };
 
@@ -234,7 +268,7 @@ export const MaintenanceModal = ({
               />
 
               {/* Fecha del mantenimiento */}
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
                 <DemoContainer components={["DatePicker"]}>
                   <DatePicker
                     label="Fecha del mantenimiento"
@@ -242,6 +276,8 @@ export const MaintenanceModal = ({
                     onChange={(date) =>
                       setValue("date", date ? date.format("YYYY-MM-DD") : "")
                     }
+                    minDate={dayjs()}
+                    maxDate={dayjs().add(7, 'day')}
                     disabled={isChangingStatus}
                     slotProps={{
                       textField: {
@@ -263,6 +299,9 @@ export const MaintenanceModal = ({
           {isChangingStatus && (
             <>
               <Box mb={1}>
+                <Typography mb={1} variant="body2">
+                  <strong>Tipo:</strong> {maintenance.type}
+                </Typography>
                 <Typography mb={1} variant="body2">
                   <strong>Descripción:</strong> {maintenance.description}
                 </Typography>
@@ -287,17 +326,19 @@ export const MaintenanceModal = ({
                     })}
                     onChange={(e) => {
                       setValue("status", e.target.value);
-                      setShowRescheduleOptions(e.target.value === "Reagendado");
-                      if (e.target.value !== "Reagendado") {
-                        setIsRealReschedule(false);
+                      setShowRescheduleOptions(e.target.value === "Reagendar");
+                      setShowCancelOptions(e.target.value === "Cancelar");
+                      if (e.target.value !== "Reagendar") {
                         setValue("reagendation_reason", "");
-                        setValue("return_to_available", "");
                         setValue("rescheduled_date", "");
+                      }
+                      if (e.target.value !== "Cancelar") {
+                        setValue("cancelation_reason", "");
                       }
                     }}
                     renderValue={(selected) => selected}
                   >
-                    {getStatusOptions(maintenance?.status).map((status) => (
+                    {getStatusOptions(maintenance?.status, maintenance?.type).map((status) => (
                       <MenuItem key={status} value={status}>
                         {status}
                       </MenuItem>
@@ -307,10 +348,10 @@ export const MaintenanceModal = ({
                 </FormControl>
                 
 
-                {/* Opciones que aparecen cuando se selecciona "Reagendado" */}
+                {/* Opciones que aparecen cuando se selecciona "Reagendar" */}
                 {showRescheduleOptions && (
                   <Box mt={2}>
-                      {/* Campo de motivo de reagendamiento - siempre visible cuando se reagenda */}
+                    {/* Campo de motivo de reagendamiento */}
                     <TextField
                       label="Motivo de reagendamiento"
                       fullWidth
@@ -323,57 +364,60 @@ export const MaintenanceModal = ({
                       helperText={errors.reagendation_reason?.message}
                       sx={{ mb: 2 }}
                     />
-                    {/* Checkbox para reagendamiento real */}
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={isRealReschedule}
-                          onChange={(e) => {
-                            setIsRealReschedule(e.target.checked);
-                            setValue("return_to_available", !e.target.checked);
+                    
+                    {/* Campo de fecha de reagendamiento */}
+                    <LocalizationProvider dateAdapter={AdapterDayjs}  adapterLocale="es">
+                      <DemoContainer components={["DatePicker"]} >
+                        <DatePicker
+                          label="Fecha de reagendamiento"
+                          value={watch("rescheduled_date") ? dayjs(watch("rescheduled_date")) : null}
+                          onChange={(date) =>
+                            setValue("rescheduled_date", date ? date.format("YYYY-MM-DD") : "")
+                          }
+                          minDate={
+                            maintenance.type === 'Preventivo' 
+                              ? dayjs(maintenance.date).subtract(7, 'day')
+                              : dayjs().add(1, 'day')
+                          }
+                          maxDate={
+                            maintenance.type === 'Preventivo' 
+                              ? dayjs(maintenance.date).add(7, 'day')
+                              : dayjs().add(7, 'day')
+                          }
+                          slotProps={{
+                            textField: {
+                              fullWidth: true,
+                              ...register("rescheduled_date", {
+                                required: showRescheduleOptions ? "La fecha de reagendamiento es obligatoria" : false,
+                              }),
+                              error: !!errors.rescheduled_date,
+                              helperText: errors.rescheduled_date?.message ?? 
+                                (maintenance.type === 'Preventivo' 
+                                  ? "Selecciona una fecha entre una semana antes y después de la fecha original"
+                                  : "Selecciona una fecha entre mañana y los próximos 7 días"),
+                            },
                           }}
                         />
-                      }
-                      label="¿El recurso estaba dañado? (El recurso sigue dañado)"
+                      </DemoContainer>
+                    </LocalizationProvider>
+                  </Box>
+                )}
+
+                {/* Opciones que aparecen cuando se selecciona "Cancelar" */}
+                {showCancelOptions && (
+                  <Box mt={2}>
+                    {/* Campo de motivo de cancelación */}
+                    <TextField
+                      label="Motivo de cancelación"
+                      fullWidth
+                      multiline
+                      minRows={2}
+                      {...register("cancelation_reason", {
+                        required: showCancelOptions ? "El motivo de cancelación es obligatorio" : false,
+                      })}
+                      error={!!errors.cancelation_reason}
+                      helperText={errors.cancelation_reason?.message}
                     />
-                    
-                    
-                    {/* Mensaje condicional cuando el reagendamiento es real */}
-                    {isRealReschedule && (
-                      <Box my={2} p={2} sx={{ backgroundColor: '#fff3cd', borderRadius: 1, border: '1px solid #ffeaa7' }}>
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>Nota:</strong> Al confirmar un reagendamiento real, el recurso permanecerá en estado "Dañado" 
-                          y será necesario programar un nuevo mantenimiento. Deberás proporcionar una fecha de reagendamiento.
-                        </Typography>
-                      </Box>
-                    )}
-                    
-                    {/* Campo de fecha de reagendamiento - solo visible cuando es reagendamiento real */}
-                    {isRealReschedule && (
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DemoContainer components={["DatePicker"]}>
-                          <DatePicker
-                            label="Fecha de reagendamiento"
-                            value={watch("rescheduled_date") ? dayjs(watch("rescheduled_date")) : null}
-                            onChange={(date) =>
-                              setValue("rescheduled_date", date ? date.format("YYYY-MM-DD") : "")
-                            }
-                            minDate={dayjs().add(1, 'day')}
-                            maxDate={dayjs().add(7, 'day')}
-                            slotProps={{
-                              textField: {
-                                fullWidth: true,
-                                ...register("rescheduled_date", {
-                                  required: isRealReschedule ? "La fecha de reagendamiento es obligatoria" : false,
-                                }),
-                                error: !!errors.rescheduled_date,
-                                helperText: errors.rescheduled_date?.message ?? "Selecciona una fecha entre mañana y los próximos 7 días",
-                              },
-                            }}
-                          />
-                        </DemoContainer>
-                      </LocalizationProvider>
-                    )}
                   </Box>
                 )}
               </Box>
