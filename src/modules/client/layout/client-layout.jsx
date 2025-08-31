@@ -1,17 +1,17 @@
 import { Box, Toolbar, useTheme } from '@mui/material';
 import { Breadcrumbs, SidebarMenu } from '../../../shared/ui/components/common';
 import { Outlet } from 'react-router-dom';
-import { menuItems } from '../constants/menu-items-admin';
+import { menuItems } from '../constants/menu-items-client';
 import { useScreenSizes } from '../../../shared/constants/screen-width';
 
-export const AdminLayout = () => {
+export const ClientLayout = () => {
   const theme = useTheme();
-  const { isLg } = useScreenSizes()
+  const { isLg } = useScreenSizes();
 
   return (
     <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' } }}>
       {/* Sidebar */}
-      {isLg && ( 
+      {isLg && (
         <Box
           sx={{
             width: { md: 400, sm: '100%' },
@@ -19,13 +19,13 @@ export const AdminLayout = () => {
           }}
         >
           <Toolbar />
-          <Box 
-            sx={{ 
-              overflow: 'auto', 
+          <Box
+            sx={{
+              overflow: 'auto',
               mt: 2,
               backgroundColor: theme.palette.mode === 'light' ? '#F5F5F5' : '#1F1F1F',
               margin: 3,
-              borderRadius: 3
+              borderRadius: 3,
             }}
           >
             <SidebarMenu menuItems={menuItems} />
