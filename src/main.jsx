@@ -13,7 +13,6 @@ createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       <BrowserRouter>
         <App />
-        
         <GlobalSnackbar /> 
       </BrowserRouter>
     </Provider>

@@ -16,11 +16,11 @@ export const authSlice = createSlice({
     documentType: null,
     documentNumber: null,
     role: null,
-    needs_password_change: null, 
+    needsPasswordChange: null, 
     userStatus: null, // Activo, Inactivo
     photoURL: null, 
     token: null,
-    extra_data:null,
+    isExtraDataCompleted: false,
   },
   reducers: {
     login: (state, { payload }) => {
@@ -37,12 +37,12 @@ export const authSlice = createSlice({
       state.documentType = payload.documentType ?? null;
       state.documentNumber = payload.documentNumber ?? null;
       state.role = payload.role;
-      state.needs_password_change = payload.needs_password_change ?? null; 
+      state.needsPasswordChange = payload.needsPasswordChange ?? null; 
       state.userStatus = payload.userStatus;
       state.photoURL = payload.photoURL; 
       state.token = payload.token;
-      state.status = payload.needs_password_change ? "fisrt-login-password" : "authenticated";
-      state.extra_data = payload.extra_data;
+      state.status = payload.needsPasswordChange ? "first-login-password" : "authenticated";
+      state.isExtraDataCompleted = payload.isExtraDataCompleted;
     },
     logout: (state) => {
       state.status = 'not-authenticated';
@@ -54,17 +54,18 @@ export const authSlice = createSlice({
       state.documentType = null;
       state.documentNumber = null;
       state.role = null;
-      state.needs_password_change = null; 
+      state.needsPasswordChange = null;
       state.userStatus = null;
       state.photoURL = null;
       state.token = null;
+      state.isExtraDataCompleted = false;
     },
     checkingCredentials: (state) => {
       state.status = 'checking';
     },
     authenticated: (state) => {
       state.status = 'authenticated';
-      state.needs_password_change = false;
+      state.needsPasswordChange = false;
     },
     sendingResetEmail: (state) => {
       state.status = 'sending-reset-email';
@@ -75,13 +76,17 @@ export const authSlice = createSlice({
     changingPassword: (state) => {
       state.status = 'changing-password';
     },
-    setExtraData: (state,  action ) => {
-      state.extra_data = action.payload;
+    setExtraData: (state, { payload }) => {
+      state.firstName = payload.firstName;
+      state.lastName = payload.lastName;
+      state.phone = payload.phone;
+      state.documentType = payload.documentType;
+      state.documentNumber = payload.documentNumber;
+      state.isExtraDataCompleted = true;
     }
   }
 });
 
-export const { setExtraData } = authSlice.actions;
 export const { 
   login, 
   logout, 
@@ -90,4 +95,5 @@ export const {
   sendingResetEmail,
   resetEmailSent,
   changingPassword,
+  setExtraData
 } = authSlice.actions;

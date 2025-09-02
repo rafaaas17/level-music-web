@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Modal,
   Box,
@@ -12,26 +11,37 @@ import {
   MenuItem,
   FormHelperText,
 } from "@mui/material";
-import { Close } from "@mui/icons-material";
-import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useSelector } from 'react-redux';
 import { useUsersStore } from '../../../hooks/user/use-users-store';
 import { useDispatch } from 'react-redux';
 import { setExtraData } from '../../../store/auth/auth-slice';
 
+export const ExtraInformationModal = ({ 
+  open,
+  onClose 
+}) => {
+  const { status, startUpdateExtraData } = useUsersStore();
 
-export const ExtraInformationModal = ({ open, onClose }) => {
-  const { register, handleSubmit } = useForm();
-  const { uid } = useSelector(state => state.auth);
-  const { updateUserExtraData } = useUsersStore();
   const dispatch = useDispatch();
+
   const { extra_data } = useSelector(state => state.auth);
-  console.log("Redux",extra_data)
-  const onSubmit = async (form_data) => {
+
+  const {
+    register,
+    unregister,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+    setValue,
+  } = useForm({
+    mode: "onBlur",
+  });
+  
+  const onSubmit = async (data) => {
     try {
-      await updateUserExtraData(uid, {...form_data, extra_data: true}); // Solo actualiza el booleano
-      dispatch(setExtraData(true));
+      // await startUpdateExtraData(uid, {...data, extra_data: true});
       if (onClose) onClose();
     } catch (error) {
       console.log("Error agregando data extra:", error);
@@ -108,10 +118,8 @@ export const ExtraInformationModal = ({ open, onClose }) => {
             defaultValue=""
             {...register("document_type")}
           >
-            <MenuItem value="dni">DNI</MenuItem>
-            <MenuItem value="ce">CE</MenuItem>
-            <MenuItem value="passport">Pasaporte</MenuItem>
-            <MenuItem value="ruc">RUC</MenuItem>
+            <MenuItem value="Dni">DNI</MenuItem>
+            <MenuItem value="Ruc">RUC</MenuItem>
           </Select>
           <FormHelperText>Selecciona tu tipo de documento</FormHelperText>
         </FormControl>
