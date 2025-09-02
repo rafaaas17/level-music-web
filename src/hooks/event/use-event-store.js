@@ -14,7 +14,7 @@ import { eventApi } from '../../api';
 // } from '../../shared/models';
 import { useState } from 'react';
 import { getAuthConfig } from '../../shared/utils';
-import { selectedEventFeatured } from '../../store';
+import { selectedEventFeatured, showSnackbar } from '../../store';
 
 export const useEventStore = () => {
   const dispatch = useDispatch();
@@ -100,19 +100,17 @@ export const useEventStore = () => {
   // };
 
   const startSearchingEvent = async (code) => {
-    const pattern = /^EVT-\d{8}-[A-Z0-9]{6}$/;
-    if (!pattern.test(code)) return;
-
-    dispatch(setLoadingResource(true));
+    // dispatch(setLoadingEvent(true));
     try {
-      const { data } = await resourceApi.get(`/code/${code}`, getAuthConfig(token));
+      const { data } = await eventApi.get(`/code/${code}`, getAuthConfig(token));
       return { data, ok: true };
     } catch (error) {
+
       const message = error.response?.data?.message;
       openSnackbar(message ?? "Ocurrió un error al buscar el evento.");
       return false;
     } finally {
-      dispatch(setLoadingEvent(false));
+      // dispatch(setLoadingEvent(false));
     }
   };
 
@@ -136,7 +134,7 @@ export const useEventStore = () => {
     // loading,
     // searchTerm,
     // rowsPerPage,
-    currentPage,
+   // currentPage,
     orderBy,
     order,
 

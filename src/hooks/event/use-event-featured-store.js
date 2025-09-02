@@ -38,11 +38,12 @@ export const useEventFeaturedStore = () => {
     dispatch(setLoadingEventFeatured(true));
     try {
       const payload = createEventFeaturedModel(eventType);
-      await eventFeaturedApi.post('/', payload, getAuthConfig(token));
+      await eventFeaturedApi.post('/', payload, getAuthConfig(token, true));
       startLoadingEventFeaturedPaginated();
       openSnackbar("El evento destacado fue creado exitosamente.");
       return true;
     } catch (error) {
+      console.log(error);
       const message = error.response?.data?.message;
       openSnackbar(message ?? "Ocurrió un error al crear el evento destacado.");
       return false;
@@ -84,7 +85,8 @@ export const useEventFeaturedStore = () => {
     dispatch(setLoadingEventFeatured(true));
     try {
       const payload = updateEventFeaturedModel(eventFeatured);
-      await eventFeaturedApi.patch(`/${id}`, payload, getAuthConfig(token));
+      const isFormData = payload instanceof FormData;
+      await eventFeaturedApi.patch(`/${id}`, payload, getAuthConfig(token, isFormData));
       startLoadingEventFeaturedPaginated();
       openSnackbar("El evento destacado fue actualizado exitosamente.");
       return true;

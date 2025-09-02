@@ -1,4 +1,3 @@
-// event-featured-modal.jsx
 import {
   Modal,
   Box,
@@ -12,8 +11,6 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { useEffect, useMemo, useState } from "react";
 import { useEventFeaturedStore } from "../../../../../hooks";
 import { EventFeaturedFieldModal } from "./event-featured-field-modal";
-
-// Swiper (deslizador sin flechas)
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import "swiper/css";
@@ -38,6 +35,8 @@ export const EventFeaturedModal = ({
     control,
     reset,
     formState: { errors },
+    setValue, 
+    watch
   } = useForm({
     mode: "onBlur",
     defaultValues: {
@@ -47,6 +46,18 @@ export const EventFeaturedModal = ({
       images: [],
     },
   });
+const handleCodeChange = async (value) => {
+    const formattedValue = value.toUpperCase();
+    setValue("eventCode", formattedValue);
+    const { ok, data } = await startSearchingEvent(formattedValue);
+    if (ok) {
+      setValue("event_id", data._id);
+      setValue("title", data.name ?? "");
+    } else {
+      setValue("event_id", "");
+      setValue("title", "");
+    }
+  };
 
   const { fields, append, remove, update } = useFieldArray({
     control,
@@ -182,14 +193,47 @@ export const EventFeaturedModal = ({
 
           {/* Título y descripción */}
           <Box display="flex" flexDirection="column" gap={2} mb={3}>
+
+            {/* Código de evento */}
             <TextField
-              label="Título"
+              label="Código del evento"
               fullWidth
-              {...register("title", { required: "El título es obligatorio" })}
-              error={!!errors.title}
-              helperText={errors.title?.message}
+              {...register("eventCode", {
+                required: "El código del evento es obligatorio",
+                pattern: {
+                  value: /^EVT-\d{8}-[A-Z0-9]{6}$/,
+                  message: "El código debe tener el formato EVT-YYYYMMDD-XXXXXX",
+                },
+              })}
+              inputProps={{
+                maxLength: 19,
+                style: { textTransform: "uppercase" },
+              }}
+              onChange={(e) => handleCodeChange(e.target.value.toUpperCase())}
+              helperText={
+                errors.eventCode?.message ??
+                "Formato esperado: EVT-YYYYMMDD-XXXXXX (ej: EVT-20231231-5F07RS)"
+              }
+              error={!!errors.eventCode}
             />
 
+            {/* Nombre del evento ingresado */}
+            <TextField
+              label="Título del Evento"
+              fullWidth
+              value={watch("title") || ""}
+              InputProps={{
+                readOnly: true,
+                style: {
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                },
+              }}
+              disabled
+            />
+          
+            {/* Descripción */}
             <TextField
               label="Descripción destacada"
               multiline
