@@ -11,6 +11,7 @@ import {
   uiSlice,
   serviceSlice,
   eventTypeSlice,
+  eventFeaturedSlice,
   resourceSlice,
   maintenanceSlice,
   clientSlice
@@ -21,6 +22,7 @@ export const store = configureStore({
     auth: authSlice.reducer,
     theme: themeSlice.reducer,
     eventType: eventTypeSlice.reducer,
+    eventFeatured: eventFeaturedSlice.reducer,
     users: usersSlice.reducer,
     workers: workersSlice.reducer,
     workerTypes: workerTypesSlice.reducer,
