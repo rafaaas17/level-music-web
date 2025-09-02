@@ -2,8 +2,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { userApi } from "../../api";
 import {
   setExtraData,
-  setLoadingUser,
+  setLoadingExtraData,
   showSnackbar,
+  stopLoadingExtraData,
 } from "../../store";
 import { 
   createUserGoogleModel,
@@ -14,14 +15,12 @@ import { getAuthConfig } from "../../shared/utils";
 
 export const useUsersStore = () => {
   const dispatch = useDispatch();
-
-  const { loading } = useSelector((state) => state.users);
-  const { token, status } = useSelector((state) => state.auth);
+  const { token, uid } = useSelector((state) => state.auth);
+  const { loadingExtraData } = useSelector((state) => state.extraData);
 
   const openSnackbar = (message) => dispatch(showSnackbar({ message }));
 
   const startCreateUser = async (user, model) => {
-    dispatch(setLoadingUser(true));
     try {
       const modelMap = {
         "google": createUserGoogleModel,
@@ -35,8 +34,6 @@ export const useUsersStore = () => {
       const message = error.response?.data?.message;
       openSnackbar(message ?? "Ocurrió un error al registrar el cliente.");
       return false;
-    } finally {
-      dispatch(setLoadingUser(false));
     }
   };
 
@@ -52,11 +49,11 @@ export const useUsersStore = () => {
     }
   }
 
-  const startUpdateExtraData = async (id, extraData) => {
-    dispatch(setLoadingUser(true));
+  const startUpdateExtraData = async (uid, extraData) => {
+    dispatch(setLoadingExtraData());
     try {
       const payload = updateExtraDataModel(extraData);
-      const { data } = await userApi.patch(`extra-data/${id}`, payload, getAuthConfig(token));
+      const { data } = await userApi.patch(`extra-data/${uid}`, payload, getAuthConfig(token));
       dispatch(
         setExtraData({
           firstName: data.first_name,
@@ -73,14 +70,14 @@ export const useUsersStore = () => {
       openSnackbar(message ?? "Ocurrió un error al actualizar los datos.");
       return false;
     } finally {
-      dispatch(setLoadingUser(false));
+      dispatch(stopLoadingExtraData());
     }
   };
 
   return {
     // state
-    loading,
-    status,
+    uid,
+    loadingExtraData,
 
     // actions
     startCreateUser,

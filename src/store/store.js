@@ -2,7 +2,6 @@ import { configureStore } from '@reduxjs/toolkit';
 import { 
   authSlice,
   themeSlice,
-  usersSlice,
   workersSlice,
   workerTypesSlice,
   providerSlice,
@@ -14,7 +13,8 @@ import {
   eventFeaturedSlice,
   resourceSlice,
   maintenanceSlice,
-  clientSlice
+  clientSlice,
+  extraDataSlice
 } from './';
 
 export const store = configureStore({
@@ -23,9 +23,9 @@ export const store = configureStore({
     theme: themeSlice.reducer,
     eventType: eventTypeSlice.reducer,
     eventFeatured: eventFeaturedSlice.reducer,
-    users: usersSlice.reducer,
     workers: workersSlice.reducer,
     workerTypes: workerTypesSlice.reducer,
+    extraData: extraDataSlice.reducer,
     stepper: stepperSlice.reducer,
     ui: uiSlice.reducer,
     provider: providerSlice.reducer,

@@ -10,7 +10,7 @@ export const useCheckAuth = () => {
   const { status } = useSelector(state => state.auth);
   const { findUserByEmail } = useUsersStore();
   const dispatch = useDispatch();
-  //aca tengo que modificar para agregar un estado de verificado si esta completado o no la informacion extra
+  
   useEffect(() => {
     dispatch(checkingCredentials());
     const unsubscribe = onAuthStateChanged(FirebaseAuth, async (user) => {

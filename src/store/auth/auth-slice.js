@@ -82,6 +82,7 @@ export const authSlice = createSlice({
       state.phone = payload.phone;
       state.documentType = payload.documentType;
       state.documentNumber = payload.documentNumber;
+      state.needsPasswordChange = false;
       state.isExtraDataCompleted = true;
     }
   }
