@@ -17,7 +17,7 @@ export const AuthLayout = ({ children, title = '', subtitle = '', isLogin = fals
         padding: 2,
         backgroundSize: "cover",
         backgroundPosition: "center",
-        mt: { xs: '20px', md: 0 } 
+        mt: { xs: '100px', md: 0 } 
       }}
     >
       <Box
